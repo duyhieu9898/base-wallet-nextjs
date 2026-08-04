@@ -56,3 +56,20 @@ scripts/*.local.ts
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Harness core maintenance binary
+scripts/bin/harness
+scripts/bin/harness.exe
+
+# Harness local recovery backups (created before replacing project instructions)
+.harness-backup/
+
+# Personal agent skills are local by default. Existing tracked Harness skills
+# remain versioned; do not remove them from the Git index.
+.agents/
+
+# Harness metadata stays local by default. Existing tracked provenance files
+# remain versioned; do not remove them from the Git index.
+.harness-core/
+
+/docs/local-docs/

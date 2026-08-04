@@ -8,20 +8,25 @@ or feature hooks.
 
 ## Decision
 
-Foundation does not implement a feature contract registry yet.
+Foundation does not implement a contract registry. The application introduces
+one central, application-owned registry only after the first implemented
+feature contract has a real consumer, ABI and deployment address on at least
+one supported EVM chain.
 
-A registry is introduced only with the first implemented feature contract that
-has a real consumer, ABI and deployment address on at least one supported EVM
-chain. The first registry entry is feature-scoped, for example staking, rather
-than a speculative application-wide map of unknown future contracts.
+The registry lives under `src/contracts/registry/`, is keyed by chain ID and
+contract key, and owns generic deployment metadata: address, ABI key/version
+and immutable deployment parameters. Features retain their own business
+semantics and consume the registry through typed selectors.
 
 ## Required behavior
 
-- A registry entry identifies the feature key, chain ID, deployed contract
+- A registry entry identifies the contract key, chain ID, deployed contract
   address and ABI/version required by that feature.
 - Feature hooks resolve deployment metadata from the registry; they do not
   hardcode contract addresses in components or hook bodies.
-- An unsupported or undeployed chain produces an explicit typed unavailable
+- Every foundation-supported chain is explicitly present in config. An empty
+  object means no application contract is deployed there. An unsupported or
+  undeployed chain produces an explicit typed unavailable
   result or error. It must not fall back to another chain's address.
 - Runtime configuration and deployment metadata are validated at their input
   boundary.
@@ -30,8 +35,9 @@ than a speculative application-wide map of unknown future contracts.
 
 ## Boundaries
 
-- No empty registry, sample addresses or placeholder ABI is committed before a
-  feature contract exists.
+- No sample addresses or placeholder ABI is committed before a feature contract
+  exists. Empty per-chain deployment maps are allowed only to state that a
+  supported chain has no deployment yet.
 - Foundation does not declare the production network, feature contract set or
   deployment lifecycle for an application.
 - The generic EVM network/token registry does not become a container for
@@ -49,6 +55,11 @@ than a speculative application-wide map of unknown future contracts.
 
 ## Code and tests
 
-Implementation: not implemented.
+Implementation:
 
-Tests: not implemented.
+- `src/contracts/registry/deployments.json`
+- `src/contracts/registry/contract-registry.ts`
+
+Tests:
+
+- `src/contracts/registry/contract-registry.test.ts`

@@ -17,6 +17,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "check": "pnpm typecheck && pnpm lint && pnpm test:run && pnpm build",
+    "staking:compile": "tsx contracts/tooling/compile.ts",
+    "staking:deploy-sepolia": "tsx contracts/tooling/deploy-sepolia.ts",
     "web3:smoke": "tsx scripts/web3-smoke.ts",
     "prepare": "husky"
   },
@@ -61,6 +63,7 @@
     "msw": "^2.15.0",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "solc": "0.8.36",
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
     "typescript": "^5",

@@ -118,6 +118,34 @@ vi.mock("@/web3/evm/hooks/use-approve-evm-token", () => ({
   }),
 }))
 
+vi.mock("@/features/staking/hooks/use-staking-position", () => ({
+  useStakingPosition: () => ({
+    selection: mockReadySelection,
+    deployment: { status: "active" },
+    nativeAmount: 0n,
+    usdcAmount: 0n,
+    isPending: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
+}))
+
+vi.mock("@/features/staking/hooks/use-staking-write", () => ({
+  useStakingWrite: () => ({
+    prepared: null,
+    prepare: vi.fn(),
+    confirm: vi.fn(),
+    canConfirm: false,
+    isSimulating: false,
+    isWriting: false,
+    hash: null,
+    receiptStatus: null,
+    isReceiptLoading: false,
+    error: null,
+    reset: vi.fn(),
+  }),
+}))
+
 describe("Web3Lab Composition", () => {
   it("renders all domain sections including TransferSection when selection is ready", () => {
     render(
