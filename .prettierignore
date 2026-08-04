@@ -1,0 +1,10 @@
+.next
+node_modules
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+
+# Generated/có chủ đích không format:
+public/mockServiceWorker.js
+IMPLEMENT_PLAN.md
