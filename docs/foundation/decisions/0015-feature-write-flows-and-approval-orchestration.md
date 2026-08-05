@@ -67,9 +67,9 @@ same approval preflight and two-step UX.
 Implementation:
 
 - `src/web3/evm/hooks/use-evm-write-lifecycle.ts`
-- `src/web3/evm/hooks/use-evm-allowance.ts`
-- `src/web3/evm/hooks/use-evm-allowances.ts`
-- `src/web3/evm/selection/assert-evm-write-ready.ts`
+- `src/web3/evm/reads/allowances/use-evm-allowance.ts`
+- `src/web3/evm/reads/allowances/use-evm-allowances.ts`
+- `src/web3/evm/chain/selection/assert-evm-write-ready.ts`
 
 Tests:
 

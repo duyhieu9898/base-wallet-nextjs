@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react"
 import type { Hash } from "viem"
 
-import { createEvmWeb3Error } from "@/web3/evm/errors"
+import { createEvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 
 type WriteOperation = {
   id: number

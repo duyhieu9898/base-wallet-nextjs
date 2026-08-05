@@ -9,9 +9,6 @@
  * Runtime barrel `@/web3/evm` cũng re-export các helper này cho React code.
  * Chỉ import từ đây khi consumer là pure logic không cần runtime.
  *
- * TODO(phase-3): chuyển implementation từ `@/web3/core/address.utils` về đúng
- * thư mục này. Consumer đã trỏ vào path công khai nên việc di chuyển không tạo
- * breaking change.
  */
 export {
   EVM_NATIVE_TOKEN_ADDRESS,
@@ -25,4 +22,4 @@ export {
   toAddressKey,
   toChecksumAddress,
   truncateAddress,
-} from "@/web3/core/address.utils"
+} from "./address.utils"

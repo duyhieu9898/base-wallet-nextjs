@@ -57,7 +57,7 @@ function setSelection(next: EvmSelection): void {
   }
 }
 
-vi.mock("@/web3/evm/selection/use-evm-selection", async () => {
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", async () => {
   const { useSyncExternalStore } = await import("react")
 
   return {

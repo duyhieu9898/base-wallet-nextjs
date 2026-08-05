@@ -2,12 +2,12 @@ import { type Chain, type Transport, http } from "viem"
 import { createConfig, type Config } from "wagmi"
 import { injected } from "wagmi/connectors"
 
-import { createEvmWeb3Error } from "@/web3/evm/errors"
+import { createEvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 import {
   getAllEvmNetworks,
   getEvmNetworkRpcUrl,
   type EvmNetworkConfig,
-} from "@/web3/evm/registry/evm-network.registry"
+} from "@/web3/evm/chain/registry/evm-network.registry"
 
 export function toNonEmptyChainTuple(
   chains: readonly Chain[],

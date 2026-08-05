@@ -1,6 +1,6 @@
 import type { Address, Hash } from "viem"
 
-import type { EvmNetworkKey } from "@/web3/core/registry.types"
+import type { EvmNetworkKey } from "@/web3/evm/chain/registry/registry.types"
 
 /**
  * Domain types of EVM family module.

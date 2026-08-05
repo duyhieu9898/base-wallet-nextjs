@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { createEvmWeb3Error } from "@/web3/evm/errors"
+import { createEvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 import { deriveEvmWriteStatus } from "./evm-write-status"
 
 const TX_HASH =

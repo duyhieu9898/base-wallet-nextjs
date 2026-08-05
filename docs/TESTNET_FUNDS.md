@@ -12,7 +12,7 @@ Tài liệu này chỉ chuẩn bị đường dẫn để nhận test assets th�
 
 ## Network đang được cấu hình
 
-Nguồn sự thật là `src/web3/evm/registry/evm-network.registry.ts`. Hiện registry có
+Nguồn sự thật là `src/web3/evm/chain/registry/evm-network.registry.ts`. Hiện registry có
 đúng hai network:
 
 | Network          | Loại    | Chain ID   | Faucet trong registry                |
@@ -40,7 +40,7 @@ của network đang chọn (chỉ testnet mới có).
 
 ## 3. Add USDC vào wallet
 
-Địa chỉ token nằm trong `src/web3/evm/registry/evm-tokens.json`. Trên Sepolia:
+Địa chỉ token nằm trong `src/web3/evm/chain/registry/evm-tokens.json`. Trên Sepolia:
 
 ```text
 0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238

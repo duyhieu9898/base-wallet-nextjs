@@ -56,28 +56,28 @@
 // kéo toàn bộ runtime vào những module graph chỉ cần một pure helper.
 
 // Selection / readiness.
-export { useEvmSelection } from "./selection/use-evm-selection"
+export { useEvmSelection } from "./chain/selection/use-evm-selection"
 export type {
   EvmSelection,
   EvmSelectionStatus,
-} from "./selection/evm-selection"
+} from "./chain/selection/evm-selection"
 
 // Wallet và network.
 export { useEvmWallet } from "./hooks/use-evm-wallet"
-export { useEvmNetwork } from "./hooks/use-evm-network"
+export { useEvmNetwork } from "./chain/use-evm-network"
 
 // Reads — balances.
-export { useEvmNativeBalance } from "./hooks/use-evm-native-balance"
-export { useEvmTokenBalance } from "./hooks/use-evm-token-balance"
-export { useEvmBalances } from "./hooks/use-evm-balances"
-export { useEvmTokenList } from "./hooks/use-evm-token-list"
+export { useEvmNativeBalance } from "./reads/balances/use-evm-native-balance"
+export { useEvmTokenBalance } from "./reads/balances/use-evm-token-balance"
+export { useEvmBalances } from "./reads/balances/use-evm-balances"
+export { useEvmTokenList } from "./reads/balances/use-evm-token-list"
 
 // Reads — allowances.
-export { useEvmAllowance } from "./hooks/use-evm-allowance"
+export { useEvmAllowance } from "./reads/allowances/use-evm-allowance"
 export {
   useEvmAllowances,
   type EvmRejectedToken,
-} from "./hooks/use-evm-allowances"
+} from "./reads/allowances/use-evm-allowances"
 
 // Writes — public transaction hooks (prepare/review/confirm đã đóng gói).
 export {
@@ -137,7 +137,7 @@ export {
   getTransactionExplorerUrl,
   getTokenExplorerUrl,
   type EvmExplorerLinkType,
-} from "./adapters/evm-registry.adapter"
+} from "./chain/registry/evm-registry.adapter"
 export {
   EVM_NETWORKS,
   getEvmNetworkExplorer,
@@ -145,13 +145,10 @@ export {
   getEvmNetworkNativeAsset,
   type AssetContractConfig,
   type EvmNetworkConfig,
-} from "./registry/evm-network.registry"
+} from "./chain/registry/evm-network.registry"
 
-// Address presentation và validation.
-//
-// TODO(phase-3): các helper này hiện sống ở `@/web3/core/address.utils` nhưng
-// mang EVM address semantics. Phase 3 chuyển chúng về EVM owner; consumer đã
-// import qua `@/web3/evm` nên việc di chuyển không tạo breaking change.
+// Address presentation và validation. Implementation ở `./address`, cũng là
+// public leaf path cho pure domain code không cần runtime.
 export {
   isSameAddress,
   isValidAddress,
@@ -164,7 +161,7 @@ export {
   toAddressKey,
   EVM_NATIVE_TOKEN_ADDRESS,
   EVM_ZERO_ADDRESS,
-} from "@/web3/core/address.utils"
+} from "./address"
 
 // ---------------------------------------------------------------------------
 // Tier B — Feature Extension API
@@ -187,7 +184,7 @@ export {
 } from "./hooks/use-evm-write-lifecycle"
 
 /** Guard bắt buộc trước mọi write: connected + supported chain. */
-export { assertEvmWriteReady } from "./selection/assert-evm-write-ready"
+export { assertEvmWriteReady } from "./chain/selection/assert-evm-write-ready"
 
 /** Derive terminal status từ receipt evidence, không từ hash. */
 export {
@@ -196,16 +193,20 @@ export {
 } from "./types/evm-write-status"
 
 /** Typed domain error. Feature không tự normalize Viem/Wagmi error. */
-export { EvmWeb3Error, createEvmWeb3Error, type EvmErrorCode } from "./errors"
+export {
+  EvmWeb3Error,
+  createEvmWeb3Error,
+  type EvmErrorCode,
+} from "./errors/evm-errors"
 export {
   toEvmWeb3Error,
   toEvmWeb3ErrorOrNull,
   type EvmTransactionErrorPhase,
   type ToEvmWeb3ErrorOptions,
-} from "./adapters/evm-error.adapter"
+} from "./errors/evm-error.adapter"
 
 /** Phân biệt user rejection với failure thật. */
-export { isUserRejectedWalletRequest } from "./adapters/evm-wallet-rejection"
+export { isUserRejectedWalletRequest } from "./errors/evm-wallet-rejection"
 
 /** Registry lookup dạng strict cho feature preflight (throw khi thiếu). */
 export {
@@ -213,4 +214,4 @@ export {
   getEvmNetworkByKey,
   findEvmNetworkByChainId,
   getDefaultEvmChainId,
-} from "./adapters/evm-registry.adapter"
+} from "./chain/registry/evm-registry.adapter"

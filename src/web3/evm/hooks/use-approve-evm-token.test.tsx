@@ -12,9 +12,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { getBalanceQueryKey, readContractQueryKey } from "wagmi/query"
 
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import { EvmWeb3Error } from "@/web3/evm/errors"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { getDefaultEvmNetwork } from "@/web3/evm/chain/registry/evm-registry.adapter"
+import { EvmWeb3Error } from "@/web3/evm/errors/evm-errors"
+import type { EvmSelection } from "@/web3/evm/chain/selection/evm-selection"
 import { useApproveEvmToken } from "@/web3/evm/hooks/use-approve-evm-token"
 import { loadEvmTransactionHistory } from "@/web3/evm/storage/evm-transaction-history.storage"
 
@@ -104,7 +104,7 @@ vi.mock("wagmi", () => ({
   }),
 }))
 
-vi.mock("@/web3/evm/selection/use-evm-selection", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => selection,
 }))
 

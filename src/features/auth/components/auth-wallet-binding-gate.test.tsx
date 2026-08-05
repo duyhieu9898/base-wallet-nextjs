@@ -61,7 +61,7 @@ function setSelection(next: EvmSelection): void {
   }
 }
 
-vi.mock("@/web3/evm/selection/use-evm-selection", async () => {
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", async () => {
   const { useSyncExternalStore } = await import("react")
 
   return {
@@ -105,13 +105,30 @@ async function seedBackendSession(): Promise<void> {
   })
 }
 
-let assertReady: () => void
+type GuardHolder = { current: (() => void) | null }
 
-function GuardProbe() {
+/**
+ * Mỗi lần render ghi vào holder riêng; test chỉ đọc holder đang active.
+ *
+ * Một biến module-level gán thẳng trong `useEffect` sẽ bị tree của test trước
+ * ghi đè khi response về muộn làm nó re-render sau lúc test sau đã render —
+ * test kế thừa closure của component đã unmount và assert nhầm cây.
+ */
+let activeGuardRef: GuardHolder = { current: null }
+
+function assertReady(): void {
+  if (activeGuardRef.current === null) {
+    throw new Error("Guard chưa sẵn sàng: gọi renderGate() trước.")
+  }
+
+  activeGuardRef.current()
+}
+
+function GuardProbe({ holderRef }: { holderRef: GuardHolder }) {
   const wallet = useAuthenticatedWallet()
 
   useEffect(() => {
-    assertReady = wallet.assertReady
+    holderRef.current = wallet.assertReady
   })
 
   return <span data-testid="binding">{wallet.binding.status}</span>
@@ -132,10 +149,14 @@ function renderGate() {
     )
   }
 
+  const holderRef: GuardHolder = { current: null }
+
+  activeGuardRef = holderRef
+
   render(
     <AuthWalletBindingGate>
       <button type="button">application action</button>
-      <GuardProbe />
+      <GuardProbe holderRef={holderRef} />
     </AuthWalletBindingGate>,
     { wrapper: Wrapper },
   )

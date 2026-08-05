@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import { EvmWeb3Error } from "@/web3/evm/errors"
+import { EvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 import {
   prepareApproveEvmToken,
   prepareSendEvmNative,

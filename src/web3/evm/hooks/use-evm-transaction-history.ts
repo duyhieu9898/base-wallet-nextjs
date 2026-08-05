@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import type { Address, Hash } from "viem"
 
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
+import { useEvmSelection } from "@/web3/evm/chain/selection/use-evm-selection"
 import {
   addEvmTransactionHistoryItem,
   clearEvmTransactionHistory,

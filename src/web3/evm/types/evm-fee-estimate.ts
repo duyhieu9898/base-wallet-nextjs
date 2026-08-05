@@ -1,4 +1,4 @@
-import type { EvmWeb3Error } from "@/web3/evm/errors"
+import type { EvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 
 export type EvmFeeEstimateStatus = "idle" | "estimating" | "success" | "error"
 

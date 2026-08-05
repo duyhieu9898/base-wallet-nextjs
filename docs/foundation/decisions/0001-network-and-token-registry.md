@@ -7,7 +7,7 @@ Network và ERC-20 metadata là configuration, không phải kiến thức nằm
 ## Decision
 
 - `EVM_NETWORKS` là map từ `chainId` đến `EvmNetworkConfig` và là nguồn duy nhất cho supported EVM networks.
-- ERC-20 token được cấu hình theo chain trong `src/web3/evm/registry/evm-tokens.json`.
+- ERC-20 token được cấu hình theo chain trong `src/web3/evm/chain/registry/evm-tokens.json`.
 - Contract address là key của token entry.
 - `hydrateTokens(rawTokens: unknown)` validate registry input tại runtime.
 - RPC URL được override qua environment, không hardcode trong component hoặc hook.
@@ -61,13 +61,13 @@ Selection model, write lifecycle, error taxonomy và cache ownership không đư
 
 Implementation:
 
-- `src/web3/evm/registry/evm-network.registry.ts`
-- `src/web3/evm/registry/evm-registry.types.ts`
-- `src/web3/evm/registry/evm-tokens.json`
-- `src/web3/evm/adapters/evm-registry.adapter.ts`
+- `src/web3/evm/chain/registry/evm-network.registry.ts`
+- `src/web3/evm/chain/registry/evm-registry.types.ts`
+- `src/web3/evm/chain/registry/evm-tokens.json`
+- `src/web3/evm/chain/registry/evm-registry.adapter.ts`
 
 Tests:
 
-- `src/web3/evm/registry/evm-network.registry.test.ts`
-- `src/web3/evm/adapters/evm-registry.adapter.test.ts`
+- `src/web3/evm/chain/registry/evm-network.registry.test.ts`
+- `src/web3/evm/chain/registry/evm-registry.adapter.test.ts`
 - `scripts/web3-smoke.ts`

@@ -4,8 +4,8 @@ import { standardErc20Abi } from "@/web3/evm/abi/erc20"
 import {
   getEvmNetworkByChainId,
   getEvmToken,
-} from "@/web3/evm/adapters/evm-registry.adapter"
-import { createEvmWeb3Error } from "@/web3/evm/errors"
+} from "@/web3/evm/chain/registry/evm-registry.adapter"
+import { createEvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 
 export type PreparedNativeTransfer = {
   to: Address

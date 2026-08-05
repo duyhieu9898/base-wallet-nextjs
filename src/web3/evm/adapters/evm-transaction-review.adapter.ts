@@ -3,14 +3,14 @@ import { formatUnits, maxUint256 } from "viem"
 import {
   getEvmNetworkByChainId,
   getEvmToken,
-} from "@/web3/evm/adapters/evm-registry.adapter"
+} from "@/web3/evm/chain/registry/evm-registry.adapter"
 import type {
   PreparedNativeTransfer,
   PreparedTokenApproval,
   PreparedTokenTransfer,
 } from "@/web3/evm/adapters/evm-transaction.adapter"
-import { assertEvmWriteReady } from "@/web3/evm/selection/assert-evm-write-ready"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { assertEvmWriteReady } from "@/web3/evm/chain/selection/assert-evm-write-ready"
+import type { EvmSelection } from "@/web3/evm/chain/selection/evm-selection"
 import type { EvmTransactionReview } from "@/web3/evm/types/evm-transaction-review"
 
 export function buildNativeTransferReview(input: {

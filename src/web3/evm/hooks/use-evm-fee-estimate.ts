@@ -3,14 +3,17 @@
 import { encodeFunctionData, formatEther, type Hex } from "viem"
 import { useEstimateGas, useEstimateFeesPerGas } from "wagmi"
 
-import { toEvmWeb3ErrorOrNull } from "@/web3/evm/adapters/evm-error.adapter"
-import { createEvmWeb3Error, type EvmWeb3Error } from "@/web3/evm/errors"
+import { toEvmWeb3ErrorOrNull } from "@/web3/evm/errors/evm-error.adapter"
+import {
+  createEvmWeb3Error,
+  type EvmWeb3Error,
+} from "@/web3/evm/errors/evm-errors"
 import type {
   PreparedNativeTransfer,
   PreparedTokenApproval,
   PreparedTokenTransfer,
 } from "@/web3/evm/adapters/evm-transaction.adapter"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
+import { useEvmSelection } from "@/web3/evm/chain/selection/use-evm-selection"
 import type {
   EvmFeeEstimate,
   EvmFeeEstimateStatus,

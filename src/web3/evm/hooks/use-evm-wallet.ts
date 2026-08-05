@@ -3,7 +3,7 @@
 import { useConnect, useConnectors, useDisconnect, useSwitchChain } from "wagmi"
 
 import type { EvmWalletConnection } from "@/web3/evm/types/evm-domain"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
+import { useEvmSelection } from "@/web3/evm/chain/selection/use-evm-selection"
 
 export function useEvmWallet() {
   const selection = useEvmSelection()

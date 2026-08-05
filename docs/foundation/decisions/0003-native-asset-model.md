@@ -34,12 +34,12 @@ Native currency và ERC-20 token có contract model khác nhau: native currency 
 
 Implementation:
 
-- `src/web3/evm/registry/evm-network.registry.ts`
-- `src/web3/evm/hooks/use-evm-native-balance.ts`
-- `src/web3/evm/hooks/use-evm-token-balance.ts`
-- `src/web3/core/registry.types.ts`
+- `src/web3/evm/chain/registry/evm-network.registry.ts`
+- `src/web3/evm/reads/balances/use-evm-native-balance.ts`
+- `src/web3/evm/reads/balances/use-evm-token-balance.ts`
+- `src/web3/evm/chain/registry/registry.types.ts`
 
 Tests:
 
-- `src/web3/evm/registry/evm-network.registry.test.ts`
-- `src/web3/evm/adapters/evm-balance.adapter.test.ts`
+- `src/web3/evm/chain/registry/evm-network.registry.test.ts`
+- `src/web3/evm/reads/balances/evm-balance.adapter.test.ts`

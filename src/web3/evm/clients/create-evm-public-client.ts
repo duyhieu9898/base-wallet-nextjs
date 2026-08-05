@@ -3,7 +3,7 @@ import { createPublicClient, http, type PublicClient } from "viem"
 import {
   getEvmNetworkByChainId,
   getEvmNetworkRpcUrl,
-} from "@/web3/evm/adapters/evm-registry.adapter"
+} from "@/web3/evm/chain/registry/evm-registry.adapter"
 
 const clientCache = new Map<number, PublicClient>()
 

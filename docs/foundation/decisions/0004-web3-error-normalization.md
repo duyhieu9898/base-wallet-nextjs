@@ -75,10 +75,10 @@ Ngoài ra:
 
 Implementation:
 
-- `src/web3/evm/errors.ts`
-- `src/web3/evm/adapters/evm-error.adapter.ts`
+- `src/web3/evm/errors/evm-errors.ts`
+- `src/web3/evm/errors/evm-error.adapter.ts`
 
 Tests:
 
-- `src/web3/evm/adapters/evm-error.adapter.test.ts`
+- `src/web3/evm/errors/evm-error.adapter.test.ts`
 - `src/web3/evm/types/evm-write-status.test.ts`

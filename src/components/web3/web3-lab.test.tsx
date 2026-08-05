@@ -19,7 +19,7 @@ const mockReadySelection: EvmSelection = {
   networks: [network],
 }
 
-vi.mock("@/web3/evm/selection/use-evm-selection", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => mockReadySelection,
 }))
 
@@ -36,7 +36,7 @@ vi.mock("@/web3/evm/hooks/use-evm-wallet", () => ({
   }),
 }))
 
-vi.mock("@/web3/evm/hooks/use-evm-native-balance", () => ({
+vi.mock("@/web3/evm/reads/balances/use-evm-native-balance", () => ({
   useEvmNativeBalance: () => ({
     isPending: false,
     balance: { formattedAmount: "1.5", symbol: "ETH" },
@@ -46,7 +46,7 @@ vi.mock("@/web3/evm/hooks/use-evm-native-balance", () => ({
   }),
 }))
 
-vi.mock("@/web3/evm/hooks/use-evm-token-balance", () => ({
+vi.mock("@/web3/evm/reads/balances/use-evm-token-balance", () => ({
   useEvmTokenBalance: () => ({
     isPending: false,
     balance: { formattedAmount: "100.0", symbol: "USDC" },

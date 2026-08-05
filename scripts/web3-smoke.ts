@@ -58,14 +58,14 @@ async function main() {
   loadEnvLocal()
 
   const { getAllEvmNetworks, getEvmNetworkRpcUrl, getEvmTokensForChain } =
-    await import("../src/web3/evm/adapters/evm-registry.adapter")
+    await import("../src/web3/evm/chain/registry/evm-registry.adapter")
   const { createEvmPublicClient } =
     await import("../src/web3/evm/clients/create-evm-public-client")
   const { standardErc20Abi } = await import("../src/web3/evm/abi/erc20")
   const { getEvmBalances } =
-    await import("../src/web3/evm/services/evm-balance.service")
+    await import("../src/web3/evm/reads/balances/evm-balance.service")
   const { getEvmAllowances } =
-    await import("../src/web3/evm/services/evm-allowance.service")
+    await import("../src/web3/evm/reads/allowances/evm-allowance.service")
 
   const onlyChainId = parseChainIdArg(process.argv.slice(2))
   const allNetworks = getAllEvmNetworks()

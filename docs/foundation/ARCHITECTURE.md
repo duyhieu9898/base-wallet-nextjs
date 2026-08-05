@@ -91,29 +91,42 @@ Foundation không import application feature.
 
 ```text
 src/web3/
-├── core/
 ├── evm/
+│   ├── index.ts          public boundary (Tier A + Tier B)
+│   ├── address/          pure address primitives, public leaf
+│   ├── errors/           error taxonomy và normalization, public leaf
+│   ├── chain/
+│   │   ├── registry/     network, token và native asset configuration
+│   │   └── selection/    wallet/network readiness
+│   ├── reads/
+│   │   ├── balances/
+│   │   └── allowances/
 │   ├── abi/
 │   ├── adapters/
 │   ├── clients/
 │   ├── hooks/
-│   ├── registry/
-│   ├── selection/
-│   ├── services/
 │   ├── storage/
 │   ├── types/
-│   ├── errors.ts
 │   └── evm-provider.tsx
+├── chain-family-template/
 └── web3-providers.tsx
 ```
 
+Không còn `src/web3/core/`. Mọi item từng nằm ở đó — address utils, registry
+types/selectors, `NATIVE_ASSET_ID` — chỉ có consumer trong `evm/**`, nên theo
+mục 10 (`không đưa shared abstraction vào core/ trước khi có ít nhất hai runtime
+consumers thật`) chúng thuộc về EVM. `core/` chỉ được lập lại khi hai family
+thật chứng minh một khái niệm chung.
+
 | Layer                    | Responsibility                                       |
 | ------------------------ | ---------------------------------------------------- |
-| `core/`                  | Concepts đã được chứng minh không phụ thuộc family   |
-| `evm/registry/`          | EVM network và token configuration                   |
-| `evm/selection/`         | EVM wallet/network readiness                         |
+| `evm/index.ts`           | Public boundary; mọi path khác là internal           |
+| `evm/address/`           | EVM address validation và presentation               |
+| `evm/errors/`            | Typed error taxonomy và phase-aware normalization    |
+| `evm/chain/registry/`    | EVM network, token và native asset configuration     |
+| `evm/chain/selection/`   | EVM wallet/network readiness                         |
+| `evm/reads/`             | Balance và allowance: hook, builder, mapper, service |
 | `evm/adapters/`          | Pure validation, builders, mappers và derivation     |
-| `evm/services/`          | Viem I/O ngoài React                                 |
 | `evm/hooks/`             | React/Wagmi lifecycle orchestration                  |
 | `evm/storage/`           | Versioned client persistence                         |
 | `components/web3/`       | Reusable presentation và user intent                 |

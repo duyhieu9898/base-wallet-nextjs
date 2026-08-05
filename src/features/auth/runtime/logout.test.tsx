@@ -35,7 +35,7 @@ const readySelection: EvmSelection = {
 
 const disconnectSpy = vi.fn()
 
-vi.mock("@/web3/evm/selection/use-evm-selection", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => readySelection,
 }))
 

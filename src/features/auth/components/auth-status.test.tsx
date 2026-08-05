@@ -43,7 +43,7 @@ const unsupportedSelection: EvmSelection = {
 
 let currentSelection: EvmSelection = readySelection
 
-vi.mock("@/web3/evm/selection/use-evm-selection", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => currentSelection,
 }))
 

@@ -2,10 +2,10 @@ import { act, renderHook, waitFor } from "@testing-library/react"
 import type { Address, Hash } from "viem"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getDefaultEvmNetwork } from "@/web3/evm/chain/registry/evm-registry.adapter"
 import { useEvmTransactionHistory } from "@/web3/evm/hooks/use-evm-transaction-history"
 
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import type { EvmSelection } from "@/web3/evm/chain/selection/evm-selection"
 import { addEvmTransactionHistoryItem } from "@/web3/evm/storage/evm-transaction-history.storage"
 import type { EvmTransactionHistoryItem } from "@/web3/evm/types/evm-transaction-history"
 
@@ -33,7 +33,7 @@ const readySelection: EvmSelection = {
 
 let selection: EvmSelection = readySelection
 
-vi.mock("@/web3/evm/selection/use-evm-selection", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => selection,
 }))
 

@@ -60,16 +60,16 @@ Read policy chung cho mọi read hook:
 
 Implementation:
 
-- `src/web3/evm/adapters/evm-balance.adapter.ts`
-- `src/web3/evm/adapters/evm-allowance.adapter.ts`
-- `src/web3/evm/services/evm-balance.service.ts`
-- `src/web3/evm/services/evm-allowance.service.ts`
-- `src/web3/evm/hooks/use-evm-balances.ts`
-- `src/web3/evm/hooks/use-evm-allowances.ts`
+- `src/web3/evm/reads/balances/evm-balance.adapter.ts`
+- `src/web3/evm/reads/allowances/evm-allowance.adapter.ts`
+- `src/web3/evm/reads/balances/evm-balance.service.ts`
+- `src/web3/evm/reads/allowances/evm-allowance.service.ts`
+- `src/web3/evm/reads/balances/use-evm-balances.ts`
+- `src/web3/evm/reads/allowances/use-evm-allowances.ts`
 
 Tests:
 
-- `src/web3/evm/adapters/evm-balance.adapter.test.ts`
-- `src/web3/evm/adapters/evm-allowance.adapter.test.ts`
-- `src/web3/evm/hooks/use-evm-balances.test.tsx`
-- `src/web3/evm/hooks/use-evm-allowances.test.tsx`
+- `src/web3/evm/reads/balances/evm-balance.adapter.test.ts`
+- `src/web3/evm/reads/allowances/evm-allowance.adapter.test.ts`
+- `src/web3/evm/reads/balances/use-evm-balances.test.tsx`
+- `src/web3/evm/reads/allowances/use-evm-allowances.test.tsx`

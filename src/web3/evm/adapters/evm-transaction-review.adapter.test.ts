@@ -4,14 +4,14 @@ import { describe, expect, it } from "vitest"
 import {
   getEvmMainnets,
   getEvmTestnets,
-} from "@/web3/evm/adapters/evm-registry.adapter"
+} from "@/web3/evm/chain/registry/evm-registry.adapter"
 import {
   buildNativeTransferReview,
   buildTokenApprovalReview,
   buildTokenTransferReview,
 } from "@/web3/evm/adapters/evm-transaction-review.adapter"
-import { EvmWeb3Error } from "@/web3/evm/errors"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { EvmWeb3Error } from "@/web3/evm/errors/evm-errors"
+import type { EvmSelection } from "@/web3/evm/chain/selection/evm-selection"
 
 const testnet = getEvmTestnets()[0]!
 const mainnet = getEvmMainnets()[0]!

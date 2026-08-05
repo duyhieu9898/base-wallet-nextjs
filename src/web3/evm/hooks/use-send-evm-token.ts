@@ -13,19 +13,22 @@ import { standardErc20Abi } from "@/web3/evm/abi/erc20"
 import {
   toEvmWeb3ErrorOrNull,
   toEvmWeb3Error,
-} from "@/web3/evm/adapters/evm-error.adapter"
+} from "@/web3/evm/errors/evm-error.adapter"
 import { buildEvmWriteInvalidationFilters } from "@/web3/evm/adapters/evm-invalidation.adapter"
-import { findEvmToken } from "@/web3/evm/adapters/evm-registry.adapter"
+import { findEvmToken } from "@/web3/evm/chain/registry/evm-registry.adapter"
 import {
   type PreparedTokenTransfer,
   prepareSendEvmToken,
 } from "@/web3/evm/adapters/evm-transaction.adapter"
 import { buildTokenTransferReview } from "@/web3/evm/adapters/evm-transaction-review.adapter"
-import { createEvmWeb3Error, type EvmWeb3Error } from "@/web3/evm/errors"
+import {
+  createEvmWeb3Error,
+  type EvmWeb3Error,
+} from "@/web3/evm/errors/evm-errors"
 import { useEvmFeeEstimate } from "@/web3/evm/hooks/use-evm-fee-estimate"
 import { useEvmWriteLifecycle } from "@/web3/evm/hooks/use-evm-write-lifecycle"
-import { assertEvmWriteReady } from "@/web3/evm/selection/assert-evm-write-ready"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
+import { assertEvmWriteReady } from "@/web3/evm/chain/selection/assert-evm-write-ready"
+import { useEvmSelection } from "@/web3/evm/chain/selection/use-evm-selection"
 import {
   addEvmTransactionHistoryItem,
   updateEvmTransactionHistoryItem,

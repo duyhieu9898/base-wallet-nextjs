@@ -5,14 +5,14 @@ import type { Address } from "viem"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import { EvmWeb3Error } from "@/web3/evm/errors"
+import { getDefaultEvmNetwork } from "@/web3/evm/chain/registry/evm-registry.adapter"
+import { EvmWeb3Error } from "@/web3/evm/errors/evm-errors"
 
 import {
   useEvmFeeEstimate,
   type EvmFeeEstimateTarget,
 } from "@/web3/evm/hooks/use-evm-fee-estimate"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import type { EvmSelection } from "@/web3/evm/chain/selection/evm-selection"
 
 const CHAIN_ID = 11155111
 const ACCOUNT: Address = "0x086d9feCB2F117369fAbDB884eC6851b36595444"
@@ -63,7 +63,7 @@ vi.mock("wagmi", () => ({
   },
 }))
 
-vi.mock("@/web3/evm/selection/use-evm-selection", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => selection,
 }))
 

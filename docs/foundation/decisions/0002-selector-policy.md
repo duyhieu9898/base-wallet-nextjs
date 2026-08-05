@@ -37,11 +37,11 @@ getEvm*
 
 Implementation:
 
-- `src/web3/evm/adapters/evm-registry.adapter.ts`
-- `src/web3/evm/registry/evm-network.registry.ts`
-- `src/web3/core/registry.selectors.ts`
-- `src/web3/evm/errors.ts`
+- `src/web3/evm/chain/registry/evm-registry.adapter.ts`
+- `src/web3/evm/chain/registry/evm-network.registry.ts`
+- `src/web3/evm/chain/registry/registry.selectors.ts`
+- `src/web3/evm/errors/evm-errors.ts`
 
 Tests:
 
-- `src/web3/evm/adapters/evm-registry.adapter.test.ts`
+- `src/web3/evm/chain/registry/evm-registry.adapter.test.ts`

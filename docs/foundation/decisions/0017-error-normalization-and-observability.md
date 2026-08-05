@@ -64,10 +64,10 @@ Implementation:
 
 - `src/lib/api/api-error.ts`
 - `src/features/auth/domain/auth-error.ts`
-- `src/web3/evm/errors.ts`
-- `src/web3/evm/adapters/evm-error.adapter.ts`
+- `src/web3/evm/errors/evm-errors.ts`
+- `src/web3/evm/errors/evm-error.adapter.ts`
 
 Tests:
 
 - `src/features/auth/domain/auth-error.test.ts`
-- `src/web3/evm/adapters/evm-error.adapter.test.ts`
+- `src/web3/evm/errors/evm-error.adapter.test.ts`

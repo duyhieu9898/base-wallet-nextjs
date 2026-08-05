@@ -84,7 +84,7 @@ function setSelection(next: EvmSelection): void {
 /** Mock signing function — test instead to simulate rejection or slow signing. */
 let signMessageImpl: (input: { message: string }) => Promise<`0x${string}`>
 
-vi.mock("@/web3/evm/selection/use-evm-selection", async () => {
+vi.mock("@/web3/evm/chain/selection/use-evm-selection", async () => {
   const { useSyncExternalStore } = await import("react")
 
   return {
@@ -358,6 +358,8 @@ describe("wallet changes mid-flow", () => {
 
     setMockAuthDelay("nonce", 10)
 
+    await ready()
+
     const pending = act(async () => {
       const promise = handle.signIn()
 
@@ -431,6 +433,8 @@ describe("response ownership", () => {
 
     setMockAuthDelay("verify", 20)
 
+    await ready()
+
     await act(async () => {
       const promise = handle.signIn()
 
@@ -445,6 +449,8 @@ describe("response ownership", () => {
     await renderHarness()
 
     setMockAuthDelay("nonce", 10)
+
+    await ready()
 
     await act(async () => {
       await Promise.all([handle.signIn(), handle.signIn(), handle.signIn()])

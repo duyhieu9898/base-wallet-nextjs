@@ -2,7 +2,7 @@ import type { QueryFilters } from "@tanstack/react-query"
 import type { Address } from "viem"
 import { getBalanceQueryKey, readContractQueryKey } from "wagmi/query"
 
-import { isSameAddress } from "@/web3/core/address.utils"
+import { isSameAddress } from "@/web3/evm/address"
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"
 
 /**

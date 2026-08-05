@@ -2,7 +2,7 @@
 
 import { useWaitForTransactionReceipt } from "wagmi"
 
-import { getEvmNetworkByChainId } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmNetworkByChainId } from "@/web3/evm/chain/registry/evm-registry.adapter"
 
 export function useEvmTransactionReceipt(input: {
   chainId?: number

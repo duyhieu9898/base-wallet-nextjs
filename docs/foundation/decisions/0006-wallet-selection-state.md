@@ -50,12 +50,12 @@ unsupported
 
 Implementation:
 
-- `src/web3/evm/selection/evm-selection.ts`
-- `src/web3/evm/selection/use-evm-selection.ts`
-- `src/web3/evm/selection/assert-evm-write-ready.ts`
+- `src/web3/evm/chain/selection/evm-selection.ts`
+- `src/web3/evm/chain/selection/use-evm-selection.ts`
+- `src/web3/evm/chain/selection/assert-evm-write-ready.ts`
 - `src/web3/evm/hooks/use-evm-wallet.ts`
 
 Tests:
 
-- `src/web3/evm/selection/evm-selection.test.ts`
-- `src/web3/evm/selection/assert-evm-write-ready.test.ts`
+- `src/web3/evm/chain/selection/evm-selection.test.ts`
+- `src/web3/evm/chain/selection/assert-evm-write-ready.test.ts`
