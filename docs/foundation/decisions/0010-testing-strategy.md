@@ -116,7 +116,14 @@ Implementation:
 
 Tests:
 
-- `src/web3/evm/adapters/*.test.ts`
-- `src/web3/evm/hooks/*.test.tsx`
-- `src/web3/evm/transactions/history/evm-transaction-history.storage.test.ts`
+Test nằm cạnh capability sở hữu chúng, không gom vào một thư mục chung:
+
+- `src/web3/evm/chain/**/*.test.ts` — registry và selection
+- `src/web3/evm/reads/**/*.test.*` — balances và allowances
+- `src/web3/evm/errors/*.test.ts` — normalization và wallet rejection
+- `src/web3/evm/address/*.test.ts`
+- `src/web3/evm/transactions/lifecycle/*.test.ts` — write status derivation
+- `src/web3/evm/transactions/{fees,history,invalidation}/*.test.*`
+- `src/web3/evm/transactions/{native-transfer,erc20-transfer,erc20-approval}/*.test.*`
+  — prepare, review và hook của từng slice
 - `src/components/web3/web3-lab.test.tsx`

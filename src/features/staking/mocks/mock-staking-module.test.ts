@@ -5,7 +5,7 @@ import {
   MOCK_STAKING_ACCOUNT,
   MOCK_STAKING_ASSET,
   type StakingPosition,
-} from "@/features/staking/public"
+} from "@/features/staking"
 
 const OTHER_ACCOUNT = "0x3333333333333333333333333333333333333333" as const
 

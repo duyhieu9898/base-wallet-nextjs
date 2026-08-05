@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest"
 
-import {
-  findStakingDeployment,
-  STAKING_DEPLOYMENTS,
-} from "@/features/staking/public"
+import { findStakingDeployment, STAKING_DEPLOYMENTS } from "@/features/staking"
 
 describe("staking deployment registry", () => {
   it("resolves the application-owned Sepolia test deployment", () => {

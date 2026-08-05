@@ -1,6 +1,6 @@
 "use client"
 
-import { StakingPositionCard } from "@/features/staking/components/staking-position-card"
+import { StakingPositionCard } from "@/features/staking"
 import {
   BalanceCard,
   NetworkCard,

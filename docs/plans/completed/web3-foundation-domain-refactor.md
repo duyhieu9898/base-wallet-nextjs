@@ -4,7 +4,7 @@ Date: 2026-08-05
 
 ## Status
 
-Active
+Completed
 
 ## Outcome
 
@@ -962,4 +962,94 @@ execution plan`. Plan cũ mâu thuẫn authority nên được sửa tại chỗ
 
 ## Result
 
-Chưa hoàn tất. Phase 1 đã xong phần baseline và observed architecture.
+Hoàn tất cả 5 phase. Sáu commit trên `refactor/web3-domain-organization`.
+
+### Kiến trúc trước và sau
+
+```text
+trước:  src/web3/{core, evm/{adapters,hooks,services,storage,types,registry,selection}}
+sau:    src/web3/evm/{index.ts, address, errors, chain/{registry,selection},
+                      reads/{balances,allowances},
+                      transactions/{lifecycle,receipt,review,fees,history,
+                                    invalidation,native-transfer,
+                                    erc20-transfer,erc20-approval},
+                      components, provider, abi, clients}
+```
+
+`src/web3/core/` bị xóa: mọi item chỉ có consumer trong `evm/**`, và
+`ARCHITECTURE.md` cấm đưa abstraction vào `core/` trước khi có hai runtime
+consumers thật.
+
+### Public API
+
+| Tier                  | Nội dung                                                                                                                                                                                      |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A — Application       | selection, wallet, network, balances, allowances, 3 write hook, fee/receipt/history hook, domain types, registry selectors, address helpers, 9 reusable component, `PendingReceiptReconciler` |
+| B — Feature Extension | `useEvmWriteLifecycle`, `assertEvmWriteReady`, `deriveEvmWriteStatus`, `EvmWeb3Error`, `createEvmWeb3Error`, `toEvmWeb3Error(OrNull)`, `isUserRejectedWalletRequest`, strict registry lookups |
+
+Public paths: `@/web3/evm`, `@/web3/evm/address`, `@/web3/evm/errors`,
+`@/web3/web3-providers`. Mọi path khác private, ESLint enforce.
+
+**Removed exports**: `EvmTransactionReference` — không producer, không consumer,
+không authority nào tham chiếu.
+
+**Compatibility notes**: không còn shim nào. ESLint override tạm thời cho
+`pending-receipt-reconciler` đã gỡ ở Phase 4 khi file về `transactions/history/`.
+
+### Safety invariant matrix
+
+| Invariant                       | Decision   | Implementation                                | Tests                                                       | Result |
+| ------------------------------- | ---------- | --------------------------------------------- | ----------------------------------------------------------- | ------ |
+| readiness                       | 0005       | `chain/selection/assert-evm-write-ready.ts`   | slice hooks + `assert-evm-write-ready.test.ts`              | pass   |
+| simulation w/ connected account | 0005       | 3 slice hooks (`useSimulateContract`)         | 3 slice hook tests                                          | pass   |
+| review snapshot bất biến        | 0011       | `*/prepare.ts`, `*/review.ts`                 | `*/prepare.test.ts`, `*/review.test.ts`                     | pass   |
+| duplicate submit                | 0008       | `transactions/lifecycle/`                     | 3 × "double confirm does not send twice"                    | pass   |
+| stale operation                 | 0008       | `transactions/lifecycle/`                     | 18 test "stale …" trên 3 slice                              | pass   |
+| user rejection                  | 0004       | `errors/evm-wallet-rejection.ts`              | `evm-wallet-rejection.test.ts` + slice tests                | pass   |
+| pre-hash failure ≠ mined revert | 0008       | 3 slice hooks                                 | 3 test "Do not report mined revert …"                       | pass   |
+| receipt = terminal evidence     | 0008       | `transactions/lifecycle/evm-write-status.ts`  | `evm-write-status.test.ts` + slice tests                    | pass   |
+| targeted invalidation           | 0009       | `transactions/invalidation/`                  | `evm-invalidation.adapter.test.ts` + slice tests            | pass   |
+| once-per-hash side effects      | 0008, 0009 | `lifecycle` (`markReceiptHandled`)            | 3 test "exactly once"                                       | pass   |
+| history/storage isolation       | 0012       | `transactions/history/`                       | `*.storage.test.ts`, `use-evm-transaction-history.test.tsx` | pass   |
+| feature write flow              | 0015       | `features/staking/hooks/use-staking-write.ts` | `use-staking-write.test.ts`                                 | pass   |
+
+Suite theo owner: lifecycle 19 · fees 9 · history 16 · invalidation 8 ·
+native-transfer 36 · erc20-transfer 33 · erc20-approval 32 · còn lại 122.
+
+### Solana seam audit
+
+| Câu hỏi                                                | Trả lời                                     |
+| ------------------------------------------------------ | ------------------------------------------- |
+| Thêm `src/web3/solana/` mà không import EVM `Address`? | Được — không còn `core/` để lẫn type        |
+| Application root mount thêm provider?                  | Được — `web3-providers.tsx` là điểm compose |
+| EVM lifecycle/type nằm trong `core/`?                  | Không còn `core/`                           |
+| Public `useWallet`/`useTransaction` universal?         | Không — mọi export mang tiền tố `Evm`       |
+| Feature khai báo rõ family runtime?                    | Có — staking import từ `@/web3/evm`         |
+| Root `src/web3` tự load mọi runtime?                   | Không — chỉ `EvmProvider`                   |
+
+### Final validation
+
+```text
+pnpm typecheck:    PASS
+pnpm lint:         PASS
+pnpm format:check: PASS
+pnpm test:run:     PASS (52 files, 491 tests)
+pnpm build:        PASS
+pnpm web3:smoke:   not run
+git diff --check:  PASS
+```
+
+`web3:smoke` chạm live RPC; refactor không đổi network/RPC config nên không
+chạy. Không claim live verification.
+
+### Deferred
+
+- Solana runtime và multi-family provider composition.
+- Approval orchestration (`0015` chặn tới khi có 2 consumer thật).
+- Global application transaction coordinator.
+- RPC failover, structured observability vendor.
+- Test infra: `auth-flow.integration.test.tsx`, `logout.test.tsx`,
+  `auth-runtime-provider.test.tsx` còn pattern `act`-rồi-assert-đồng-bộ cùng lớp
+  với flake đã sửa; chưa lộ triệu chứng.
+- 13 `vi.mock()` trỏ path nội bộ: ESLint không thấy chúng vì không phải import
+  statement. Lần di chuyển file kế tiếp phải cập nhật thủ công.

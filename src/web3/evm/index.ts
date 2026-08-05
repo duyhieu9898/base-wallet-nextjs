@@ -107,10 +107,6 @@ export {
 // Public domain types.
 export type { EvmAssetBalance } from "./reads/balances/evm-balance.types"
 export type { EvmWalletConnection } from "./chain/selection/evm-wallet.types"
-// TODO(phase-5 public API audit): không có producer lẫn consumer nào trong
-// repo. Giữ export vì Phase 4 không đổi public API; quyết định giữ hay bỏ ở
-// Phase 5.
-export type { EvmTransactionReference } from "./transactions/evm-transaction.types"
 export type {
   EvmFeeEstimate,
   EvmFeeEstimateStatus,
