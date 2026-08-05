@@ -15,7 +15,11 @@ import {
   MOCK_OTHER_ADDRESS,
   signMockMessage,
 } from "@/mocks/data/auth-session"
-import { type EvmSelection, getDefaultEvmNetwork } from "@/web3/evm"
+import {
+  getDefaultEvmNetwork,
+  truncateAddress,
+  type EvmSelection,
+} from "@/web3/evm"
 import { AuthWalletBindingGate } from "./auth-wallet-binding-gate"
 
 const ADDRESS = MOCK_ADDRESS
@@ -261,13 +265,18 @@ describe("no dismissal path", () => {
   it("shows both addresses so the user knows which wallet to switch to", async () => {
     await openMismatchModal()
 
-    // Deduce from the constant itself instead of the hardcode prefix: change signer test no
-    // getting this test done is red for meaningless reasons.
-    expect(screen.getByTestId("session-address")).toHaveTextContent(
-      ADDRESS.slice(0, 6),
+    // Query bằng nhãn người dùng nghe thấy, không bằng test id: nếu liên kết
+    // nhãn/giá trị hỏng thì screen reader cũng hỏng, và test phải đỏ vì đúng lý
+    // do đó.
+    //
+    // So khớp chuỗi render đầy đủ, dẫn xuất từ chính `truncateAddress`. Assert
+    // 6 ký tự đầu như trước vẫn xanh ngay cả khi phần đuôi hiển thị nhầm địa
+    // chỉ khác — mà nhầm đuôi mới đúng là lỗi nguy hiểm ở đây.
+    expect(screen.getByLabelText("Session wallet").textContent).toBe(
+      truncateAddress(ADDRESS),
     )
-    expect(screen.getByTestId("connected-address")).toHaveTextContent(
-      OTHER_ADDRESS.slice(0, 6),
+    expect(screen.getByLabelText("Connected wallet").textContent).toBe(
+      truncateAddress(OTHER_ADDRESS),
     )
   })
 

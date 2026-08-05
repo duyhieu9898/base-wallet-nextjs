@@ -1,6 +1,7 @@
 "use client"
 
 import { Dialog } from "@base-ui/react/dialog"
+import { useId } from "react"
 
 import { Button } from "@/components/ui/button"
 import { truncateAddress } from "@/web3/evm"
@@ -41,6 +42,8 @@ export function WalletBindingModal({
 }: WalletBindingModalProps) {
   const { t } = useTranslation()
   const isMismatch = binding.status === "wallet-mismatched"
+  const sessionLabelId = useId()
+  const connectedLabelId = useId()
   const sessionAddress = truncateAddress(binding.sessionAddress)
 
   return (
@@ -77,19 +80,27 @@ export function WalletBindingModal({
               : t.auth.disconnectedDescription}
           </Dialog.Description>
 
+          {/*
+            `aria-labelledby` gắn từng địa chỉ với nhãn của nó: screen reader
+            đọc "Session wallet: 0x…" thay vì một chuỗi hex trần. Nó cũng là lý
+            do các giá trị này không cần `data-testid` — test query được bằng
+            đúng thứ người dùng nghe thấy.
+          */}
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex items-center justify-between gap-4">
-              <dt className="text-muted-foreground">{t.auth.sessionWallet}</dt>
-              <dd className="font-mono" data-testid="session-address">
+              <dt className="text-muted-foreground" id={sessionLabelId}>
+                {t.auth.sessionWallet}
+              </dt>
+              <dd className="font-mono" aria-labelledby={sessionLabelId}>
                 {sessionAddress}
               </dd>
             </div>
 
             <div className="flex items-center justify-between gap-4">
-              <dt className="text-muted-foreground">
+              <dt className="text-muted-foreground" id={connectedLabelId}>
                 {t.auth.connectedWallet}
               </dt>
-              <dd className="font-mono" data-testid="connected-address">
+              <dd className="font-mono" aria-labelledby={connectedLabelId}>
                 {isMismatch
                   ? truncateAddress(binding.connectedAddress)
                   : t.auth.notConnected}
