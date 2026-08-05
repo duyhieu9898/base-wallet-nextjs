@@ -1,8 +1,8 @@
 import type { Address } from "viem"
 
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { isSameAddress } from "@/web3/evm/address"
+import type { EvmSelection } from "@/web3/evm"
 import { createAuthError } from "./auth-error"
-import { isSameAddress } from "@/web3/core/address.utils"
 import type { AuthState } from "./auth-state"
 
 /**

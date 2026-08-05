@@ -6,10 +6,8 @@ import { useQueryClient } from "@tanstack/react-query"
 import { useWaitForTransactionReceipt } from "wagmi"
 
 import { buildEvmWriteInvalidationFilters } from "@/web3/evm/adapters/evm-invalidation.adapter"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
+import { type EvmTransactionHistoryItem, useEvmSelection } from "@/web3/evm"
 import { updateEvmTransactionHistoryItem } from "@/web3/evm/storage/evm-transaction-history.storage"
-import type { EvmTransactionHistoryItem } from "@/web3/evm/types/evm-transaction-history"
-
 /**
  * Reconciles pending transactions from localStorage after page reload or
  * chain/account switch. Invalidates relevant caches on receipt success so

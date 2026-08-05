@@ -5,9 +5,7 @@ import { NativeTransferForm } from "@/components/web3/forms/native-transfer-form
 import { TokenApproveForm } from "@/components/web3/forms/token-approve-form"
 import { TokenTransferForm } from "@/components/web3/forms/token-transfer-form"
 import { useTranslation } from "@/i18n/use-translation"
-import type { AssetContractConfig } from "@/web3/evm/registry/evm-registry.types"
-import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
-
+import { type AssetContractConfig, type EvmNetworkConfig } from "@/web3/evm"
 export function TransferSection(props: {
   chainId: number
   network: EvmNetworkConfig

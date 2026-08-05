@@ -3,9 +3,7 @@
 import { AlertTriangle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTranslation } from "@/i18n/use-translation"
-import type { EvmFeeEstimate } from "@/web3/evm/types/evm-fee-estimate"
-import type { EvmTransactionReview } from "@/web3/evm/types/evm-transaction-review"
-
+import { type EvmFeeEstimate, type EvmTransactionReview } from "@/web3/evm"
 export function TransactionReviewCard(props: {
   review: EvmTransactionReview
   feeEstimate: EvmFeeEstimate

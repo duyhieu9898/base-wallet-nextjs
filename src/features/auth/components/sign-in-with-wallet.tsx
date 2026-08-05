@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { useSiweLogin } from "@/features/auth/hooks/use-siwe-login"
 import { useTranslation } from "@/i18n/use-translation"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
-
+import { useEvmSelection } from "@/web3/evm"
 /**
  * Wallet login button.
  *

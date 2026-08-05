@@ -7,8 +7,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 import { I18nProvider } from "@/i18n/i18n-provider"
 import { AuthRuntimeProvider } from "@/features/auth/runtime/auth-runtime-provider"
 import { MOCK_ADDRESS, signMockMessage } from "@/mocks/data/auth-session"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { type EvmSelection, getDefaultEvmNetwork } from "@/web3/evm"
 import { AuthStatus } from "./auth-status"
 
 const ADDRESS = MOCK_ADDRESS

@@ -28,9 +28,10 @@ export const queryKeys = {
 
 /**
  * Note: onchain data (balance / allowance / receipt) is owned by Wagmi and
- * Use Wagmi's own query key. If you want to invalidate them, use
- * `buildEvmWriteInvalidationFilters` trong `@/web3/evm/adapters/evm-invalidation.adapter`
- * — the self-defined key here will never match Wagmi's query.
+ * Use Wagmi's own query key. Invalidating them is foundation-owned: the public
+ * write hooks in `@/web3/evm` already do targeted invalidation after a receipt.
+ * Application code must not build those filters itself — the self-defined key
+ * here will never match Wagmi's query.
  *
  * That also means logout can't accidentally clear Wagmi's cache
  * `queryKeys.userScoped.all`.

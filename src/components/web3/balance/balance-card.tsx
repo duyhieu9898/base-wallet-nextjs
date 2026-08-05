@@ -5,11 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useTranslation } from "@/i18n/use-translation"
-import { getEvmTokensForChain } from "@/web3/evm/adapters/evm-registry.adapter"
-import { useEvmNativeBalance } from "@/web3/evm/hooks/use-evm-native-balance"
-import { useEvmTokenBalance } from "@/web3/evm/hooks/use-evm-token-balance"
-import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
-
+import {
+  type EvmNetworkConfig,
+  getEvmTokensForChain,
+  useEvmNativeBalance,
+  useEvmTokenBalance,
+} from "@/web3/evm"
 function Field(props: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1">

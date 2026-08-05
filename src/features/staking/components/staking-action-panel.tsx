@@ -6,8 +6,7 @@ import { TransactionStatus } from "@/components/web3/common/transaction-status"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useApproveEvmToken } from "@/web3/evm/hooks/use-approve-evm-token"
-import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl, useApproveEvmToken } from "@/web3/evm"
 import type { StakingDeployment } from "../contracts/staking-deployments"
 import {
   type StakingAsset,

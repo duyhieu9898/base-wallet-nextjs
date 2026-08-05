@@ -9,16 +9,17 @@ import {
 } from "wagmi"
 
 import {
+  type EvmWeb3Error,
+  assertEvmWriteReady,
+  createEvmWeb3Error,
+  deriveEvmWriteStatus,
+  findEvmToken,
   toEvmWeb3Error,
   toEvmWeb3ErrorOrNull,
-} from "@/web3/evm/adapters/evm-error.adapter"
-import { findEvmToken } from "@/web3/evm/adapters/evm-registry.adapter"
-import { createEvmWeb3Error, type EvmWeb3Error } from "@/web3/evm/errors"
-import { useEvmAllowance } from "@/web3/evm/hooks/use-evm-allowance"
-import { useEvmWriteLifecycle } from "@/web3/evm/hooks/use-evm-write-lifecycle"
-import { assertEvmWriteReady } from "@/web3/evm/selection/assert-evm-write-ready"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
-import { deriveEvmWriteStatus } from "@/web3/evm/types/evm-write-status"
+  useEvmAllowance,
+  useEvmSelection,
+  useEvmWriteLifecycle,
+} from "@/web3/evm"
 import { findStakingDeployment } from "../contracts/staking-deployments"
 
 export type StakingAsset = "native" | "usdc"

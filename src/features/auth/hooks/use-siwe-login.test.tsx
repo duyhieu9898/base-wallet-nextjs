@@ -4,8 +4,7 @@ import { useEffect, type ReactNode } from "react"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { Address } from "viem"
 
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { type EvmSelection, getDefaultEvmNetwork } from "@/web3/evm"
 import { useAuth } from "@/features/auth/hooks/use-auth"
 import { AuthRuntimeProvider } from "@/features/auth/runtime/auth-runtime-provider"
 import {

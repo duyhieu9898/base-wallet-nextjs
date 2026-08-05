@@ -2,8 +2,7 @@ import { isAddress, type Abi, type Address } from "viem"
 
 import testStakingVaultAbiJson from "../../../contracts/artifacts/TestStakingVault.abi.json"
 import deploymentsJson from "./deployments.json"
-import { EVM_NETWORKS } from "@/web3/evm/registry/evm-network.registry"
-
+import { EVM_NETWORKS } from "@/web3/evm"
 export type ContractKey = "staking-vault"
 export type ContractAbiKey = "TestStakingVault"
 

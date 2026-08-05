@@ -99,17 +99,57 @@ Bypass foundation safety là architecture violation.
 
 ## 3. Public consumption boundary
 
-Application tiêu thụ public API của family module đã adopt.
+Application tiêu thụ public API của family module đã adopt. Family module quyết
+định public surface của mình; file tree bên trong là private.
+
+### 3.1. Public paths của EVM module
+
+```text
+@/web3/evm            runtime API (hooks, domain types, registry selectors)
+@/web3/evm/address    pure address primitives, React-free và wagmi-free
+@/web3/evm/errors     pure error taxonomy, React-free và wagmi-free
+@/web3/web3-providers provider composition cho các family đã adopt
+```
+
+Mọi path khác dưới `src/web3/**` là internal. ESLint enforce ranh giới này.
+
+Hai leaf path pure tồn tại vì lý do kỹ thuật cụ thể: pure domain code (ví dụ
+SIWE message building, wallet binding, MSW handlers) cần address/error helper
+nhưng không được kéo cả EVM runtime — provider, wagmi config và mọi hook — vào
+module graph của mình.
+
+Vì lý do đó `EvmProvider` **không** nằm trong `@/web3/evm`. Provider composition
+đi qua `@/web3/web3-providers`, nơi application chọn family runtime nào được
+mount.
+
+### 3.2. Hai tier của `@/web3/evm`
+
+**Tier A — Application API.** Hooks, domain types và registry selectors mà UI
+dùng trực tiếp. Chúng đã đóng gói sẵn toàn bộ safety invariant của foundation.
+
+**Tier B — Feature Extension API.** Primitive để một feature tự triển khai
+contract-specific write flow theo `0015`: `useEvmWriteLifecycle`,
+`assertEvmWriteReady`, `deriveEvmWriteStatus`, `EvmWeb3Error`,
+`createEvmWeb3Error`, `toEvmWeb3Error`, `isUserRejectedWalletRequest` và các
+registry selector dạng strict.
+
+Tier B là public **có kiểm soát**. Feature dùng Tier B bắt buộc:
+
+- thực hiện `Prepare → Review → Confirm`;
+- simulation với connected account trước khi mở wallet request;
+- đi qua `useEvmWriteLifecycle` cho mọi submission;
+- không kết luận success chỉ từ transaction hash;
+- giữ stale-operation protection khi account/chain/token/spender đổi;
+- coi receipt là terminal evidence duy nhất cho success/revert;
+- giữ side effects (callback, invalidation, history) once-per-hash.
+
+Feature hook được phép gọi write hook của Wagmi cho contract của chính nó — đó
+là điều `0015` quy định — miễn là đi qua lifecycle guard ở trên. UI layer thì
+không: component không submit transaction trực tiếp.
 
 Application UI nên tiêu thụ:
 
-- public hooks của family module đã adopt:
-
-```text
-EVM:
-src/web3/evm/hooks/
-```
-
+- Tier A hooks;
 - exported domain types;
 - exported registry selectors;
 - reusable components dưới `src/components/web3/`.

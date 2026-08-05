@@ -15,8 +15,7 @@ import {
   MOCK_OTHER_ADDRESS,
   signMockMessage,
 } from "@/mocks/data/auth-session"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import { type EvmSelection, getDefaultEvmNetwork } from "@/web3/evm"
 import { AuthWalletBindingGate } from "./auth-wallet-binding-gate"
 
 const ADDRESS = MOCK_ADDRESS

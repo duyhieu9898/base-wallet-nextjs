@@ -3,8 +3,7 @@
 import { useReadContract } from "wagmi"
 
 import { findStakingDeployment } from "../contracts/staking-deployments"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
-
+import { useEvmSelection } from "@/web3/evm"
 /** Read the two balances the deployed test vault actually owns; no reward or lock semantics are inferred. */
 export function useStakingPosition() {
   const selection = useEvmSelection()

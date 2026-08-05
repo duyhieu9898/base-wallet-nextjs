@@ -1,6 +1,6 @@
 import type { Address } from "viem"
 
-import { isValidAddress, toChecksumAddress } from "@/web3/core/address.utils"
+import { isValidAddress, toChecksumAddress } from "@/web3/evm/address"
 import { createAuthError } from "./auth-error"
 
 /**

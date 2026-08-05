@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTranslation } from "@/i18n/use-translation"
-import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
-
+import { type EvmNetworkConfig } from "@/web3/evm"
 export function UnsupportedNetworkCard(props: {
   walletChainId: number
   networks: readonly EvmNetworkConfig[]

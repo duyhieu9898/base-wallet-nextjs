@@ -10,8 +10,7 @@ import {
   type WalletBinding,
 } from "@/features/auth/domain/wallet-binding"
 import { useAuth } from "@/features/auth/hooks/use-auth"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
-
+import { useEvmSelection } from "@/web3/evm"
 export type UseAuthenticatedWalletResult = {
   binding: WalletBinding
   /** Application is allowed to run normally. */

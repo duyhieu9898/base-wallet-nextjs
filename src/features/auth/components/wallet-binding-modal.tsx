@@ -3,7 +3,7 @@
 import { Dialog } from "@base-ui/react/dialog"
 
 import { Button } from "@/components/ui/button"
-import { truncateAddress } from "@/web3/core/address.utils"
+import { truncateAddress } from "@/web3/evm"
 import type { WalletBinding } from "@/features/auth/domain/wallet-binding"
 import { useTranslation } from "@/i18n/use-translation"
 import { cn } from "@/lib/utils"

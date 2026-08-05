@@ -16,10 +16,7 @@ import { canStartLogin } from "@/features/auth/domain/auth-state"
 import { buildSiweMessage } from "@/features/auth/domain/siwe-message"
 import { useAuthRuntime } from "@/features/auth/runtime/auth-runtime-context"
 import { useSingleFlight } from "@/hooks/use-single-flight"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
-import { isSameAddress } from "@/web3/core/address.utils"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
-
+import { type EvmSelection, isSameAddress, useEvmSelection } from "@/web3/evm"
 /**
  * Immutable snapshot of the condition at login start.
  *

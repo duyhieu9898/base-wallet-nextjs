@@ -3,9 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useTranslation } from "@/i18n/use-translation"
-import { useEvmBalances } from "@/web3/evm/hooks/use-evm-balances"
-import { useEvmWallet } from "@/web3/evm/hooks/use-evm-wallet"
-
+import { useEvmBalances, useEvmWallet } from "@/web3/evm"
 export function WalletPanel() {
   const { t } = useTranslation()
   const {

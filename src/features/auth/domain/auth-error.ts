@@ -1,6 +1,5 @@
 import { ApiError, isDefinitiveClientError } from "@/lib/api/api-error"
-import { isUserRejectedWalletRequest } from "@/web3/evm/adapters/evm-wallet-rejection"
-
+import { isUserRejectedWalletRequest } from "@/web3/evm/errors"
 /**
  * Auth-specific error taxonomy. Intentionally DO NOT reuse `EvmWeb3Error`: auth
  * is an application concern, Web3 foundation must not depend on it.

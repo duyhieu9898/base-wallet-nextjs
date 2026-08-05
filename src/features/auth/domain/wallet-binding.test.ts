@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest"
 import type { Address } from "viem"
 
-import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
+import {
+  type EvmNetworkConfig,
+  type EvmSelection,
+  getDefaultEvmNetwork,
+} from "@/web3/evm"
 import type { AuthState } from "./auth-state"
 import {
   assertAuthenticatedWalletBinding,

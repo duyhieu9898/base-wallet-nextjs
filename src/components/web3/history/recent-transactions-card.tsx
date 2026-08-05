@@ -5,10 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/web3/common/status-badge"
 import { PendingReceiptReconciler } from "@/components/web3/history/pending-receipt-reconciler"
 import { useTranslation } from "@/i18n/use-translation"
-import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
-import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
-import { useEvmTransactionHistory } from "@/web3/evm/hooks/use-evm-transaction-history"
-
+import {
+  getEvmExplorerUrl,
+  useEvmSelection,
+  useEvmTransactionHistory,
+} from "@/web3/evm"
 export function RecentTransactionsCard() {
   const selection = useEvmSelection()
   const { t } = useTranslation()

@@ -6,11 +6,10 @@ import { Label } from "@/components/ui/label"
 import { StageBadge } from "@/components/web3/common/stage-badge"
 import { useTranslation } from "@/i18n/use-translation"
 import {
+  type EvmNetworkConfig,
   getEvmNetworkExplorer,
   getEvmNetworkRpcUrl,
-} from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
-
+} from "@/web3/evm"
 function Field(props: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1">

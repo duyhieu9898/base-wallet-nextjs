@@ -8,10 +8,11 @@ import { TransactionReviewCard } from "@/components/web3/common/transaction-revi
 import { TransactionStatus } from "@/components/web3/common/transaction-status"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { useTranslation } from "@/i18n/use-translation"
-import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
-import { useSendEvmNative } from "@/web3/evm/hooks/use-send-evm-native"
-import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
-
+import {
+  type EvmNetworkConfig,
+  getEvmExplorerUrl,
+  useSendEvmNative,
+} from "@/web3/evm"
 function Field(props: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1">

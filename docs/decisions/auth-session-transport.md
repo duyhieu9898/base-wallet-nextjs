@@ -108,7 +108,7 @@ Khi sử dụng application:
 normalized connected address === normalized session address
 ```
 
-So sánh address luôn qua `isSameAddress` trong `@/web3/core/address.utils`,
+So sánh address luôn qua `isSameAddress` trong `@/web3/evm/address`,
 không dùng string equality thô và không tự viết bản chuẩn hoá riêng cho auth. Wallet mismatch hoặc wallet disconnected khi đang authenticated sẽ khoá
 toàn application bằng blocking modal không thể dismiss (không backdrop, không
 Escape, không close button). Modal tự unlock khi connected address khớp lại

@@ -1,7 +1,14 @@
 /**
  * Typed EVM errors. Do not show the entire raw RPC error to the UI; keep the original error
  * in `cause` to debug. Wallet secrets never come through here.
+ *
+ * Đây là public leaf entrypoint (`@/web3/evm/errors`): React-free và wagmi-free,
+ * nên pure domain code dùng được mà không kéo EVM runtime vào module graph.
  */
+
+/** Phân biệt user rejection với failure thật — thuộc error taxonomy (0004). */
+export { isUserRejectedWalletRequest } from "./adapters/evm-wallet-rejection"
+
 export type EvmErrorCode =
   | "NETWORK_NOT_FOUND"
   | "NETWORK_DISABLED"

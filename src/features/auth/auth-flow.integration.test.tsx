@@ -20,9 +20,7 @@ import {
   setMockAuthDelay,
 } from "@/mocks/data/auth-session"
 import { PROTECTED_RESOURCE_PATH } from "@/mocks/handlers/protected-handlers"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
-
+import { type EvmSelection, getDefaultEvmNetwork } from "@/web3/evm"
 /**
  * Integration coverage for the entire auth flow.
  *

@@ -23,8 +23,7 @@ import { Button } from "@/components/ui/button"
 import type { Dictionary } from "@/i18n/dictionaries"
 import { useTranslation } from "@/i18n/use-translation"
 import { cn } from "@/lib/utils"
-import type { EvmWriteStatus } from "@/web3/evm/types/evm-write-status"
-
+import { type EvmWriteStatus } from "@/web3/evm"
 const MAX_VISIBLE_NOTIFICATIONS = 2
 const SUCCESS_DISMISS_DELAY_MS = 5_000
 const REJECTED_DISMISS_DELAY_MS = 3_000

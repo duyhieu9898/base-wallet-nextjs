@@ -180,7 +180,24 @@ Application không được phụ thuộc trực tiếp vào:
 - internal adapter implementation chỉ phục vụ một hook;
 - undocumented deep imports được xem là private.
 
-Public entrypoints hiện được xác định bởi các exported hooks, types và components được application sử dụng có chủ đích. Deep imports khác được xem là private.
+Public entrypoints được khai báo tường minh, không suy ra từ việc application
+đang import gì:
+
+```text
+@/web3/evm            runtime API (Tier A application, Tier B feature extension)
+@/web3/evm/address    pure address primitives, React-free và wagmi-free
+@/web3/evm/errors     pure error taxonomy, React-free và wagmi-free
+@/web3/web3-providers provider composition cho các family đã adopt
+```
+
+Mọi path khác dưới `src/web3/**` là private. ESLint enforce ranh giới này thay
+vì dựa vào review.
+
+`EvmProvider` cố ý không nằm trong `@/web3/evm`: export nó ở đó buộc mọi
+consumer của bất kỳ hook nào cũng phải dựng wagmi config tại import time, kéo
+toàn bộ runtime vào những module graph chỉ cần một pure helper.
+
+Chi tiết hai tier và contract của Tier B: `EXTENSION_CONTRACT.md` mục 3.
 
 ## 7. EVM application adoption
 

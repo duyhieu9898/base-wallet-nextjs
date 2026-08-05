@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useTranslation } from "@/i18n/use-translation"
-import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
-import { useEvmWallet } from "@/web3/evm/hooks/use-evm-wallet"
-
+import { getEvmExplorerUrl, useEvmWallet } from "@/web3/evm"
 function Field(props: { label: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-1">

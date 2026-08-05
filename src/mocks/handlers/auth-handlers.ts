@@ -7,7 +7,7 @@ import {
   requestSiweNonceInputSchema,
   verifySiweInputSchema,
 } from "@/features/auth/domain/auth.schemas"
-import { isSameAddress, isValidAddress } from "@/web3/core/address.utils"
+import { isSameAddress, isValidAddress } from "@/web3/evm/address"
 import { parseSiweMessage } from "./parse-siwe-message"
 import {
   mockAuthState,

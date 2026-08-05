@@ -5,9 +5,7 @@ import type { Address } from "viem"
 import { Web3Lab } from "@/components/web3/web3-lab"
 import { TransactionFeedbackProvider } from "@/components/web3/common/transaction-feedback"
 import { I18nProvider } from "@/i18n/i18n-provider"
-import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
-import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
-
+import { type EvmSelection, getDefaultEvmNetwork } from "@/web3/evm"
 const CHAIN_ID = 11155111
 const ACCOUNT: Address = "0x086d9feCB2F117369fAbDB884eC6851b36595444"
 const network = getDefaultEvmNetwork()

@@ -3,9 +3,10 @@
 import { CheckCircle2, HelpCircle, Loader2, XCircle } from "lucide-react"
 import { useTranslation } from "@/i18n/use-translation"
 
-import type { EvmTransactionHistoryStatus } from "@/web3/evm/types/evm-transaction-history"
-import type { EvmWriteStatus } from "@/web3/evm/types/evm-write-status"
-
+import {
+  type EvmTransactionHistoryStatus,
+  type EvmWriteStatus,
+} from "@/web3/evm"
 export type StatusBadgeStatus =
   EvmTransactionHistoryStatus | EvmWriteStatus | (string & {})
 

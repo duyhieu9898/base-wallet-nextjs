@@ -7,9 +7,7 @@ import { NetworkCard } from "@/components/web3/network/network-card"
 import { UnsupportedNetworkCard } from "@/components/web3/network/unsupported-network-card"
 import { WalletCard } from "@/components/web3/wallet/wallet-card"
 import { StakingPositionCard } from "@/features/staking/components/staking-position-card"
-import { getEvmTokensForChain } from "@/web3/evm/adapters/evm-registry.adapter"
-import { useEvmWallet } from "@/web3/evm/hooks/use-evm-wallet"
-
+import { getEvmTokensForChain, useEvmWallet } from "@/web3/evm"
 /**
  * Web3Lab is a dev-only test harness assembling production-grade Web3 domain components.
  */
