@@ -1,5 +1,1 @@
-export type ApiRequestOptions = Omit<RequestInit, "body"> & {
-  body?: unknown
-  accessToken?: string
-  timeout?: number
-}
+export type { ApiRequestOptions } from "@/types/api"

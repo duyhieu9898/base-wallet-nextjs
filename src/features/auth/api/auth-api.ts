@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from "@/constants/status-codes"
 import { ApiError } from "@/lib/api/api-error"
 import { api } from "@/lib/api"
 import {
@@ -158,7 +159,10 @@ export type LogoutOptions = AuthRequestOptions & {
 }
 
 function isSessionAlreadyAbsent(error: ApiError): boolean {
-  return error.status === 401 || error.status === 404
+  return (
+    error.status === HTTP_STATUS.UNAUTHORIZED ||
+    error.status === HTTP_STATUS.NOT_FOUND
+  )
 }
 
 /**

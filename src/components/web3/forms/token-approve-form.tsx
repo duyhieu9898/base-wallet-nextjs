@@ -7,7 +7,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TransactionReviewCard } from "@/components/web3/common/transaction-review-card"
 import { TransactionStatus } from "@/components/web3/common/transaction-status"
+import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { useTranslation } from "@/i18n/use-translation"
+import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import { useApproveEvmToken } from "@/web3/evm/hooks/use-approve-evm-token"
 import type { AssetContractConfig } from "@/web3/evm/registry/evm-registry.types"
 
@@ -53,6 +55,17 @@ export function TokenApproveForm(props: {
   })
 
   const isLocked = status === "awaiting-signature" || status === "confirming"
+  const feedback = useTransactionFeedback({
+    title: t.transfer.approveNotificationTitle.replace(
+      "{symbol}",
+      token.symbol,
+    ),
+    status,
+    hash,
+    error: hookError,
+    getExplorerUrl: (transactionHash) =>
+      getTransactionExplorerUrl(chainId, transactionHash),
+  })
 
   function onPrepare() {
     setFormError(null)
@@ -65,6 +78,7 @@ export function TokenApproveForm(props: {
 
   async function onConfirm() {
     setFormError(null)
+    feedback.begin()
     try {
       await confirmApprove()
     } catch (cause) {
@@ -111,7 +125,7 @@ export function TokenApproveForm(props: {
             <Button variant="ghost" size="sm" onClick={stopTrackingReceipt}>
               {t.common.stopTracking}
             </Button>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-sm">
               {t.common.stopTrackingDescription}
             </p>
           </div>

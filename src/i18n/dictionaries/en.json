@@ -107,7 +107,9 @@
     "confirmSendNative": "Confirm & Send {symbol}",
     "confirmSendToken": "Confirm & Send {symbol}",
     "confirmApproveToken": "Confirm & Approve {symbol}",
-    "openingWallet": "Opening Wallet..."
+    "openingWallet": "Opening Wallet...",
+    "sendNotificationTitle": "Send {symbol}",
+    "approveNotificationTitle": "Approve {symbol}"
   },
   "review": {
     "title": "Transaction Review",
@@ -122,6 +124,17 @@
     "estimatedMaxFee": "Estimated maximum fee (EIP-1559 upper bound):",
     "estimatingGas": "Estimating gas...",
     "feeEstimateFailed": "Fee estimate failed ({message})"
+  },
+  "feedback": {
+    "awaitingSignature": "Confirm in wallet",
+    "confirming": "Transaction submitted",
+    "success": "Transaction confirmed",
+    "reverted": "Transaction reverted",
+    "rejected": "Request cancelled",
+    "receiptError": "Unable to confirm transaction",
+    "error": "Transaction could not be submitted",
+    "viewInExplorer": "View in explorer",
+    "dismiss": "Dismiss transaction notification"
   },
   "errors": {
     "userRejected": "Transaction was rejected in wallet.",

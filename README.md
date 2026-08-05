@@ -4,6 +4,12 @@ NLN Frontend is a Next.js Web3 foundation with an EVM runtime and an
 application-level SIWE authentication example. Reusable blockchain behavior is
 kept separate from application features and policy.
 
+## Related repository
+
+The standalone administration UI lives in the sibling
+[`nln-admin`](../nln-admin) repository. It is a React/Vite application and does
+not depend on this Web3 foundation.
+
 ## Documentation
 
 Start with [`docs/README.md`](docs/README.md). For an application feature, read

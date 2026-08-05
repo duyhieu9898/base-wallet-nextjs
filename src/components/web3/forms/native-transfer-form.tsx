@@ -6,7 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { TransactionReviewCard } from "@/components/web3/common/transaction-review-card"
 import { TransactionStatus } from "@/components/web3/common/transaction-status"
+import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { useTranslation } from "@/i18n/use-translation"
+import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import { useSendEvmNative } from "@/web3/evm/hooks/use-send-evm-native"
 import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
 
@@ -46,6 +48,17 @@ export function NativeTransferForm(props: {
   const [formError, setFormError] = useState<string | null>(null)
 
   const isLocked = status === "awaiting-signature" || status === "confirming"
+  const feedback = useTransactionFeedback({
+    title: t.transfer.sendNotificationTitle.replace(
+      "{symbol}",
+      network.chain.nativeCurrency.symbol,
+    ),
+    status,
+    hash,
+    error: hookError,
+    getExplorerUrl: (transactionHash) =>
+      getTransactionExplorerUrl(chainId, transactionHash),
+  })
 
   function onPrepare() {
     setFormError(null)
@@ -58,6 +71,7 @@ export function NativeTransferForm(props: {
 
   async function onConfirm() {
     setFormError(null)
+    feedback.begin()
     try {
       await confirmSend()
     } catch (cause) {
@@ -105,7 +119,7 @@ export function NativeTransferForm(props: {
             <Button variant="ghost" size="sm" onClick={stopTrackingReceipt}>
               {t.common.stopTracking}
             </Button>
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-sm">
               {t.common.stopTrackingDescription}
             </p>
           </div>

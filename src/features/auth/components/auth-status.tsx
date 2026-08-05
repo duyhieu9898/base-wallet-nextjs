@@ -39,7 +39,7 @@ export function AuthStatus() {
                   {state.user.roles.map((role) => (
                     <span
                       key={role}
-                      className="bg-muted rounded px-2 py-0.5 text-xs"
+                      className="bg-muted rounded px-2 py-0.5 text-sm"
                     >
                       {role}
                     </span>

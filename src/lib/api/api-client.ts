@@ -1,3 +1,4 @@
+import { HTTP_STATUS } from "@/constants/status-codes"
 import { ApiError, type ApiErrorPayload } from "./api-error"
 import type { ApiRequestOptions } from "./types"
 
@@ -10,7 +11,7 @@ function isBodyAllowed(method?: string) {
 }
 
 async function parseResponseBody(response: Response): Promise<unknown> {
-  if (response.status === 204) {
+  if (response.status === HTTP_STATUS.NO_CONTENT) {
     return null
   }
 

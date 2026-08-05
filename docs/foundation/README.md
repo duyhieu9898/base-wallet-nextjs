@@ -36,7 +36,9 @@ Foundation không chứa business logic của một dApp cụ thể.
 
 Foundation tổ chức blockchain support theo các chain-family modules độc lập.
 
-EVM là runtime implementation hiện tại. Solana tồn tại như một module boundary/reference implementation để chứng minh rằng foundation, application và từng chain family không bị gắn cứng vào nhau; Solana wallet/read/write runtime chưa được triển khai.
+EVM là runtime implementation duy nhất hiện tại. Hướng dẫn trung lập để thêm
+một chain family mới nằm tại `src/web3/chain-family-template/`; không có SDK,
+metadata catalog, hay provider cho family chưa có consumer.
 
 Foundation được xây bằng:
 
@@ -74,13 +76,12 @@ Foundation chỉ cung cấp module boundaries, reusable primitives, safety invar
 | Foundation module    | Implementation độc lập cho một chain family                                    |
 | Application adoption | Quyết định của dApp về family/network/feature/constraint                       |
 
-Ví dụ chain family: `EVM`, `Solana`.
+Ví dụ chain family: `EVM`.
 
 Ví dụ network của EVM: Ethereum Mainnet, Sepolia, Arbitrum, Polygon, BSC. Sepolia hoặc Arbitrum không phải chain family khác EVM.
 
-Ví dụ network của Solana: Mainnet Beta, Devnet.
-
-Solana không phải fallback của EVM. Không tồn tại behavior "EVM lỗi → tự chuyển sang Solana".
+Một chain family khác không phải fallback của EVM. Không tồn tại behavior tự
+chuyển family khi EVM lỗi.
 
 ## Operational modes
 
@@ -94,7 +95,8 @@ Các mode khả dụng hiện tại:
 
 Foundation không hardcode network của các mode trên; application adoption/config quyết định.
 
-Solana-only và multi-family application không phải capability hiện tại: chúng cần một Solana runtime module chưa được triển khai. Xem `CAPABILITIES.md`.
+Multi-family application không phải capability hiện tại: chúng cần ít nhất hai
+runtime đã được triển khai. Xem `CAPABILITIES.md`.
 
 ## Production-oriented, không phải production-complete
 
@@ -113,6 +115,7 @@ Danh sách đầy đủ non-goals nằm trong `CAPABILITIES.md`.
 | `ARCHITECTURE.md`       | Cấu trúc, module ownership, module classification, adoption flow, public API và trust boundary |
 | `CAPABILITIES.md`       | Foundation đã cung cấp, deferred, product-dependent và non-goals                               |
 | `EXTENSION_CONTRACT.md` | Quy tắc application/feature sử dụng và mở rộng foundation                                      |
+| `ADOPTION_GUIDE.md`     | Cách copy base, cấu hình runtime và chọn các reference module                                  |
 | `decisions/`            | Rule hiện hành của foundation theo từng responsibility                                         |
 
 ## Foundation và application

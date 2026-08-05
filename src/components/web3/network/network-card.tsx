@@ -61,7 +61,7 @@ export function NetworkCard(props: {
         </Field>
 
         <Field label={t.network.rpc}>
-          <span className="font-mono text-xs break-all">
+          <span className="font-mono text-sm break-all">
             {getEvmNetworkRpcUrl(network)}
           </span>
         </Field>
@@ -79,7 +79,7 @@ export function NetworkCard(props: {
 
         {network.faucets.length > 0 ? (
           <div className="space-y-1">
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-sm">
               {t.network.faucetTestnet}
             </p>
             {network.faucets.map((faucet) => (

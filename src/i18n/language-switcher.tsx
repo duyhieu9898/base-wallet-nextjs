@@ -9,13 +9,13 @@ export function LanguageSwitcher() {
   const { locale, setLocale } = useTranslation()
 
   return (
-    <div className="flex items-center gap-1 rounded-md border p-1 text-xs">
+    <div className="flex items-center gap-1 rounded-md border p-1 text-sm">
       {locales.map((loc: Locale) => (
         <Button
           key={loc}
           variant={locale === loc ? "default" : "ghost"}
           size="sm"
-          className="h-6 px-2 text-xs"
+          className="h-7 px-2.5 text-sm"
           onClick={() => setLocale(loc)}
         >
           {localeNames[loc]}

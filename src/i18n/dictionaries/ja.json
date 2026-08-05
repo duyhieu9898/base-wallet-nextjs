@@ -107,7 +107,9 @@
     "confirmSendNative": "確認して {symbol} を送金",
     "confirmSendToken": "確認して {symbol} を送金",
     "confirmApproveToken": "確認して {symbol} を承認",
-    "openingWallet": "ウォレット起動中..."
+    "openingWallet": "ウォレット起動中...",
+    "sendNotificationTitle": "{symbol} 送金",
+    "approveNotificationTitle": "{symbol} 承認"
   },
   "review": {
     "title": "取引内容の確認",
@@ -122,6 +124,17 @@
     "estimatedMaxFee": "推定最大手数料 (EIP-1559 上限):",
     "estimatingGas": "ガス代計算中...",
     "feeEstimateFailed": "手数料計算失敗 ({message})"
+  },
+  "feedback": {
+    "awaitingSignature": "ウォレットで確認してください",
+    "confirming": "トランザクションが送信されました",
+    "success": "トランザクションが確定しました",
+    "reverted": "トランザクションがリバートされました",
+    "rejected": "リクエストがキャンセルされました",
+    "receiptError": "トランザクションを確認できません",
+    "error": "トランザクションを送信できませんでした",
+    "viewInExplorer": "エクスプローラーで表示",
+    "dismiss": "トランザクション通知を閉じる"
   },
   "errors": {
     "userRejected": "ウォレットで取引が拒否されました。",

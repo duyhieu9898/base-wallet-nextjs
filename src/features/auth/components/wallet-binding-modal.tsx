@@ -104,7 +104,7 @@ export function WalletBindingModal({
           )}
 
           <div className="mt-6 flex flex-col gap-2">
-            <p className="text-muted-foreground text-xs">
+            <p className="text-muted-foreground text-sm">
               {t.auth.switchHint.replace("{address}", sessionAddress)}
             </p>
 

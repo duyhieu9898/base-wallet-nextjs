@@ -1,15 +1,14 @@
-export type ApiErrorPayload = {
-  code?: string
-  message?: string
-  details?: unknown
-}
+import { HTTP_STATUS, type HttpStatusCode } from "@/constants/status-codes"
+import type { ApiErrorPayload } from "@/types/api"
+
+export type { ApiErrorPayload }
 
 export class ApiError extends Error {
-  readonly status: number
+  readonly status: HttpStatusCode | number
   readonly code?: string
   readonly details?: unknown
 
-  constructor(status: number, payload?: ApiErrorPayload) {
+  constructor(status: HttpStatusCode | number, payload?: ApiErrorPayload) {
     super(payload?.message ?? `API request failed with status ${status}`)
 
     this.name = "ApiError"
@@ -28,7 +27,11 @@ export class ApiError extends Error {
  * Exposing users unfairly, with the retry policy, that's giving up too early.
  */
 export function isDefinitiveClientError(error: unknown): boolean {
-  return error instanceof ApiError && error.status >= 400 && error.status < 500
+  return (
+    error instanceof ApiError &&
+    error.status >= HTTP_STATUS.BAD_REQUEST &&
+    error.status < HTTP_STATUS.INTERNAL_SERVER_ERROR
+  )
 }
 
 /**

@@ -8,6 +8,7 @@ import { AuthRuntimeProvider } from "@/features/auth/runtime/auth-runtime-provid
 import { I18nProvider } from "@/i18n/i18n-provider"
 import { MockProvider } from "@/providers/mock-provider"
 import { QueryProvider } from "@/providers/query-provider"
+import { TransactionFeedbackProvider } from "@/components/web3/common/transaction-feedback"
 import { Web3Providers } from "@/web3/web3-providers"
 
 type ProvidersProps = {
@@ -35,9 +36,11 @@ export function Providers({ children }: ProvidersProps) {
         <QueryProvider>
           <Web3Providers>
             <AuthRuntimeProvider>
-              <AuthBootstrapBoundary>
-                <AuthWalletBindingGate>{children}</AuthWalletBindingGate>
-              </AuthBootstrapBoundary>
+              <TransactionFeedbackProvider>
+                <AuthBootstrapBoundary>
+                  <AuthWalletBindingGate>{children}</AuthWalletBindingGate>
+                </AuthBootstrapBoundary>
+              </TransactionFeedbackProvider>
             </AuthRuntimeProvider>
           </Web3Providers>
         </QueryProvider>

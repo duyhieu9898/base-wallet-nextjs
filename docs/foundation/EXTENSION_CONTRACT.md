@@ -61,23 +61,13 @@ Không sửa foundation decision chỉ vì khách hàng đổi Sepolia → Arbit
 
 - enable EVM module;
 - configure supported EVM networks;
-- disable/ignore Solana module boundary;
 - add feature contracts trong application layer.
 
-#### Solana-only dApp
+#### Additional-family dApp
 
-Chỉ thực hiện sau khi Solana runtime hoàn chỉnh.
-
-- enable Solana provider;
-- configure Solana clusters;
-- không load EVM providers nếu không dùng.
-
-#### Multi-family dApp
-
-- compose cả hai providers;
-- giữ riêng wallet contexts;
-- giữ riêng transaction states;
-- application định nghĩa cross-family navigation.
+Chỉ thực hiện sau khi family runtime được hoàn thành theo
+`src/web3/chain-family-template/README.md`. Không load EVM providers nếu
+application không adopt EVM.
 
 ## 2. Stricter, not weaker
 
@@ -118,9 +108,6 @@ Application UI nên tiêu thụ:
 ```text
 EVM:
 src/web3/evm/hooks/
-
-Solana:
-src/web3/solana/hooks/ khi được triển khai
 ```
 
 - exported domain types;
@@ -407,7 +394,7 @@ Business-specific contracts nên bắt đầu ở feature layer.
 
 ### 13.6. Thêm chain-family runtime
 
-Checklist này áp dụng cho cả hai trường hợp: hoàn thiện Solana runtime hiện đang là boundary, hoặc thêm một family module thứ ba.
+Checklist này áp dụng khi thêm một chain-family runtime mới.
 
 Một chain family mới không được ép vào EVM abstractions nếu semantics khác.
 

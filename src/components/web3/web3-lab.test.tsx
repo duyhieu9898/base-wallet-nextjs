@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest"
 import type { Address } from "viem"
 
 import { Web3Lab } from "@/components/web3/web3-lab"
+import { TransactionFeedbackProvider } from "@/components/web3/common/transaction-feedback"
 import { I18nProvider } from "@/i18n/i18n-provider"
 import { getDefaultEvmNetwork } from "@/web3/evm/adapters/evm-registry.adapter"
 import type { EvmSelection } from "@/web3/evm/selection/evm-selection"
@@ -150,7 +151,9 @@ describe("Web3Lab Composition", () => {
   it("renders all domain sections including TransferSection when selection is ready", () => {
     render(
       <I18nProvider>
-        <Web3Lab />
+        <TransactionFeedbackProvider>
+          <Web3Lab />
+        </TransactionFeedbackProvider>
       </I18nProvider>,
     )
 

@@ -47,13 +47,13 @@ export function RecentTransactionsCard() {
       </CardHeader>
       <CardContent className="space-y-3 text-sm">
         {transactions.length === 0 ? (
-          <p className="text-muted-foreground text-xs">{t.history.empty}</p>
+          <p className="text-muted-foreground text-sm">{t.history.empty}</p>
         ) : (
           <div className="space-y-3">
             {transactions.map((tx) => (
               <div
                 key={`${tx.chainId}:${tx.hash}`}
-                className="border-border bg-muted/20 space-y-1.5 rounded-md border p-3 text-xs"
+                className="border-border bg-muted/20 space-y-1.5 rounded-md border p-3 text-sm"
               >
                 {tx.status === "pending" ? (
                   <PendingReceiptReconciler

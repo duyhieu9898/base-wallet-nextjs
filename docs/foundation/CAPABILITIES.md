@@ -15,27 +15,16 @@ Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó ch
 
 ## Implementation status
 
-| Module/capability                 | Trạng thái        |
-| --------------------------------- | ----------------- |
-| Foundation/application separation | Ready             |
-| Chain-family module boundary      | Ready             |
-| EVM module                        | Ready             |
-| EVM multi-network registry        | Ready             |
-| EVM read/write lifecycle          | Ready             |
-| Solana module boundary            | Ready             |
-| Solana metadata/reference catalog | Ready             |
-| Solana wallet/read/write runtime  | Not implemented   |
-| Solana production components      | Not implemented   |
-| Multi-family provider composition | Deferred          |
-| Cross-family application UX       | Product-dependent |
-
-Hai điểm không được đọc nhầm:
-
-```text
-Solana boundary tồn tại
-≠
-Solana runtime đã sẵn sàng
-```
+| Module/capability                    | Trạng thái        |
+| ------------------------------------ | ----------------- |
+| Foundation/application separation    | Ready             |
+| Chain-family module boundary         | Ready             |
+| EVM module                           | Ready             |
+| EVM multi-network registry           | Ready             |
+| EVM read/write lifecycle             | Ready             |
+| Chain-family implementation template | Ready             |
+| Multi-family provider composition    | Deferred          |
+| Cross-family application UX          | Product-dependent |
 
 ```text
 EVM runtime tồn tại
@@ -139,6 +128,11 @@ foundation bị khóa cứng vào một EVM dApp
 ## Ready application shell
 
 - Reusable Web3 domain components.
+- Transaction feedback provider for UI-only write progress. A feature calls
+  `useTransactionFeedback().begin()` when the user confirms; its write hook
+  remains the source of truth for hash and receipt status. It shows at most two
+  bottom-right notifications: success closes after 5 seconds, rejected after 3
+  seconds, and reverted or receipt-tracking failures require manual dismissal.
 - Dev-only Web3 composition harness.
 - English/Japanese i18n.
 - Hydration-safe locale initialization.
@@ -153,18 +147,12 @@ foundation bị khóa cứng vào một EVM dApp
 - Local EVM testnet write script.
 - Typecheck, lint, format, tests và Next.js build.
 
-## Ready Solana reference boundary
+## Ready chain-family implementation template
 
-Chỉ những gì thực sự tồn tại:
-
-- `src/web3/solana/` module boundary;
-- Solana metadata catalog (`registry/solana-network.catalog.ts`);
-- explicit non-import boundary với EVM;
-- `runtimeImplemented: false` trong catalog entries;
-- không cài Solana SDK;
-- không nằm trong active provider tree.
-
-Boundary này là reference implementation của chain-family isolation, không phải một runtime capability.
+`src/web3/chain-family-template/README.md` defines the required ownership,
+decisions, and completion criteria for a future chain-family runtime. It is
+documentation only and does not add a dependency, provider, or supported
+network.
 
 ## Deferred capabilities
 
@@ -251,24 +239,11 @@ Chỉ thêm khi deterministic integration tests trở nên cần thiết.
 
 Hook/domain invariants hiện được ưu tiên. Application cụ thể bổ sung UI tests theo user flows thật.
 
-### Solana executable runtime
+### Additional chain-family runtime
 
-Module boundary và metadata catalog đã có; runtime thì chưa.
-
-Chưa triển khai:
-
-- wallet standard integration;
-- provider/client;
-- selection;
-- balances;
-- SPL token reads;
-- transaction simulation/preflight;
-- writes;
-- confirmation lifecycle;
-- UI components;
-- tests.
-
-Chỉ triển khai khi có Solana application requirement.
+Chỉ triển khai khi có application requirement. Start from
+`src/web3/chain-family-template/README.md`; do not add an SDK, metadata
+catalog, or universal multi-chain type beforehand.
 
 ### Multi-network EVM application
 
@@ -323,9 +298,9 @@ Foundation không:
 - đảm bảo finality ngoài dữ liệu chain cung cấp;
 - tự chọn chain/network thay application;
 - hứa mọi blockchain chạy được chỉ bằng config;
-- tự failover giữa EVM và Solana;
-- ép EVM và Solana vào một transaction model giả;
-- coi Solana module boundary là production runtime;
+- tự failover giữa các chain family;
+- ép các chain family vào một transaction model giả;
+- coi implementation template là production runtime;
 - hardcode customer chain selection vào foundation docs.
 
 "Any chain" luôn bị giới hạn bởi các family module đã thực sự được triển khai.

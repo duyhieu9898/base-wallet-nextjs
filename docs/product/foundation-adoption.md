@@ -4,10 +4,9 @@ Foundation: `base-wallet-nextjs`, maintained in this repository.
 
 Foundation version: the application and foundation share the same Git commit.
 
-## Adopted chain-family modules
+## Adopted runtime
 
 - EVM runtime is adopted.
-- Solana remains a reference/module boundary and is not an application runtime.
 
 ## Supported networks and default network
 

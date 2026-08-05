@@ -56,7 +56,7 @@ export function BalanceCard(props: {
               label={t.balance.tokenMetadata.replace("{symbol}", token.symbol)}
             >
               {token.name} · {token.expectedDecimals} decimals ·{" "}
-              <span className="font-mono text-xs break-all">
+              <span className="font-mono text-sm break-all">
                 {token.address}
               </span>
             </Field>

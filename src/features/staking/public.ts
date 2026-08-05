@@ -17,6 +17,10 @@ export {
   type CreateMockStakingModuleOptions,
 } from "./mocks/mock-staking-module"
 export { useStakingPosition } from "./hooks/use-staking-position"
+export { StakingActionPanel } from "./components/staking-action-panel"
+export { StakingApprovalPanel } from "./components/staking-approval-panel"
+export { StakingPositionCard } from "./components/staking-position-card"
+export { StakingPositionSummary } from "./components/staking-position-summary"
 export {
   type StakingAsset,
   type StakingOperation,

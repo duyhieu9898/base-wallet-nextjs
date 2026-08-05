@@ -23,9 +23,7 @@ Foundation không quyết định thay application:
 - backend, indexer hoặc analytics;
 - product-specific UI và business rules.
 
-EVM là runtime implementation hiện tại.
-
-Solana chỉ giữ một independent module boundary/reference để chứng minh rằng một chain family khác không phải dùng EVM types hoặc lifecycle. Solana executable runtime và multi-family orchestration chưa được triển khai và không phải committed roadmap.
+EVM là runtime implementation duy nhất hiện tại.
 
 ## 2. Design principles
 
@@ -106,22 +104,21 @@ src/web3/
 │   ├── types/
 │   ├── errors.ts
 │   └── evm-provider.tsx
-├── solana/
 └── web3-providers.tsx
 ```
 
-| Layer              | Responsibility                                     |
-| ------------------ | -------------------------------------------------- |
-| `core/`            | Concepts đã được chứng minh không phụ thuộc family |
-| `evm/registry/`    | EVM network và token configuration                 |
-| `evm/selection/`   | EVM wallet/network readiness                       |
-| `evm/adapters/`    | Pure validation, builders, mappers và derivation   |
-| `evm/services/`    | Viem I/O ngoài React                               |
-| `evm/hooks/`       | React/Wagmi lifecycle orchestration                |
-| `evm/storage/`     | Versioned client persistence                       |
-| `components/web3/` | Reusable presentation và user intent               |
-| `features/`        | Application business behavior                      |
-| `solana/`          | Reference boundary; không phải executable runtime  |
+| Layer                    | Responsibility                                       |
+| ------------------------ | ---------------------------------------------------- |
+| `core/`                  | Concepts đã được chứng minh không phụ thuộc family   |
+| `evm/registry/`          | EVM network và token configuration                   |
+| `evm/selection/`         | EVM wallet/network readiness                         |
+| `evm/adapters/`          | Pure validation, builders, mappers và derivation     |
+| `evm/services/`          | Viem I/O ngoài React                                 |
+| `evm/hooks/`             | React/Wagmi lifecycle orchestration                  |
+| `evm/storage/`           | Versioned client persistence                         |
+| `components/web3/`       | Reusable presentation và user intent                 |
+| `features/`              | Application business behavior                        |
+| `chain-family-template/` | Checklist documentation cho family runtime tương lai |
 
 ## 5. Foundation module classification
 
@@ -158,7 +155,7 @@ Các phần sau không phải product requirement:
 - example networks và tokens;
 - Sepolia local-write script;
 - public RPC defaults;
-- Solana module boundary/reference metadata.
+- Chain-family implementation template (documentation only).
 
 Application adoption phải review, thay thế hoặc xóa các reference defaults không phù hợp.
 
@@ -309,9 +306,9 @@ Không được:
 - ép mọi family vào universal `sendTransaction`;
 - đưa shared abstraction vào `core/` trước khi có ít nhất hai runtime consumers thật.
 
-`src/web3/solana/` hiện chỉ là reference boundary. Nó không cung cấp wallet, read, write hoặc provider runtime.
-
-Multi-family execution không phải capability hiện tại hoặc committed roadmap. Application chỉ compose nhiều family providers sau khi các runtime đó thực sự tồn tại.
+`src/web3/chain-family-template/` không phải module runtime. Multi-family
+execution không phải capability hiện tại hoặc committed roadmap. Một family mới
+chỉ được thêm khi có application requirement đã được chấp thuận.
 
 ## 11. Testing and quality
 

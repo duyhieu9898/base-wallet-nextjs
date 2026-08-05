@@ -1,3 +1,4 @@
+import { HTTP_STATUS, API_ERROR_CODES } from "@/constants/status-codes"
 import { delay, http, HttpResponse } from "msw"
 import { recoverMessageAddress, type Address } from "viem"
 
@@ -48,7 +49,11 @@ async function applyEndpointMode(endpoint: Endpoint): Promise<Response | null> {
   }
 
   if (mode === "server-error") {
-    return jsonError(500, "INTERNAL_ERROR", "Mock backend error.")
+    return jsonError(
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      API_ERROR_CODES.INTERNAL_ERROR,
+      "Mock backend error.",
+    )
   }
 
   return null
@@ -326,7 +331,7 @@ export const authHandlers = [
 
     // Idempotent: callback when there is no longer a session still returns 204.
     return new HttpResponse(null, {
-      status: 204,
+      status: HTTP_STATUS.NO_CONTENT,
       headers: refreshCookieHeaders(null),
     })
   }),
