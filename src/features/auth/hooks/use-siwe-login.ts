@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useLayoutEffect, useRef, useState } from "react"
 import { useSignMessage } from "wagmi"
 import type { Address } from "viem"
 
@@ -94,12 +94,16 @@ export function useSiweLogin(): UseSiweLoginResult {
   // The *current* state, not the frozen state in the render closure
   // Start logging in.
   //
-  // Write in the effect, not the render — the render must be pure. Wallet
-  // Changes always involve a commit, so the ref is updated before the next async step
-  // keep running.
+  // Write in the effect, not the render — the render must be pure.
   const selectionRef = useRef(selection)
 
-  useEffect(() => {
+  // `useLayoutEffect`, không phải `useEffect`: passive effect được flush sau
+  // paint và React có thể hoãn nó dưới tải. Trong khoảng đó `selectionRef` còn
+  // giữ selection cũ, nên một wallet change xảy ra giữa flow có thể lọt qua
+  // `assertSnapshotStillValid`. Layout effect flush ngay sau commit, khép cửa
+  // sổ đó lại. Đây cũng là pattern `useEvmWriteLifecycle` dùng cho stale-
+  // operation refs.
+  useLayoutEffect(() => {
     selectionRef.current = selection
   }, [selection])
 

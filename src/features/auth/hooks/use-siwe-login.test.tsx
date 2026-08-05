@@ -118,14 +118,43 @@ type HarnessHandle = {
   logout: () => Promise<void>
 }
 
-let handle: HarnessHandle
+type HarnessHolder = { current: HarnessHandle | null }
 
-function Harness() {
+/**
+ * Mỗi lần render tạo một holder riêng, và `handle` chỉ đọc holder đang active.
+ *
+ * Không dùng một biến module-level được gán thẳng trong `useEffect`: tree của
+ * test trước có thể chưa cleanup xong khi test sau đã render. Một response về
+ * muộn làm tree cũ re-render, effect chạy lại và ghi đè handle bằng closure của
+ * component đã unmount — test hiện tại sẽ drive cái tree chết đó và state không
+ * bao giờ xuất hiện trên DOM đang assert. Đây là race chỉ lộ ra khi suite chạy
+ * song song.
+ */
+let activeHolderRef: HarnessHolder = { current: null }
+
+const handle: HarnessHandle = {
+  signIn: () => {
+    if (activeHolderRef.current === null) {
+      throw new Error("Harness chưa sẵn sàng: gọi renderHarness() trước.")
+    }
+
+    return activeHolderRef.current.signIn()
+  },
+  logout: () => {
+    if (activeHolderRef.current === null) {
+      throw new Error("Harness chưa sẵn sàng: gọi renderHarness() trước.")
+    }
+
+    return activeHolderRef.current.logout()
+  },
+}
+
+function Harness({ holderRef }: { holderRef: HarnessHolder }) {
   const login = useSiweLogin()
   const auth = useAuth()
 
   useEffect(() => {
-    handle = { signIn: login.signIn, logout: auth.logout }
+    holderRef.current = { signIn: login.signIn, logout: auth.logout }
   })
 
   return (
@@ -153,7 +182,11 @@ function renderHarness() {
     )
   }
 
-  render(<Harness />, { wrapper: Wrapper })
+  const holderRef: HarnessHolder = { current: null }
+
+  activeHolderRef = holderRef
+
+  render(<Harness holderRef={holderRef} />, { wrapper: Wrapper })
 
   return waitFor(() => {
     expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
