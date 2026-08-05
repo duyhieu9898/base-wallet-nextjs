@@ -61,13 +61,13 @@ Public write boundary phải:
 Implementation:
 
 - `src/web3/evm/chain/selection/assert-evm-write-ready.ts`
-- `src/web3/evm/hooks/use-send-evm-native.ts`
-- `src/web3/evm/hooks/use-send-evm-token.ts`
-- `src/web3/evm/hooks/use-approve-evm-token.ts`
+- `src/web3/evm/transactions/native-transfer/use-send-evm-native.ts`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.ts`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.ts`
 
 Tests:
 
 - `src/web3/evm/chain/selection/assert-evm-write-ready.test.ts`
-- `src/web3/evm/hooks/use-send-evm-native.test.tsx`
-- `src/web3/evm/hooks/use-send-evm-token.test.tsx`
-- `src/web3/evm/hooks/use-approve-evm-token.test.tsx`
+- `src/web3/evm/transactions/native-transfer/use-send-evm-native.test.tsx`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.test.tsx`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.test.tsx`

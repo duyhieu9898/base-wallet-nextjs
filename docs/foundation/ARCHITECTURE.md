@@ -101,13 +101,20 @@ src/web3/
 │   ├── reads/
 │   │   ├── balances/
 │   │   └── allowances/
-│   ├── abi/
-│   ├── adapters/
-│   ├── clients/
-│   ├── hooks/
-│   ├── storage/
-│   ├── types/
-│   └── evm-provider.tsx
+│   ├── transactions/
+│   │   ├── lifecycle/         duplicate-submit, operation ownership
+│   │   ├── receipt/           receipt tracking
+│   │   ├── review/            shared review model
+│   │   ├── fees/              fee estimate
+│   │   ├── history/           versioned persistence, reconciliation
+│   │   ├── invalidation/      targeted cache invalidation
+│   │   ├── native-transfer/   prepare, review, hook, tests
+│   │   ├── erc20-transfer/    prepare, review, hook, tests
+│   │   └── erc20-approval/    prepare, review, hook, tests
+│   ├── components/       reusable, hiểu EVM semantics
+│   ├── provider/         EvmProvider, wagmi config
+│   ├── abi/              standard ABI (ERC-20)
+│   └── clients/          Viem public client
 ├── chain-family-template/
 └── web3-providers.tsx
 ```
@@ -126,10 +133,10 @@ thật chứng minh một khái niệm chung.
 | `evm/chain/registry/`    | EVM network, token và native asset configuration     |
 | `evm/chain/selection/`   | EVM wallet/network readiness                         |
 | `evm/reads/`             | Balance và allowance: hook, builder, mapper, service |
-| `evm/adapters/`          | Pure validation, builders, mappers và derivation     |
-| `evm/hooks/`             | React/Wagmi lifecycle orchestration                  |
-| `evm/storage/`           | Versioned client persistence                         |
-| `components/web3/`       | Reusable presentation và user intent                 |
+| `evm/transactions/`      | Shared write mechanics + vertical slice mỗi loại tx  |
+| `evm/components/`        | Reusable component hiểu EVM semantics                |
+| `evm/provider/`          | EvmProvider và wagmi configuration                   |
+| `components/web3/`       | Application-owned web3 presentation                  |
 | `features/`              | Application business behavior                        |
 | `chain-family-template/` | Checklist documentation cho family runtime tương lai |
 

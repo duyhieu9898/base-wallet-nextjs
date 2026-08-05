@@ -3,7 +3,7 @@
 import { useMemo } from "react"
 import { useBalance, useReadContracts } from "wagmi"
 
-import type { EvmAssetBalance } from "@/web3/evm/types/evm-domain"
+import type { EvmAssetBalance } from "@/web3/evm/reads/balances/evm-balance.types"
 import {
   buildTokenBalanceContracts,
   mapTokenBalanceResults,

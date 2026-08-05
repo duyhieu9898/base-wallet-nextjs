@@ -73,15 +73,15 @@ Warnings:
 
 Implementation:
 
-- `src/web3/evm/adapters/evm-transaction-review.adapter.ts`
-- `src/web3/evm/types/evm-transaction-review.ts`
-- `src/web3/evm/hooks/use-evm-fee-estimate.ts`
-- `src/web3/evm/types/evm-fee-estimate.ts`
-- `src/components/web3/common/transaction-review-card.tsx`
-- `src/components/web3/forms/`
+- `src/web3/evm/transactions/{native-transfer,erc20-transfer,erc20-approval}/review.ts`
+- `src/web3/evm/transactions/review/evm-transaction-review.ts`
+- `src/web3/evm/transactions/fees/use-evm-fee-estimate.ts`
+- `src/web3/evm/transactions/fees/evm-fee-estimate.ts`
+- `src/web3/evm/components/common/transaction-review-card.tsx`
+- `src/web3/evm/components/forms/`
 
 Tests:
 
-- `src/web3/evm/adapters/evm-transaction-review.adapter.test.ts`
-- `src/web3/evm/hooks/use-evm-fee-estimate.test.tsx`
+- `src/web3/evm/transactions/{native-transfer,erc20-transfer,erc20-approval}/review.test.ts`
+- `src/web3/evm/transactions/fees/use-evm-fee-estimate.test.tsx`
 - `src/components/web3/web3-lab.test.tsx`

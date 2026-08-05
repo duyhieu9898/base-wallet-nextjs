@@ -53,7 +53,7 @@ Implementation:
 - `src/web3/evm/chain/selection/evm-selection.ts`
 - `src/web3/evm/chain/selection/use-evm-selection.ts`
 - `src/web3/evm/chain/selection/assert-evm-write-ready.ts`
-- `src/web3/evm/hooks/use-evm-wallet.ts`
+- `src/web3/evm/chain/selection/use-evm-wallet.ts`
 
 Tests:
 

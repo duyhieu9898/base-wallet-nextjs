@@ -61,14 +61,14 @@ Receipt-success callbacks và invalidations chỉ chạy một lần cho mỗi h
 
 Implementation:
 
-- `src/web3/evm/adapters/evm-invalidation.adapter.ts`
-- `src/web3/evm/hooks/use-send-evm-native.ts`
-- `src/web3/evm/hooks/use-send-evm-token.ts`
-- `src/web3/evm/hooks/use-approve-evm-token.ts`
+- `src/web3/evm/transactions/invalidation/evm-invalidation.adapter.ts`
+- `src/web3/evm/transactions/native-transfer/use-send-evm-native.ts`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.ts`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.ts`
 - `src/providers/query-provider.tsx`
 
 Tests:
 
-- `src/web3/evm/adapters/evm-invalidation.adapter.test.ts`
-- `src/web3/evm/hooks/use-send-evm-token.test.tsx`
-- `src/web3/evm/hooks/use-approve-evm-token.test.tsx`
+- `src/web3/evm/transactions/invalidation/evm-invalidation.adapter.test.ts`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.test.tsx`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.test.tsx`

@@ -118,5 +118,5 @@ Tests:
 
 - `src/web3/evm/adapters/*.test.ts`
 - `src/web3/evm/hooks/*.test.tsx`
-- `src/web3/evm/storage/evm-transaction-history.storage.test.ts`
+- `src/web3/evm/transactions/history/evm-transaction-history.storage.test.ts`
 - `src/components/web3/web3-lab.test.tsx`

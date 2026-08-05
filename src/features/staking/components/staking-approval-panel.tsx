@@ -1,8 +1,11 @@
 "use client"
 
-import { getEvmExplorerUrl, type useApproveEvmToken } from "@/web3/evm"
-import { TransactionReviewCard } from "@/components/web3/common/transaction-review-card"
-import { TransactionStatus } from "@/components/web3/common/transaction-status"
+import {
+  TransactionReviewCard,
+  TransactionStatus,
+  getEvmExplorerUrl,
+  type useApproveEvmToken,
+} from "@/web3/evm"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { Button } from "@/components/ui/button"
 type StakingApprovalPanelProps = {

@@ -23,7 +23,7 @@ vi.mock("@/web3/evm/chain/selection/use-evm-selection", () => ({
   useEvmSelection: () => mockReadySelection,
 }))
 
-vi.mock("@/web3/evm/hooks/use-evm-wallet", () => ({
+vi.mock("@/web3/evm/chain/selection/use-evm-wallet", () => ({
   useEvmWallet: () => ({
     wallet: { connected: true, connecting: false, address: ACCOUNT },
     selection: mockReadySelection,
@@ -56,14 +56,14 @@ vi.mock("@/web3/evm/reads/balances/use-evm-token-balance", () => ({
   }),
 }))
 
-vi.mock("@/web3/evm/hooks/use-evm-transaction-history", () => ({
+vi.mock("@/web3/evm/transactions/history/use-evm-transaction-history", () => ({
   useEvmTransactionHistory: () => ({
     transactions: [],
     clearTransactions: vi.fn(),
   }),
 }))
 
-vi.mock("@/web3/evm/hooks/use-send-evm-native", () => ({
+vi.mock("@/web3/evm/transactions/native-transfer/use-send-evm-native", () => ({
   useSendEvmNative: () => ({
     prepare: vi.fn(),
     confirmSend: vi.fn(),
@@ -79,7 +79,7 @@ vi.mock("@/web3/evm/hooks/use-send-evm-native", () => ({
   }),
 }))
 
-vi.mock("@/web3/evm/hooks/use-send-evm-token", () => ({
+vi.mock("@/web3/evm/transactions/erc20-transfer/use-send-evm-token", () => ({
   useSendEvmToken: () => ({
     prepare: vi.fn(),
     confirmSend: vi.fn(),
@@ -98,7 +98,7 @@ vi.mock("@/web3/evm/hooks/use-send-evm-token", () => ({
   }),
 }))
 
-vi.mock("@/web3/evm/hooks/use-approve-evm-token", () => ({
+vi.mock("@/web3/evm/transactions/erc20-approval/use-approve-evm-token", () => ({
   useApproveEvmToken: () => ({
     prepare: vi.fn(),
     confirmApprove: vi.fn(),

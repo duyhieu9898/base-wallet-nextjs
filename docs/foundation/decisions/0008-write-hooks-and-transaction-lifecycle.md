@@ -144,17 +144,17 @@ UI phải diễn đạt rõ rằng transaction vẫn có thể confirm on-chain.
 
 Implementation:
 
-- `src/web3/evm/types/evm-write-status.ts`
-- `src/web3/evm/hooks/use-send-evm-native.ts`
-- `src/web3/evm/hooks/use-send-evm-token.ts`
-- `src/web3/evm/hooks/use-approve-evm-token.ts`
-- `src/web3/evm/hooks/use-evm-transaction-receipt.ts`
-- `src/web3/evm/adapters/evm-transaction.adapter.ts`
+- `src/web3/evm/transactions/lifecycle/evm-write-status.ts`
+- `src/web3/evm/transactions/native-transfer/use-send-evm-native.ts`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.ts`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.ts`
+- `src/web3/evm/transactions/receipt/use-evm-transaction-receipt.ts`
+- `src/web3/evm/transactions/{native-transfer,erc20-transfer,erc20-approval}/prepare.ts`
 
 Tests:
 
-- `src/web3/evm/types/evm-write-status.test.ts`
-- `src/web3/evm/adapters/evm-transaction.adapter.test.ts`
-- `src/web3/evm/hooks/use-send-evm-native.test.tsx`
-- `src/web3/evm/hooks/use-send-evm-token.test.tsx`
-- `src/web3/evm/hooks/use-approve-evm-token.test.tsx`
+- `src/web3/evm/transactions/lifecycle/evm-write-status.test.ts`
+- `src/web3/evm/transactions/{native-transfer,erc20-transfer,erc20-approval}/prepare.test.ts`
+- `src/web3/evm/transactions/native-transfer/use-send-evm-native.test.tsx`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.test.tsx`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.test.tsx`

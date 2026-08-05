@@ -63,7 +63,7 @@ export type {
 } from "./chain/selection/evm-selection"
 
 // Wallet và network.
-export { useEvmWallet } from "./hooks/use-evm-wallet"
+export { useEvmWallet } from "./chain/selection/use-evm-wallet"
 export { useEvmNetwork } from "./chain/use-evm-network"
 
 // Reads — balances.
@@ -83,46 +83,47 @@ export {
 export {
   useSendEvmNative,
   type UseSendEvmNativeInput,
-} from "./hooks/use-send-evm-native"
+} from "./transactions/native-transfer/use-send-evm-native"
 export {
   useSendEvmToken,
   type UseSendEvmTokenInput,
-} from "./hooks/use-send-evm-token"
+} from "./transactions/erc20-transfer/use-send-evm-token"
 export {
   useApproveEvmToken,
   type UseApproveEvmTokenInput,
-} from "./hooks/use-approve-evm-token"
+} from "./transactions/erc20-approval/use-approve-evm-token"
 
 // Fees, receipt tracking và history.
 export {
   useEvmFeeEstimate,
   type EvmFeeEstimateTarget,
-} from "./hooks/use-evm-fee-estimate"
-export { useEvmTransactionReceipt } from "./hooks/use-evm-transaction-receipt"
+} from "./transactions/fees/use-evm-fee-estimate"
+export { useEvmTransactionReceipt } from "./transactions/receipt/use-evm-transaction-receipt"
 export {
   useEvmTransactionHistory,
   type UseEvmTransactionHistoryOptions,
-} from "./hooks/use-evm-transaction-history"
+} from "./transactions/history/use-evm-transaction-history"
 
 // Public domain types.
-export type {
-  EvmAssetBalance,
-  EvmTransactionReference,
-  EvmWalletConnection,
-} from "./types/evm-domain"
+export type { EvmAssetBalance } from "./reads/balances/evm-balance.types"
+export type { EvmWalletConnection } from "./chain/selection/evm-wallet.types"
+// TODO(phase-5 public API audit): không có producer lẫn consumer nào trong
+// repo. Giữ export vì Phase 4 không đổi public API; quyết định giữ hay bỏ ở
+// Phase 5.
+export type { EvmTransactionReference } from "./transactions/evm-transaction.types"
 export type {
   EvmFeeEstimate,
   EvmFeeEstimateStatus,
-} from "./types/evm-fee-estimate"
-export type { EvmTransactionReview } from "./types/evm-transaction-review"
+} from "./transactions/fees/evm-fee-estimate"
+export type { EvmTransactionReview } from "./transactions/review/evm-transaction-review"
 export type {
   EvmTransactionHistoryItem,
   EvmTransactionHistoryStatus,
   NativeTransferHistoryItem,
   TokenApprovalHistoryItem,
   TokenTransferHistoryItem,
-} from "./types/evm-transaction-history"
-export type { EvmWriteStatus } from "./types/evm-write-status"
+} from "./transactions/history/evm-transaction-history"
+export type { EvmWriteStatus } from "./transactions/lifecycle/evm-write-status"
 
 // Registry — read-only selectors. UI và feature không đọc registry JSON trực
 // tiếp (decision 0001).
@@ -163,6 +164,25 @@ export {
   EVM_ZERO_ADDRESS,
 } from "./address"
 
+// Reusable EVM components.
+//
+// Chúng hiểu trực tiếp EVM semantics (write status, review, network mismatch,
+// balances). Generic primitive ở `@/components/ui`; component mang business
+// semantics của một feature thuộc về chính feature đó (decision 0014).
+export { BalanceCard } from "./components/balance/balance-card"
+export { NetworkCard } from "./components/network/network-card"
+export { UnsupportedNetworkCard } from "./components/network/unsupported-network-card"
+export { WalletCard } from "./components/wallet/wallet-card"
+export { TransferSection } from "./components/forms/transfer-section"
+export { RecentTransactionsCard } from "./components/history/recent-transactions-card"
+export { TransactionReviewCard } from "./components/common/transaction-review-card"
+export { TransactionStatus } from "./components/common/transaction-status"
+export { StatusBadge } from "./components/common/status-badge"
+
+// Pending receipt reconciliation: headless, application mount ở đâu là quyết
+// định của application.
+export { PendingReceiptReconciler } from "./transactions/history/pending-receipt-reconciler"
+
 // ---------------------------------------------------------------------------
 // Tier B — Feature Extension API
 //
@@ -181,7 +201,7 @@ export {
 export {
   useEvmWriteLifecycle,
   type UseEvmWriteLifecycleInput,
-} from "./hooks/use-evm-write-lifecycle"
+} from "./transactions/lifecycle/use-evm-write-lifecycle"
 
 /** Guard bắt buộc trước mọi write: connected + supported chain. */
 export { assertEvmWriteReady } from "./chain/selection/assert-evm-write-ready"
@@ -190,7 +210,7 @@ export { assertEvmWriteReady } from "./chain/selection/assert-evm-write-ready"
 export {
   deriveEvmWriteStatus,
   type DeriveEvmWriteStatusInput,
-} from "./types/evm-write-status"
+} from "./transactions/lifecycle/evm-write-status"
 
 /** Typed domain error. Feature không tự normalize Viem/Wagmi error. */
 export {

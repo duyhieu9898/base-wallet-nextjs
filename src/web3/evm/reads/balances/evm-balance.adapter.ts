@@ -1,6 +1,6 @@
 import { formatUnits, type Address } from "viem"
 
-import type { EvmAssetBalance } from "@/web3/evm/types/evm-domain"
+import type { EvmAssetBalance } from "@/web3/evm/reads/balances/evm-balance.types"
 import { NATIVE_ASSET_ID } from "@/web3/evm/chain/registry/native-asset"
 import { isValidAddress, toAddressKey } from "@/web3/evm/address"
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"

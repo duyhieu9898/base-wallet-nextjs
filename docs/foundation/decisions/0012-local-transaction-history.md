@@ -74,13 +74,13 @@ Ngoài ra:
 
 Implementation:
 
-- `src/web3/evm/storage/evm-transaction-history.storage.ts`
-- `src/web3/evm/types/evm-transaction-history.ts`
-- `src/web3/evm/hooks/use-evm-transaction-history.ts`
-- `src/components/web3/history/pending-receipt-reconciler.tsx`
-- `src/components/web3/history/recent-transactions-card.tsx`
+- `src/web3/evm/transactions/history/evm-transaction-history.storage.ts`
+- `src/web3/evm/transactions/history/evm-transaction-history.ts`
+- `src/web3/evm/transactions/history/use-evm-transaction-history.ts`
+- `src/web3/evm/transactions/history/pending-receipt-reconciler.tsx`
+- `src/web3/evm/components/history/recent-transactions-card.tsx`
 
 Tests:
 
-- `src/web3/evm/storage/evm-transaction-history.storage.test.ts`
-- `src/web3/evm/hooks/use-evm-transaction-history.test.tsx`
+- `src/web3/evm/transactions/history/evm-transaction-history.storage.test.ts`
+- `src/web3/evm/transactions/history/use-evm-transaction-history.test.tsx`

@@ -1,7 +1,7 @@
 import type { Address } from "viem"
 
 import { isValidAddress, toAddressKey } from "@/web3/evm/address"
-import type { EvmAssetBalance } from "@/web3/evm/types/evm-domain"
+import type { EvmAssetBalance } from "@/web3/evm/reads/balances/evm-balance.types"
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"
 import {
   buildTokenBalanceContracts,

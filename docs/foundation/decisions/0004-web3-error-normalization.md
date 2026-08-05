@@ -81,4 +81,4 @@ Implementation:
 Tests:
 
 - `src/web3/evm/errors/evm-error.adapter.test.ts`
-- `src/web3/evm/types/evm-write-status.test.ts`
+- `src/web3/evm/transactions/lifecycle/evm-write-status.test.ts`

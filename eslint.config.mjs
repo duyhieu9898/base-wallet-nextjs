@@ -114,19 +114,6 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // TEMPORARY — xóa ở Phase 5.
-  //
-  // `pending-receipt-reconciler` thực hiện pending reconciliation, vốn thuộc
-  // `web3/evm/transactions/history/` theo Phase 4. Cho tới khi nó được chuyển
-  // về foundation, nó vẫn cần storage và invalidation internals. Đây là danh
-  // sách file cụ thể, không phải glob rộng.
-  {
-    files: ["src/components/web3/history/pending-receipt-reconciler.tsx"],
-    rules: {
-      "no-restricted-imports": "off",
-    },
-  },
-
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

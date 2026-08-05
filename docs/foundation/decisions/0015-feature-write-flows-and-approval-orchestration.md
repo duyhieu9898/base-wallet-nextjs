@@ -66,13 +66,13 @@ same approval preflight and two-step UX.
 
 Implementation:
 
-- `src/web3/evm/hooks/use-evm-write-lifecycle.ts`
+- `src/web3/evm/transactions/lifecycle/use-evm-write-lifecycle.ts`
 - `src/web3/evm/reads/allowances/use-evm-allowance.ts`
 - `src/web3/evm/reads/allowances/use-evm-allowances.ts`
 - `src/web3/evm/chain/selection/assert-evm-write-ready.ts`
 
 Tests:
 
-- `src/web3/evm/hooks/use-send-evm-native.test.tsx`
-- `src/web3/evm/hooks/use-send-evm-token.test.tsx`
-- `src/web3/evm/hooks/use-approve-evm-token.test.tsx`
+- `src/web3/evm/transactions/native-transfer/use-send-evm-native.test.tsx`
+- `src/web3/evm/transactions/erc20-transfer/use-send-evm-token.test.tsx`
+- `src/web3/evm/transactions/erc20-approval/use-approve-evm-token.test.tsx`

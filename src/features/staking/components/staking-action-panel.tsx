@@ -2,11 +2,14 @@
 
 import { useState } from "react"
 
-import { TransactionStatus } from "@/components/web3/common/transaction-status"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { getEvmExplorerUrl, useApproveEvmToken } from "@/web3/evm"
+import {
+  TransactionStatus,
+  getEvmExplorerUrl,
+  useApproveEvmToken,
+} from "@/web3/evm"
 import type { StakingDeployment } from "../contracts/staking-deployments"
 import {
   type StakingAsset,

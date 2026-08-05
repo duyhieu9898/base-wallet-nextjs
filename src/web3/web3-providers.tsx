@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react"
 
-import { EvmProvider } from "@/web3/evm/evm-provider"
+import { EvmProvider } from "@/web3/evm/provider/evm-provider"
 
 type Web3ProvidersProps = {
   children: ReactNode

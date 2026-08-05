@@ -1,13 +1,16 @@
 "use client"
 
-import { BalanceCard } from "@/components/web3/balance/balance-card"
-import { TransferSection } from "@/components/web3/forms/transfer-section"
-import { RecentTransactionsCard } from "@/components/web3/history/recent-transactions-card"
-import { NetworkCard } from "@/components/web3/network/network-card"
-import { UnsupportedNetworkCard } from "@/components/web3/network/unsupported-network-card"
-import { WalletCard } from "@/components/web3/wallet/wallet-card"
 import { StakingPositionCard } from "@/features/staking/components/staking-position-card"
-import { getEvmTokensForChain, useEvmWallet } from "@/web3/evm"
+import {
+  BalanceCard,
+  NetworkCard,
+  RecentTransactionsCard,
+  TransferSection,
+  UnsupportedNetworkCard,
+  WalletCard,
+  getEvmTokensForChain,
+  useEvmWallet,
+} from "@/web3/evm"
 /**
  * Web3Lab is a dev-only test harness assembling production-grade Web3 domain components.
  */
