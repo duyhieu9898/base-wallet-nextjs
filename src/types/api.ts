@@ -1,5 +1,3 @@
-import type { HttpStatusCode } from "@/constants/status-codes"
-
 /**
  * Generic API Response Wrapper
  */

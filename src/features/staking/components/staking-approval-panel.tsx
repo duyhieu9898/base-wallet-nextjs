@@ -6,7 +6,7 @@ import { TransactionReviewCard } from "@/components/web3/common/transaction-revi
 import { TransactionStatus } from "@/components/web3/common/transaction-status"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { Button } from "@/components/ui/button"
-import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 
 type StakingApprovalPanelProps = {
   approval: ReturnType<typeof useApproveEvmToken>
@@ -30,7 +30,7 @@ export function StakingApprovalPanel({
     hash: approval.hash,
     error: approval.error,
     getExplorerUrl: (transactionHash) =>
-      getTransactionExplorerUrl(chainId, transactionHash),
+      getEvmExplorerUrl(chainId, transactionHash, "transaction"),
   })
 
   return (

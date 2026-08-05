@@ -1,6 +1,6 @@
 import type { Address } from "viem"
 
-import { isValidAddress } from "@/web3/core/address.utils"
+import { isValidAddress, toAddressKey } from "@/web3/core/address.utils"
 import type { EvmAssetBalance } from "@/web3/evm/types/evm-domain"
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"
 import {
@@ -17,7 +17,6 @@ import {
   getEvmTokensForChain,
 } from "@/web3/evm/adapters/evm-registry.adapter"
 import { createEvmPublicClient } from "@/web3/evm/clients/create-evm-public-client"
-import { toAddressKey } from "@/web3/evm/evm-address"
 import { createEvmWeb3Error } from "@/web3/evm/errors"
 
 /**

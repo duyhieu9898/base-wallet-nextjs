@@ -2,9 +2,14 @@ import { describe, expect, it } from "vitest"
 import { zeroAddress } from "viem"
 
 import {
+  EVM_NATIVE_TOKEN_ADDRESS,
+  EVM_ZERO_ADDRESS,
+  isNativeTokenAddress,
   isSameAddress,
   isValidAddress,
   isZeroAddress,
+  parseChecksumAddress,
+  shortenAddress,
   toChecksumAddress,
   truncateAddress,
 } from "./address.utils"
@@ -14,6 +19,14 @@ const ALICE_LOWER = "0x086d9fecb2f117369fabdb884ec6851b36595444"
 const BOB = "0x1111111111111111111111111111111111111111"
 
 describe("address.utils", () => {
+  describe("constants", () => {
+    it("exports valid zero address and native token address", () => {
+      expect(EVM_ZERO_ADDRESS).toBe(zeroAddress)
+      expect(isValidAddress(EVM_ZERO_ADDRESS)).toBe(true)
+      expect(isValidAddress(EVM_NATIVE_TOKEN_ADDRESS)).toBe(true)
+    })
+  })
+
   describe("isValidAddress", () => {
     it("returns true for valid checksum and lowercase addresses", () => {
       expect(isValidAddress(ALICE_CHECKSUM)).toBe(true)
@@ -61,29 +74,52 @@ describe("address.utils", () => {
     })
   })
 
-  describe("truncateAddress", () => {
-    it("truncates address with default format (0x086d...5444)", () => {
+  describe("isNativeTokenAddress", () => {
+    it("returns true for zero address or native token placeholder", () => {
+      expect(isNativeTokenAddress(EVM_ZERO_ADDRESS)).toBe(true)
+      expect(isNativeTokenAddress(EVM_NATIVE_TOKEN_ADDRESS)).toBe(true)
+      expect(isNativeTokenAddress(EVM_NATIVE_TOKEN_ADDRESS.toLowerCase())).toBe(
+        true,
+      )
+    })
+
+    it("returns false for normal ERC20 contract address", () => {
+      expect(isNativeTokenAddress(ALICE_CHECKSUM)).toBe(false)
+      expect(isNativeTokenAddress(null)).toBe(false)
+    })
+  })
+
+  describe("shortenAddress / truncateAddress", () => {
+    it("shortens address with default format (0x086d...5444)", () => {
+      expect(shortenAddress(ALICE_CHECKSUM)).toBe("0x086d...5444")
       expect(truncateAddress(ALICE_CHECKSUM)).toBe("0x086d...5444")
     })
 
     it("supports custom start/end lengths", () => {
-      expect(truncateAddress(ALICE_CHECKSUM, 4, 2)).toBe("0x08...44")
+      expect(shortenAddress(ALICE_CHECKSUM, 4, 2)).toBe("0x08...44")
     })
 
     it("returns empty string for null, undefined, or invalid inputs", () => {
-      expect(truncateAddress(null)).toBe("")
-      expect(truncateAddress(undefined)).toBe("")
-      expect(truncateAddress("0xinvalid")).toBe("")
+      expect(shortenAddress(null)).toBe("")
+      expect(shortenAddress(undefined)).toBe("")
+      expect(shortenAddress("0xinvalid")).toBe("")
     })
   })
 
-  describe("toChecksumAddress", () => {
+  describe("toChecksumAddress & parseChecksumAddress", () => {
     it("returns checksummed format", () => {
       expect(toChecksumAddress(ALICE_LOWER)).toBe(ALICE_CHECKSUM)
+      expect(parseChecksumAddress(ALICE_LOWER)).toBe(ALICE_CHECKSUM)
     })
 
-    it("throws for invalid address", () => {
+    it("toChecksumAddress throws for invalid address", () => {
       expect(() => toChecksumAddress("0xinvalid")).toThrow()
+    })
+
+    it("parseChecksumAddress safely returns null for invalid input", () => {
+      expect(parseChecksumAddress("0xinvalid")).toBeNull()
+      expect(parseChecksumAddress(null)).toBeNull()
+      expect(parseChecksumAddress(undefined)).toBeNull()
     })
   })
 })

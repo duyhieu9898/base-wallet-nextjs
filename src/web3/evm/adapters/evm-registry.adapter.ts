@@ -1,6 +1,5 @@
 import { web3Config } from "@/config/web3.config"
-import { isValidAddress } from "@/web3/core/address.utils"
-import { toAddressKey } from "@/web3/evm/evm-address"
+import { isValidAddress, toAddressKey } from "@/web3/core/address.utils"
 import { createEvmWeb3Error } from "@/web3/evm/errors"
 import {
   EVM_NETWORKS,
@@ -105,6 +104,22 @@ export function getEvmTokensForChain(
   return tokens
 }
 
+/**
+ * Safe selector: returns matching enabled token or null by symbol.
+ * Case-insensitive match on token symbol.
+ */
+export function findEvmTokenBySymbol(
+  chainId: number,
+  symbol: string,
+): AssetContractConfig | null {
+  if (!symbol) return null
+  const tokens = getEvmTokensForChain(chainId)
+  const searchSymbol = symbol.trim().toLowerCase()
+  return (
+    tokens.find((token) => token.symbol.toLowerCase() === searchSymbol) ?? null
+  )
+}
+
 export function isEvmNetworkSupported(chainId: number): boolean {
   return Boolean(EVM_NETWORKS[chainId])
 }
@@ -123,4 +138,45 @@ export function getTransactionExplorerUrl(
 ): string {
   const network = getEvmNetworkByChainId(chainId)
   return getEvmNetworkExplorer(network).transactionUrl(hash)
+}
+
+export function getTokenExplorerUrl(
+  chainId: number,
+  tokenAddress: string,
+): string {
+  const network = getEvmNetworkByChainId(chainId)
+  return getEvmNetworkExplorer(network).addressUrl(tokenAddress)
+}
+
+export function getBlockExplorerUrl(
+  chainId: number,
+  blockNumberOrHash: string | number,
+): string {
+  const network = getEvmNetworkByChainId(chainId)
+  const explorer = getEvmNetworkExplorer(network)
+  return `${explorer.url}/block/${blockNumberOrHash}`
+}
+
+export type EvmExplorerLinkType = "address" | "transaction" | "token" | "block"
+
+/**
+ * Unified explorer link generator aligned with Uniswap interface `getExplorerLink`.
+ */
+export function getEvmExplorerUrl(
+  chainId: number,
+  target: string | number,
+  type: EvmExplorerLinkType,
+): string {
+  switch (type) {
+    case "address":
+      return getAddressExplorerUrl(chainId, String(target))
+    case "transaction":
+      return getTransactionExplorerUrl(chainId, String(target))
+    case "token":
+      return getTokenExplorerUrl(chainId, String(target))
+    case "block":
+      return getBlockExplorerUrl(chainId, target)
+    default:
+      return getAddressExplorerUrl(chainId, String(target))
+  }
 }

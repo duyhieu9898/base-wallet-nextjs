@@ -4,8 +4,7 @@ import { useMemo } from "react"
 import type { Address } from "viem"
 import { useReadContracts } from "wagmi"
 
-import { isValidAddress } from "@/web3/core/address.utils"
-import { toAddressKey } from "@/web3/evm/evm-address"
+import { isValidAddress, toAddressKey } from "@/web3/core/address.utils"
 import type { AssetContractConfig } from "@/web3/evm/registry/evm-registry.types"
 import {
   buildAllowanceContracts,

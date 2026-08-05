@@ -1,7 +1,6 @@
 import type { Address } from "viem"
 
-import { isValidAddress } from "@/web3/core/address.utils"
-import { toAddressKey } from "@/web3/evm/evm-address"
+import { isValidAddress, toAddressKey } from "@/web3/core/address.utils"
 import { standardErc20Abi } from "@/web3/evm/abi/erc20"
 import type { MulticallReadResult } from "@/web3/evm/adapters/evm-balance.adapter"
 import { createEvmWeb3Error, type EvmWeb3Error } from "@/web3/evm/errors"

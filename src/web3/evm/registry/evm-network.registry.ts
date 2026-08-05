@@ -4,7 +4,7 @@ import { mainnet, sepolia } from "viem/chains"
 import { web3Config } from "@/config/web3.config"
 import type { ExplorerConfig, FaucetConfig } from "@/web3/core/registry.types"
 import { createExplorerConfig } from "@/web3/core/registry.selectors"
-import { toAddressKey } from "@/web3/evm/evm-address"
+import { toAddressKey } from "@/web3/core/address.utils"
 import { createEvmWeb3Error } from "@/web3/evm/errors"
 import type {
   AssetContractConfig,

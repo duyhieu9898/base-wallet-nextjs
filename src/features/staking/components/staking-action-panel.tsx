@@ -7,7 +7,7 @@ import { useTransactionFeedback } from "@/components/web3/common/transaction-fee
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useApproveEvmToken } from "@/web3/evm/hooks/use-approve-evm-token"
-import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import type { StakingDeployment } from "../contracts/staking-deployments"
 import {
   type StakingAsset,
@@ -48,7 +48,7 @@ export function StakingActionPanel({
     hash: write.hash,
     error: write.error,
     getExplorerUrl: (transactionHash) =>
-      getTransactionExplorerUrl(chainId, transactionHash),
+      getEvmExplorerUrl(chainId, transactionHash, "transaction"),
   })
 
   function showError(cause: unknown) {

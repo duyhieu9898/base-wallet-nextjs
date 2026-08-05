@@ -4,7 +4,7 @@ import type { ReactNode } from "react"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { useTranslation } from "@/i18n/use-translation"
-import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import type { EvmWeb3Error } from "@/web3/evm/errors"
 
 function Field(props: { label: string; children: ReactNode }) {
@@ -45,7 +45,7 @@ export function TransactionStatus(props: {
       <Field label={t.common.txHash}>
         <a
           className="font-mono underline underline-offset-2"
-          href={getTransactionExplorerUrl(chainId, hash)}
+          href={getEvmExplorerUrl(chainId, hash, "transaction")}
           target="_blank"
           rel="noreferrer noopener"
         >

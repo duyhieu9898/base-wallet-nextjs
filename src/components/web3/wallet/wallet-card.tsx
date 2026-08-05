@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { useTranslation } from "@/i18n/use-translation"
-import { getAddressExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import { useEvmWallet } from "@/web3/evm/hooks/use-evm-wallet"
 
 function Field(props: { label: string; children: ReactNode }) {
@@ -55,9 +55,10 @@ export function WalletCard() {
               {selection.chainId && selection.account ? (
                 <a
                   className="font-mono underline underline-offset-2"
-                  href={getAddressExplorerUrl(
+                  href={getEvmExplorerUrl(
                     selection.chainId,
                     selection.account,
+                    "address",
                   )}
                   target="_blank"
                   rel="noreferrer noopener"

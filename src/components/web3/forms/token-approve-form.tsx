@@ -9,7 +9,7 @@ import { TransactionReviewCard } from "@/components/web3/common/transaction-revi
 import { TransactionStatus } from "@/components/web3/common/transaction-status"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { useTranslation } from "@/i18n/use-translation"
-import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import { useApproveEvmToken } from "@/web3/evm/hooks/use-approve-evm-token"
 import type { AssetContractConfig } from "@/web3/evm/registry/evm-registry.types"
 
@@ -64,7 +64,7 @@ export function TokenApproveForm(props: {
     hash,
     error: hookError,
     getExplorerUrl: (transactionHash) =>
-      getTransactionExplorerUrl(chainId, transactionHash),
+      getEvmExplorerUrl(chainId, transactionHash, "transaction"),
   })
 
   function onPrepare() {

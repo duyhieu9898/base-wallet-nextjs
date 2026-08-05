@@ -8,7 +8,7 @@ import { TransactionReviewCard } from "@/components/web3/common/transaction-revi
 import { TransactionStatus } from "@/components/web3/common/transaction-status"
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"
 import { useTranslation } from "@/i18n/use-translation"
-import { getTransactionExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import { useSendEvmNative } from "@/web3/evm/hooks/use-send-evm-native"
 import type { EvmNetworkConfig } from "@/web3/evm/registry/evm-network.registry"
 
@@ -57,7 +57,7 @@ export function NativeTransferForm(props: {
     hash,
     error: hookError,
     getExplorerUrl: (transactionHash) =>
-      getTransactionExplorerUrl(chainId, transactionHash),
+      getEvmExplorerUrl(chainId, transactionHash, "transaction"),
   })
 
   function onPrepare() {

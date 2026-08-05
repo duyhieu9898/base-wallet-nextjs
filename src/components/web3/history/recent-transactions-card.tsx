@@ -5,10 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusBadge } from "@/components/web3/common/status-badge"
 import { PendingReceiptReconciler } from "@/components/web3/history/pending-receipt-reconciler"
 import { useTranslation } from "@/i18n/use-translation"
-import {
-  getAddressExplorerUrl,
-  getTransactionExplorerUrl,
-} from "@/web3/evm/adapters/evm-registry.adapter"
+import { getEvmExplorerUrl } from "@/web3/evm/adapters/evm-registry.adapter"
 import { useEvmSelection } from "@/web3/evm/selection/use-evm-selection"
 import { useEvmTransactionHistory } from "@/web3/evm/hooks/use-evm-transaction-history"
 
@@ -80,7 +77,11 @@ export function RecentTransactionsCard() {
                     </span>
                     <a
                       className="font-mono underline underline-offset-2"
-                      href={getTransactionExplorerUrl(tx.chainId, tx.hash)}
+                      href={getEvmExplorerUrl(
+                        tx.chainId,
+                        tx.hash,
+                        "transaction",
+                      )}
                       target="_blank"
                       rel="noreferrer noopener"
                     >
@@ -113,7 +114,11 @@ export function RecentTransactionsCard() {
                       </span>
                       <a
                         className="font-mono underline underline-offset-2"
-                        href={getAddressExplorerUrl(tx.chainId, tx.recipient)}
+                        href={getEvmExplorerUrl(
+                          tx.chainId,
+                          tx.recipient,
+                          "address",
+                        )}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
@@ -130,7 +135,11 @@ export function RecentTransactionsCard() {
                       </span>
                       <a
                         className="font-mono underline underline-offset-2"
-                        href={getAddressExplorerUrl(tx.chainId, tx.spender)}
+                        href={getEvmExplorerUrl(
+                          tx.chainId,
+                          tx.spender,
+                          "address",
+                        )}
                         target="_blank"
                         rel="noreferrer noopener"
                       >
@@ -147,9 +156,10 @@ export function RecentTransactionsCard() {
                       </span>
                       <a
                         className="font-mono underline underline-offset-2"
-                        href={getAddressExplorerUrl(
+                        href={getEvmExplorerUrl(
                           tx.chainId,
                           tx.tokenAddress,
+                          "token",
                         )}
                         target="_blank"
                         rel="noreferrer noopener"

@@ -4,12 +4,16 @@ import { createExplorerConfig } from "@/web3/core/registry.selectors"
 import {
   findEvmNetworkByChainId,
   findEvmToken,
+  findEvmTokenBySymbol,
   getAddressExplorerUrl,
   getAllEvmNetworks,
+  getBlockExplorerUrl,
+  getEvmExplorerUrl,
   getEvmNetworkByChainId,
   getEvmNetworkByKey,
   getEvmToken,
   getEvmTokensForChain,
+  getTokenExplorerUrl,
   getTransactionExplorerUrl,
 } from "@/web3/evm/adapters/evm-registry.adapter"
 import { EVM_NETWORKS } from "@/web3/evm/registry/evm-network.registry"
@@ -60,7 +64,7 @@ describe("evm-registry.adapter", () => {
     expect(getAllEvmNetworks()).toBe(getAllEvmNetworks())
   })
 
-  describe("getEvmToken & findEvmToken", () => {
+  describe("getEvmToken & findEvmToken & findEvmTokenBySymbol", () => {
     it("returns USDC config by address", () => {
       const token = getEvmToken(11155111, USDC_SEPOLIA)
       expect(token.symbol).toBe("USDC")
@@ -101,6 +105,13 @@ describe("evm-registry.adapter", () => {
     it("getEvmToken throws for invalid address format", () => {
       expect(() => getEvmToken(11155111, "0xinvalid")).toThrow()
     })
+
+    it("findEvmTokenBySymbol resolves token by case-insensitive symbol", () => {
+      const usdc = findEvmTokenBySymbol(11155111, "usdc")
+      expect(usdc).not.toBeNull()
+      expect(usdc?.symbol).toBe("USDC")
+      expect(findEvmTokenBySymbol(11155111, "UNKNOWN")).toBeNull()
+    })
   })
 
   describe("getEvmTokensForChain", () => {
@@ -116,12 +127,33 @@ describe("evm-registry.adapter", () => {
   })
 
   describe("explorer urls", () => {
-    it("builds address + transaction urls", () => {
+    it("builds address, transaction, token and block urls", () => {
       expect(getAddressExplorerUrl(11155111, "0xabc")).toBe(
         "https://sepolia.etherscan.io/address/0xabc",
       )
       expect(getTransactionExplorerUrl(11155111, "0xdef")).toBe(
         "https://sepolia.etherscan.io/tx/0xdef",
+      )
+      expect(getTokenExplorerUrl(11155111, "0xabc")).toBe(
+        "https://sepolia.etherscan.io/address/0xabc",
+      )
+      expect(getBlockExplorerUrl(11155111, 123456)).toBe(
+        "https://sepolia.etherscan.io/block/123456",
+      )
+    })
+
+    it("getEvmExplorerUrl dispatches correct link type (Uniswap alignment)", () => {
+      expect(getEvmExplorerUrl(11155111, "0xabc", "address")).toBe(
+        "https://sepolia.etherscan.io/address/0xabc",
+      )
+      expect(getEvmExplorerUrl(11155111, "0xdef", "transaction")).toBe(
+        "https://sepolia.etherscan.io/tx/0xdef",
+      )
+      expect(getEvmExplorerUrl(11155111, "0xabc", "token")).toBe(
+        "https://sepolia.etherscan.io/address/0xabc",
+      )
+      expect(getEvmExplorerUrl(11155111, 123456, "block")).toBe(
+        "https://sepolia.etherscan.io/block/123456",
       )
     })
 
