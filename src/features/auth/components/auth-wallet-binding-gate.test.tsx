@@ -142,7 +142,7 @@ async function renderAuthenticatedGate() {
   renderGate()
 
   await waitFor(() => {
-    expect(screen.getByTestId("binding")).toHaveTextContent("matched")
+    expect(screen.getByTestId("binding")).toHaveTextContent(/^matched$/)
   })
 }
 
@@ -182,7 +182,9 @@ describe("blocking behavior", () => {
     renderGate()
 
     await waitFor(() => {
-      expect(screen.getByTestId("binding")).toHaveTextContent("not-applicable")
+      expect(screen.getByTestId("binding")).toHaveTextContent(
+        /^not-applicable$/,
+      )
     })
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
@@ -194,7 +196,7 @@ describe("blocking behavior", () => {
     setSelection(readySelection(ADDRESS, 1))
 
     await waitFor(() => {
-      expect(screen.getByTestId("binding")).toHaveTextContent("matched")
+      expect(screen.getByTestId("binding")).toHaveTextContent(/^matched$/)
     })
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
@@ -338,7 +340,7 @@ describe("unlocking", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     })
 
-    expect(screen.getByTestId("binding")).toHaveTextContent("matched")
+    expect(screen.getByTestId("binding")).toHaveTextContent(/^matched$/)
   })
 
   it("closes after logging out from the modal", async () => {
@@ -358,7 +360,7 @@ describe("unlocking", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument()
     })
 
-    expect(screen.getByTestId("binding")).toHaveTextContent("not-applicable")
+    expect(screen.getByTestId("binding")).toHaveTextContent(/^not-applicable$/)
   })
 })
 
@@ -387,7 +389,9 @@ describe("domain guard", () => {
     renderGate()
 
     await waitFor(() => {
-      expect(screen.getByTestId("binding")).toHaveTextContent("not-applicable")
+      expect(screen.getByTestId("binding")).toHaveTextContent(
+        /^not-applicable$/,
+      )
     })
 
     expect(() => {

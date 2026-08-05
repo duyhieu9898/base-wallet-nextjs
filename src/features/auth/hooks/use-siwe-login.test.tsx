@@ -189,13 +189,64 @@ function renderHarness() {
   render(<Harness holderRef={holderRef} />, { wrapper: Wrapper })
 
   return waitFor(() => {
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+  })
+}
+
+/**
+ * Chờ hook về trạng thái nghỉ trước khi test assert hoặc chạy thao tác kế.
+ *
+ * `await handle.signIn()` chỉ nói promise của flow đã resolve, không nói React
+ * đã commit state kết quả. Assert đồng bộ ngay sau đó là test yếu: nó pass nhờ
+ * timing chứ không nhờ hành vi, và fail ngẫu nhiên khi suite chạy song song.
+ *
+ * `pending` là tín hiệu settle do chính hook công bố, nên chờ nó là chờ đúng
+ * thứ cần chờ — không phải `setTimeout` đoán mò.
+ */
+async function settle() {
+  await waitFor(() => {
+    expect(screen.getByTestId("pending")).toHaveTextContent(/^false$/)
+  })
+}
+
+/**
+ * `signIn()` im lặng no-op khi `canStartLogin` false — và nó false khi runtime
+ * đang `bootstrapping`. `renderHarness()` chỉ chờ lần đầu status chạm
+ * `unauthenticated`; runtime vẫn có thể quay lại `bootstrapping` sau đó, và khi
+ * đó test sẽ assert một error không bao giờ được set.
+ *
+ * Chờ ra khỏi `bootstrapping` ngay trước khi drive để test đo đúng hành vi thay
+ * vì đo thời điểm.
+ */
+async function ready() {
+  await waitFor(() => {
+    expect(screen.getByTestId("status")).not.toHaveTextContent(
+      /^bootstrapping$/,
+    )
   })
 }
 
 async function signIn() {
+  await ready()
+
   await act(async () => {
     await handle.signIn()
+  })
+
+  await settle()
+}
+
+/**
+ * Logout phải settle trước khi login lại: `canStartLogin` từ chối khi session
+ * cũ chưa bị gỡ, và lần signIn kế sẽ im lặng no-op.
+ */
+async function logout() {
+  await act(async () => {
+    await handle.logout()
+  })
+
+  await waitFor(() => {
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
   })
 }
 
@@ -205,7 +256,7 @@ describe("happy path", () => {
 
     await signIn()
 
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
     expect(screen.getByTestId("address")).toHaveTextContent(ADDRESS)
     expect(mockAuthState.requestCounts.nonce).toBe(1)
     expect(mockAuthState.requestCounts.verify).toBe(1)
@@ -216,16 +267,14 @@ describe("happy path", () => {
 
     await signIn()
 
-    await act(async () => {
-      await handle.logout()
-    })
+    await logout()
 
     await signIn()
 
     // The nonce is one-time: the second login cannot reuse the old nonce.
     expect(mockAuthState.requestCounts.nonce).toBe(2)
     expect(mockAuthState.requestCounts.verify).toBe(2)
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
   })
 
   it("is a no-op when a session already exists", async () => {
@@ -240,7 +289,7 @@ describe("happy path", () => {
     // Do not ask for nonces, do not open wallets, and do not oversign existing sessions.
     expect(mockAuthState.requestCounts.nonce).toBe(nonceCount)
     expect(screen.getByTestId("error")).toHaveTextContent("")
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
   })
 })
 
@@ -251,7 +300,9 @@ describe("wallet preconditions", () => {
     await renderHarness()
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("WALLET_DISCONNECTED")
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^WALLET_DISCONNECTED$/,
+    )
     expect(mockAuthState.requestCounts.nonce).toBe(0)
   })
 
@@ -261,7 +312,7 @@ describe("wallet preconditions", () => {
     await renderHarness()
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("WALLET_NOT_READY")
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_NOT_READY$/)
     expect(mockAuthState.requestCounts.nonce).toBe(0)
   })
 
@@ -271,7 +322,9 @@ describe("wallet preconditions", () => {
     await renderHarness()
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("UNSUPPORTED_NETWORK")
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^UNSUPPORTED_NETWORK$/,
+    )
     expect(mockAuthState.requestCounts.nonce).toBe(0)
     expect(mockAuthState.requestCounts.verify).toBe(0)
   })
@@ -284,8 +337,10 @@ describe("signature rejection", () => {
     await renderHarness()
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("SIGNATURE_REJECTED")
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^SIGNATURE_REJECTED$/,
+    )
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
     expect(mockAuthState.requestCounts.verify).toBe(0)
 
     // You can still re-sign immediately afterwards.
@@ -293,7 +348,7 @@ describe("signature rejection", () => {
 
     await signIn()
 
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
   })
 })
 
@@ -312,9 +367,10 @@ describe("wallet changes mid-flow", () => {
     })
 
     await pending
+    await settle()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("WALLET_CHANGED")
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_CHANGED$/)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
     expect(mockAuthState.requestCounts.verify).toBe(0)
   })
 
@@ -329,8 +385,8 @@ describe("wallet changes mid-flow", () => {
 
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("WALLET_CHANGED")
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_CHANGED$/)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
     expect(mockAuthState.requestCounts.verify).toBe(0)
   })
 
@@ -345,8 +401,8 @@ describe("wallet changes mid-flow", () => {
 
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("WALLET_CHANGED")
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_CHANGED$/)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
   })
 })
 
@@ -361,7 +417,7 @@ describe("response ownership", () => {
 
     await signIn()
 
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
     expect(screen.getByTestId("error")).toHaveTextContent(
       "SIWE_VERIFY_REJECTED",
     )
@@ -382,7 +438,7 @@ describe("response ownership", () => {
       await promise
     })
 
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
   })
 
   it("ignores a duplicate submit while a login is in flight", async () => {
@@ -394,8 +450,10 @@ describe("response ownership", () => {
       await Promise.all([handle.signIn(), handle.signIn(), handle.signIn()])
     })
 
+    await settle()
+
     expect(mockAuthState.requestCounts.nonce).toBe(1)
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
   })
 })
 
@@ -409,7 +467,7 @@ describe("backend failures", () => {
     expect(screen.getByTestId("error")).toHaveTextContent(
       "NONCE_REQUEST_FAILED",
     )
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
   })
 
   it("distinguishes verify unavailability from rejection", async () => {
@@ -419,6 +477,8 @@ describe("backend failures", () => {
 
     await signIn()
 
-    expect(screen.getByTestId("error")).toHaveTextContent("SIWE_VERIFY_FAILED")
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^SIWE_VERIFY_FAILED$/,
+    )
   })
 })

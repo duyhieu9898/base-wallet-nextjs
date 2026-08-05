@@ -85,10 +85,10 @@ describe("bootstrap", () => {
 
     render(<AuthProbe />, { wrapper: Wrapper })
 
-    expect(screen.getByTestId("status")).toHaveTextContent("bootstrapping")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^bootstrapping$/)
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
     })
 
     expect(screen.getByTestId("address")).toHaveTextContent(ADDRESS)
@@ -100,7 +100,9 @@ describe("bootstrap", () => {
     render(<AuthProbe />, { wrapper: Wrapper })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
   })
 
@@ -112,7 +114,7 @@ describe("bootstrap", () => {
     render(<AuthProbe />, { wrapper: Wrapper })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unavailable")
+      expect(screen.getByTestId("status")).toHaveTextContent(/^unavailable$/)
     })
   })
 
@@ -124,7 +126,7 @@ describe("bootstrap", () => {
     render(<AuthProbe />, { wrapper: Wrapper })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unavailable")
+      expect(screen.getByTestId("status")).toHaveTextContent(/^unavailable$/)
     })
   })
 
@@ -136,7 +138,7 @@ describe("bootstrap", () => {
     render(<AuthProbe />, { wrapper: Wrapper })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
     })
 
     expect(mockAuthState.requestCounts.refresh).toBe(1)
@@ -191,7 +193,7 @@ describe("bootstrap boundary", () => {
     await user.click(screen.getByRole("button", { name: "Try again" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
     })
   })
 })

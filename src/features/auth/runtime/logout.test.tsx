@@ -141,7 +141,7 @@ async function renderAuthenticated() {
   render(<LogoutProbe />, { wrapper: Wrapper })
 
   await waitFor(() => {
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
   })
 
   seedCache(queryClient)
@@ -156,7 +156,9 @@ describe("logout", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
 
     expect(mockAuthState.currentRefreshCookieId).toBeNull()
@@ -169,7 +171,9 @@ describe("logout", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
 
     expect(queryClient.getQueryData(WAGMI_KEY)).toEqual({ value: 1n })
@@ -182,7 +186,9 @@ describe("logout", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
 
     expect(disconnectSpy).not.toHaveBeenCalled()
@@ -202,7 +208,9 @@ describe("logout", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
   })
 
@@ -217,7 +225,9 @@ describe("logout", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
 
     expect(mockAuthState.requestCounts.logout).toBe(1)
@@ -246,7 +256,9 @@ describe("logout", () => {
     })
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
   })
 
@@ -263,7 +275,7 @@ describe("logout", () => {
       )
     })
 
-    expect(screen.getByTestId("status")).toHaveTextContent("authenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
     expect(queryClient.getQueryData(PROFILE_KEY)).toEqual({
       id: "user_1",
     })
@@ -287,7 +299,9 @@ describe("logout", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
   })
 
@@ -300,7 +314,9 @@ describe("logout", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
 
     expect(screen.getByTestId("logout-error")).toHaveTextContent("")
@@ -320,13 +336,15 @@ describe("logout", () => {
     await user.click(screen.getByRole("button", { name: "Sign out" }))
 
     await waitFor(() => {
-      expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+      expect(screen.getByTestId("status")).toHaveTextContent(
+        /^unauthenticated$/,
+      )
     })
 
     // Refresh returns late: generation has changed so it cannot be committed.
     await pendingRequest
 
-    expect(screen.getByTestId("status")).toHaveTextContent("unauthenticated")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
     expect(mockAuthState.requestCounts.refresh).toBeGreaterThan(0)
   })
 })
