@@ -185,7 +185,7 @@ done nằm ở `CHAIN_FAMILY_TEMPLATE.md`, và không mục nào trong danh sác
 - Real TanStack QueryClient trong hook tests.
 - Live read-only RPC smoke tests.
 - Local EVM testnet write script.
-- Typecheck, lint, format, tests và Next.js build.
+- Typecheck, lint, format, tests và production build.
 
 ## Ready chain-family implementation template
 

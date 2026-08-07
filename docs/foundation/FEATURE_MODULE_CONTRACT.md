@@ -47,7 +47,7 @@ and never on two.
 
 Feature modules must not import:
 
-- Host application pages or App Router layouts (`@/app/*`).
+- Host application route modules or page components (`@/routes/*`, `@/pages/*`).
 - Host root providers or composition wrappers (`@/providers/*`).
 - Application bootstrap leaves of a runtime package (its `config` or `provider`
   entrypoints). Provider composition is the host's job.

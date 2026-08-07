@@ -16,7 +16,7 @@ import {
   type MockRefreshSession,
 } from "../data/auth-session"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 const NONCE_TTL_MS = 5 * 60 * 1000
 const ACCESS_TOKEN_TTL_SECONDS = 15 * 60

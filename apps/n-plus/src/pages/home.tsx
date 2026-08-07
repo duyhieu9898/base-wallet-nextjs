@@ -1,6 +1,4 @@
-"use client"
-
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 
 import { WalletPanel } from "@/components/web3/wallet-panel"
 import { AuthStatus } from "@/features/auth/components/auth-status"
@@ -30,7 +28,7 @@ export default function HomePage() {
       <AuthStatus />
 
       {process.env.NODE_ENV !== "production" && (
-        <Link className="text-sm underline underline-offset-4" href="/web3-lab">
+        <Link className="text-sm underline underline-offset-4" to="/web3-lab">
           {t.home.web3LabLink}
         </Link>
       )}

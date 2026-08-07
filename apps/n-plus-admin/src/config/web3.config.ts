@@ -17,7 +17,7 @@ import {
  * hash stored by the backend into a block-explorer link.
  *
  * Unlike the product application, admin is **single-chain per deployment**. There
- * is no network switcher and no per-record chain: `NEXT_PUBLIC_APP_ENV` decides
+ * is no network switcher and no per-record chain: `VITE_APP_ENV` decides
  * the chain, so a production deployment links to mainnet and every other
  * deployment links to testnet. The registry therefore gets exactly one network
  * installed — a registry holding chains this deployment can never show is a
@@ -50,7 +50,7 @@ export function resolveAdminChain(appEnv: string | undefined): Chain {
       return sepolia
     default:
       throw new Error(
-        `NEXT_PUBLIC_APP_ENV="${appEnv}" is not recognized. Expected "production" or "development".`,
+        `VITE_APP_ENV="${appEnv}" is not recognized. Expected "production" or "development".`,
       )
   }
 }

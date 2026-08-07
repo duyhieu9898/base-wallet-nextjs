@@ -1,5 +1,3 @@
-"use client"
-
 import { useState, type ReactNode } from "react"
 import type { Address } from "viem"
 import { Button } from "@/components/ui/button"

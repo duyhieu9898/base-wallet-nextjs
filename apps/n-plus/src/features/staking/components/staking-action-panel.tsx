@@ -1,5 +1,3 @@
-"use client"
-
 import { useState } from "react"
 
 import { useTransactionFeedback } from "@/components/web3/common/transaction-feedback"

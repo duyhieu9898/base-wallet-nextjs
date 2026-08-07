@@ -38,7 +38,7 @@ export function resolveDefaultEvmChainId(
   const parsed = Number(raw)
   if (!Number.isInteger(parsed) || parsed <= 0) {
     throw new Error(
-      `NEXT_PUBLIC_DEFAULT_CHAIN_ID must be a positive integer chain ID, received "${raw}".`,
+      `VITE_DEFAULT_CHAIN_ID must be a positive integer chain ID, received "${raw}".`,
     )
   }
 
@@ -66,7 +66,7 @@ export const evmNetworks: readonly EvmNetworkConfig[] = Object.freeze([
     key: "ethereum-sepolia",
     family: "evm" as const,
     chain: sepolia,
-    rpcUrlOverride: process.env.NEXT_PUBLIC_RPC_ETHEREUM_SEPOLIA || undefined,
+    rpcUrlOverride: import.meta.env.VITE_RPC_ETHEREUM_SEPOLIA || undefined,
     tokens: hydrateTokens(rawEvmTokensMap[sepolia.id]),
     faucets: Object.freeze([
       {
@@ -81,7 +81,7 @@ export const evmNetworks: readonly EvmNetworkConfig[] = Object.freeze([
     key: "ethereum-mainnet",
     family: "evm" as const,
     chain: mainnet,
-    rpcUrlOverride: process.env.NEXT_PUBLIC_RPC_ETHEREUM_MAINNET || undefined,
+    rpcUrlOverride: import.meta.env.VITE_RPC_ETHEREUM_MAINNET || undefined,
     tokens: hydrateTokens(rawEvmTokensMap[mainnet.id]),
     faucets: Object.freeze([]),
   },
@@ -90,7 +90,7 @@ export const evmNetworks: readonly EvmNetworkConfig[] = Object.freeze([
 export const evmRuntimeConfig: EvmRuntimeConfig = createEvmRuntimeConfig({
   networks: evmNetworks,
   defaultChainId: resolveDefaultEvmChainId(
-    process.env.NEXT_PUBLIC_DEFAULT_CHAIN_ID,
+    import.meta.env.VITE_DEFAULT_CHAIN_ID,
   ),
 })
 

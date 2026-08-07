@@ -1,5 +1,3 @@
-"use client"
-
 import type { ReactNode } from "react"
 import { CheckCircle2, XCircle } from "lucide-react"
 import { Label } from "@/components/ui/label"

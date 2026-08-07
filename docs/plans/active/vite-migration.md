@@ -121,17 +121,17 @@ code beyond one cookie read, so it isolates tooling risk from product risk.
 
 ## Progress
 
-- [ ] 0. Audit `process.env` / `NEXT_PUBLIC_` usage across both apps.
-- [ ] 1. Admin: Vite tooling.
-- [ ] 2. Admin: routes.
-- [ ] 3. Admin: root layout, fonts, sidebar cookie.
-- [ ] 4. Admin: `next/navigation` and `next/link` call sites.
-- [ ] 5. Admin: validate and commit.
-- [ ] 6. Product: Vite tooling and routes.
-- [ ] 7. Product: drop `/api/health`, adjust e2e assertion.
-- [ ] 8. Playwright configuration.
-- [ ] 9. Decision `0013` rewritten for SPA.
-- [ ] 10. Documentation and deployment target updated; `next` removed workspace-wide.
+- [x] 0. Audited env usage — 28 `NEXT_PUBLIC_*` reads, all renamed to `VITE_*`.
+- [x] 1. Admin: Vite tooling.
+- [x] 2. Admin: routes, URL parity proven by diff.
+- [x] 3. Admin: root route, fonts, sidebar cookie.
+- [x] 4. Admin: `next/navigation` and `next/link` call sites.
+- [x] 5. Admin: validated and committed (`5b6f4da`).
+- [x] 6. Product: Vite tooling and routes.
+- [x] 7. Product: `/api/health` dropped, e2e asserts client boot.
+- [x] 8. Playwright configuration.
+- [x] 9. Decision `0013` rewritten for a static bundle.
+- [x] 10. Documentation updated; `next` and `eslint-config-next` removed workspace-wide.
 
 ## Decisions
 
@@ -163,4 +163,49 @@ code beyond one cookie read, so it isolates tooling risk from product risk.
 
 ## Result
 
-Pending.
+Complete, pending review. Two commits: `5b6f4da` (admin), plus the product app
+and workspace cleanup.
+
+Delivered:
+
+- No `next` dependency, no `next/*` import, no `next.config.*`, no
+  `next-env.d.ts`, no API route anywhere in the repository.
+- Both apps build to static assets with Vite and route with TanStack Router.
+- Admin URL parity proven: the generated route tree diffed against the App Router
+  paths is identical across all 18 routes.
+- `eslint-config-next` replaced with `@eslint/js` + `typescript-eslint` +
+  `eslint-plugin-react-hooks` + `eslint-plugin-react-refresh`. The boundary rules
+  that enforce the architecture were preserved, and `src/test/eslint-boundaries.test.ts`
+  proves it — that suite exists to fail if the rules stop being enforced.
+
+Found and fixed while migrating, not caused by it:
+
+- Three zero-width spaces (U+200B) embedded in source comments, invisible until
+  `no-irregular-whitespace` — a rule `eslint-config-next` did not enable — started
+  running.
+- A `no-useless-assignment` in an admin mock handler.
+- `apps/n-plus/tsconfig.json` had excluded gitignored `scripts/**/*.local.ts`;
+  that exclusion was briefly lost and restored.
+
+Known limitation, deliberately not fixed:
+
+- The `/web3-lab` route chunk is still emitted in the production build. The
+  `beforeLoad` gate is a runtime check, so the lab never renders and its chunk is
+  never fetched in production, but the asset exists. Excluding it from the output
+  needs a build-level exclusion. It contains development UI only, no secrets.
+
+Validation:
+
+- `pnpm typecheck`, `pnpm lint` (0 errors), `pnpm format:check`, `pnpm test:run`
+  (568 tests) and `pnpm build` all pass.
+- `pnpm --filter n-plus test:e2e` — 2 passed against the Vite dev server.
+- Negative proof: no `NEXT_PUBLIC` and no `next` import remains in any `src/`,
+  `scripts/`, `contracts/` or `e2e/` directory.
+
+Follow-up, not in this plan:
+
+- Deployment configuration still has to change from a Node server to static
+  hosting; the repository holds no deployment manifest, so there was nothing to
+  edit here.
+- `pnpm web3:smoke` and `staking:deploy-sepolia` now load env through Vite's
+  `loadEnv`. Neither was executed — both require live RPC and funded keys.

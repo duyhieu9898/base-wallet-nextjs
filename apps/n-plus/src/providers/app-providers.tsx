@@ -1,5 +1,3 @@
-"use client"
-
 import type { ReactNode } from "react"
 
 import { AuthBootstrapBoundary } from "@/features/auth/components/auth-bootstrap-boundary"

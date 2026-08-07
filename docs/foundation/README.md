@@ -41,7 +41,7 @@ Trạng thái hỗ trợ chi tiết của từng runtime (EVM, Solana) và danh 
 Foundation không có một technology stack duy nhất — mỗi lớp có stack riêng:
 
 ```text
-Host / reference applications   Next.js App Router · React · TypeScript
+Host / reference applications   Vite · React · TanStack Router · TypeScript
 EVM runtime (@nln/web3-evm)     Wagmi · Viem · TanStack Query
 Family runtime tiếp theo        dependencies riêng của nó
 ```

@@ -1,56 +1,75 @@
-# 0013 i18n and hydration policy
+# 0013 i18n and first-paint policy
 
 ## Purpose
 
-Server không biết local storage. Đọc locale trực tiếp từ local storage trong initial client render tạo hydration mismatch với server HTML. Document language cũng phải theo locale để hỗ trợ accessibility và browser tooling.
+Locale preference lives in local storage, which is not readable before the app
+mounts. Reading it during the initial render used to cause a hydration mismatch
+against server HTML; the applications are now static bundles with no server
+render, so that specific mismatch cannot occur.
+
+The requirement that survives is about **first paint**, not hydration: the first
+frame must be deterministic, and the document language must follow the active
+locale for accessibility and browser tooling.
 
 ## Decision
 
-- Server render và first client render dùng cùng một deterministic locale.
-- `I18nProvider` không đọc local storage trong initial render.
-- Stored locale preference chỉ được áp dụng post-mount.
-- `document.documentElement.lang` đồng bộ theo active locale.
-- Context consumer fail rõ khi được dùng ngoài provider.
+- The first render uses a deterministic default locale, not a value read from
+  storage.
+- `I18nProvider` does not read local storage during the initial render.
+- Stored locale preference is applied post-mount.
+- `document.documentElement.lang` follows the active locale.
+- A context consumer fails loudly when used outside its provider.
 
-Reference shell hiện ship:
+The reference shell ships:
 
 - `en`;
 - `ja`;
 - default `en`.
 
-Danh sách locale là reference configuration và application được phép thay thế hoặc mở rộng.
+The locale list is reference configuration; an application may replace or extend
+it.
 
 ## Required behavior
 
-- Không đọc local storage trong initial render.
-- Stored preference chỉ được đọc post-mount trong `useEffect`, nên có một frame hiển thị default locale.
-- Context consumer ném lỗi rõ khi nằm ngoài provider, thay vì fallback im lặng về default locale.
-- Thêm locale mới phải cập nhật dictionary và supported locale union trong cùng change.
+- Do not read local storage during the initial render.
+- Read the stored preference post-mount in `useEffect`, so exactly one frame
+  shows the default locale.
+- A context consumer throws a clear error outside its provider rather than
+  silently falling back to the default locale.
+- Adding a locale updates the dictionary and the supported-locale union in the
+  same change.
 
 ## Boundaries
 
-- Hydration invariant thuộc foundation.
-- Locale list, copy và default product language thuộc application/reference shell.
-- Application có thể xóa `ja`, thêm locale mới hoặc đổi default, miễn server và first client render vẫn deterministic.
+- The deterministic-first-render invariant belongs to the application shell, not
+  to a chain-family package. No `@nln/web3-*` package renders text.
+- Locale list, copy and default product language belong to the
+  application/reference shell.
+- An application may remove `ja`, add a locale or change the default, as long as
+  the first render stays deterministic.
+- If an application ever reintroduces server rendering or prerendering, this
+  decision returns to being a hydration invariant and the server and first client
+  render must agree. That is a change of premise and must be recorded here, not
+  assumed.
 
 ## Enforcement
 
-- Provider khởi tạo bằng hằng số, không đọc storage.
-- Context consumer ném lỗi khi thiếu provider.
-- Type system cho locale union và dictionary shape.
+- The provider initialises from a constant and does not read storage.
+- The context consumer throws when its provider is missing.
+- The type system covers the locale union and dictionary shape.
 
 ## Code and tests
 
 Implementation:
 
-- `src/i18n/config.ts`
-- `src/i18n/i18n-provider.tsx`
-- `src/i18n/use-translation.ts`
-- `src/i18n/dictionaries.ts`
-- `src/i18n/dictionaries/en.json`
-- `src/i18n/dictionaries/ja.json`
-- `src/i18n/language-switcher.tsx`
+- `apps/n-plus/src/i18n/config.ts`
+- `apps/n-plus/src/i18n/i18n-provider.tsx`
+- `apps/n-plus/src/i18n/use-translation.ts`
+- `apps/n-plus/src/i18n/dictionaries.ts`
+- `apps/n-plus/src/i18n/dictionaries/en.json`
+- `apps/n-plus/src/i18n/dictionaries/ja.json`
+- `apps/n-plus/src/i18n/language-switcher.tsx`
 
 Tests:
 
-- `src/components/web3/web3-lab.test.tsx`
+- `apps/n-plus/src/components/web3/web3-lab.test.tsx`

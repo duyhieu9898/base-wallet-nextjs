@@ -126,7 +126,9 @@ ABIs and deployment metadata. Code is not shared between them
 
 ```text
 apps/<app>/src/
-├── app/                  routes
+├── routes/               TanStack Router file routes (generates routeTree.gen.ts)
+├── pages/                page components the routes mount
+├── main.tsx              entry point — creates the router and mounts React
 ├── providers/            composition root — chooses which runtime is mounted
 ├── components/ui/        design system primitives
 ├── components/web3/      application-owned web3 presentation (0014)

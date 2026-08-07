@@ -156,7 +156,7 @@ packages/web3-evm               →  KHÔNG BAO GIỜ import →  apps/n-plus/sr
 ```
 
 Auth provider không được thêm vào foundation provider. Application
-provider composition (`apps/n-plus/src/app/providers.tsx`) chịu trách nhiệm đó.
+provider composition (`apps/n-plus/src/providers/app-providers.tsx`) chịu trách nhiệm đó.
 
 ## Required behavior
 
@@ -183,7 +183,7 @@ Decision này **không** claim:
 - database session persistence;
 - refresh-token hashing, rotation family, reuse detection đã được implement;
 - EIP-1271 / smart account signature verification được hỗ trợ;
-- Next.js middleware route protection hoặc server component authentication;
+- middleware route protection hoặc server-side authentication (không có server);
 - role/permission authorization policy cho business feature.
 
 MSW mock **có** verify chữ ký thật: nó recover signer theo EIP-191 và so với

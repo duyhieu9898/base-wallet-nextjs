@@ -338,7 +338,7 @@ Additional EVM trust boundary items:
   manages a private key.
 - RPC and wallet-provider responses are external data.
 - JSON registry, environment variables and local storage are runtime-validated.
-- `NEXT_PUBLIC_*` variables must not contain secrets.
+- Client-exposed environment variables (`VITE_*`) must not contain secrets.
 - UI must not bypass domain write guards.
 - Application business policy may be stricter than this runtime, never weaker.
 

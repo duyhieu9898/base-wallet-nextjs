@@ -1,5 +1,3 @@
-"use client"
-
 import { useTranslation } from "@/i18n/use-translation"
 
 export function StageBadge(props: { isTestnet?: boolean }) {

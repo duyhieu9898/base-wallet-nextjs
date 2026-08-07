@@ -2,7 +2,7 @@ import { HTTP_STATUS } from "@/constants/status-codes"
 import { ApiError, type ApiErrorPayload } from "./api-error"
 import type { ApiRequestOptions } from "./types"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 function isBodyAllowed(method?: string) {
   const normalizedMethod = method?.toUpperCase() ?? "GET"

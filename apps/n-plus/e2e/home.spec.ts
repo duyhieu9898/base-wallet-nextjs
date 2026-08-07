@@ -10,12 +10,19 @@ test("renders the homepage", async ({ page }) => {
   ).toBeVisible()
 })
 
-test("health API returns ok", async ({ request }) => {
-  const response = await request.get("/api/health")
-
-  expect(response.ok()).toBe(true)
-
-  await expect(response.json()).resolves.toMatchObject({
-    status: "ok",
+/**
+ * Replaces the old `/api/health` assertion. The app is a static bundle with no
+ * server of its own, so there is no route left to answer a health check —
+ * whether the app is serving is exactly whether it boots and renders.
+ */
+test("boots the client application", async ({ page }) => {
+  const consoleErrors: string[] = []
+  page.on("console", (message) => {
+    if (message.type() === "error") consoleErrors.push(message.text())
   })
+
+  await page.goto("/")
+
+  await expect(page.locator("#root")).not.toBeEmpty()
+  expect(consoleErrors).toEqual([])
 })

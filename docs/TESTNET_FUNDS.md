@@ -20,7 +20,7 @@ Nguồn sự thật là `packages/web3-evm/src/chain/registry/evm-network.regist
 | Ethereum Sepolia | testnet | `11155111` | Chainlink (native), Circle (USDC)    |
 | Ethereum Mainnet | mainnet | `1`        | — (không có, và sẽ không bao giờ có) |
 
-Network mặc định lấy từ `NEXT_PUBLIC_DEFAULT_CHAIN_ID` trong `.env.local`
+Network mặc định lấy từ `VITE_DEFAULT_CHAIN_ID` trong `.env.local`
 (`.env.example` đặt sẵn `11155111`). Dev và production dùng giá trị khác nhau, nên
 nó nằm ở env chứ không hardcode. Chain ID không có trong registry sẽ làm app fail
 ngay lúc boot thay vì chạy nhầm mạng.
@@ -55,7 +55,7 @@ Mở `/web3-lab` (chỉ có ở dev), connect ví, chọn network. UI đọc nat
 balance thật qua RPC. Không có mock RPC hay mock balance ở đây.
 
 RPC mặc định là public endpoint của `viem/chains`. Nếu bị rate limit, đặt endpoint
-riêng qua `NEXT_PUBLIC_RPC_ETHEREUM_SEPOLIA` / `NEXT_PUBLIC_RPC_ETHEREUM_MAINNET`
+riêng qua `VITE_RPC_ETHEREUM_SEPOLIA` / `VITE_RPC_ETHEREUM_MAINNET`
 (xem `.env.example`).
 
 ## 5. Test self-transfer nhỏ

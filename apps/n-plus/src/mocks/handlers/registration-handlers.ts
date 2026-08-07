@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw"
 import { mockAuthState } from "../data/auth-session"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 export const registrationHandlers = [
   // Get registration policy terms in force

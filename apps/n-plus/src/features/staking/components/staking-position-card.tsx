@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
 import { useStakingPosition } from "../hooks/use-staking-position"
 import { StakingActionPanel } from "./staking-action-panel"

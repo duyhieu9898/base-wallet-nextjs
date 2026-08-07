@@ -1,5 +1,3 @@
-"use client"
-
 import { CheckCircle2, HelpCircle, Loader2, XCircle } from "lucide-react"
 import { useTranslation } from "@/i18n/use-translation"
 

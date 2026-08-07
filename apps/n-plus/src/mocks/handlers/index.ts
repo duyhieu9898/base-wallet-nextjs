@@ -5,7 +5,7 @@ import { protectedHandlers } from "./protected-handlers"
 import { registrationHandlers } from "./registration-handlers"
 
 const isGlobalApiMockingEnabled =
-  process.env.NEXT_PUBLIC_API_MOCKING !== "disabled"
+  import.meta.env.VITE_API_MOCKING !== "disabled"
 
 /**
  * Per-module MSW Mocking Configuration for Product App.

@@ -1,5 +1,3 @@
-"use client"
-
 import type { ReactNode } from "react"
 
 import { evmRuntimeConfig } from "@/config/web3.config"

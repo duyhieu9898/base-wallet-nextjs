@@ -1,5 +1,3 @@
-"use client"
-
 import { formatUnits } from "viem"
 
 type StakedAsset = Readonly<{

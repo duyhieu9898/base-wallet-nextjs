@@ -89,7 +89,7 @@ It also records **product-side candidates** for a shared Base Foundation Package
 | **MLM Tree**   | Unilevel Tree Structure          |     ✅ (Unilevel Tree)     |            ❌             |   ✅ (Unilevel + Series)   |                  Backend/indexer — REJECT (§4.3)                  |
 | **MLM Rank**   | Rank System                      |   ✅ (Monthly P/T Rank)    |            ❌             | ✅ (NFT/Sales/Effective/T) |                        Application Package                        |
 | **MLM Reward** | Referral & Unilevel Team Bonus   |   ✅ (Team Bonus L1-L3)    |            ❌             | ✅ (5-Tier Reward Engine)  |                  Backend/indexer — REJECT (§4.3)                  |
-| **Admin**      | Admin Portal & Management        |    ✅ (`n-plus-admin`)     |    ✅ (`neura-admin`)     |  ✅ (`neura-link-admin`)   |             `apps/*-admin` (Next.js / `shadcn-admin`)             |
+| **Admin**      | Admin Portal & Management        |    ✅ (`n-plus-admin`)     |    ✅ (`neura-admin`)     |  ✅ (`neura-link-admin`)   |              `apps/*-admin` (Vite / `shadcn-admin`)               |
 
 ---
 

@@ -1,5 +1,3 @@
-"use client"
-
 import { useQueryClient, type QueryClient } from "@tanstack/react-query"
 import {
   useCallback,

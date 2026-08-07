@@ -53,7 +53,7 @@ export const adminAdminsHandlers = [
     const sortOrder = url.searchParams.get("sortOrder") ?? "desc" // default newest first
 
     const sorted = [...mockAdminsList].sort((a, b) => {
-      let comp = 0
+      let comp: number
       if (sortBy === "name") comp = a.name.localeCompare(b.name)
       else if (sortBy === "email") comp = a.email.localeCompare(b.email)
       else

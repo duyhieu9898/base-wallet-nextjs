@@ -1,5 +1,3 @@
-"use client"
-
 import { Button } from "@/components/ui/button"
 import type { Locale } from "@/i18n/config"
 import { localeNames, locales } from "@/i18n/config"

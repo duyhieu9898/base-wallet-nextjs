@@ -1,5 +1,3 @@
-"use client"
-
 import { Dialog } from "@base-ui/react/dialog"
 import { useId } from "react"
 

@@ -16,7 +16,8 @@ NLN Frontend is a pnpm monorepo hosting the shared EVM foundation package (`@nln
 │       ├── src/features/      # Product features (auth, staking, ...)
 │       ├── src/components/    # UI components and presentation panels
 │       ├── src/providers/     # Application provider composition root
-│       ├── src/app/           # Next.js App Router pages & API routes
+│       ├── src/routes/        # TanStack Router file routes
+│       ├── src/pages/         # Page components the routes mount
 │       └── contracts/         # Solidity test fixture and its tooling
 ├── scripts/                   # Workspace tooling (live RPC smoke entry)
 └── docs/                      # Architectural decisions, foundation specs, and plans

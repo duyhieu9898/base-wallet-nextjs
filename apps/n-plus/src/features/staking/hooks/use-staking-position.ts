@@ -1,5 +1,3 @@
-"use client"
-
 import { useReadContract } from "wagmi"
 
 import { findStakingDeployment } from "../contracts/staking-deployments"

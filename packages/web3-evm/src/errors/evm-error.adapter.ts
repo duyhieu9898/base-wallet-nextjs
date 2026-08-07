@@ -35,7 +35,7 @@ function resolveGenericErrorCode(
 /**
  * Convert viem/wagmi's raw error to `EvmWeb3Error` with `code` and `phase` context.
  *
- * Viem's ​​error is `BaseError` with multi-line message including `Details:`,
+ * Viem's error is `BaseError` with multi-line message including `Details:`,
  * `Version: viem@x.y.z` and sometimes even the request payload — are not appropriate to include
  * straight to the UI. This function derives the actual cause via `walk()`, returning a short message,
  * and keep the original error in `cause` for debugging.

@@ -80,7 +80,7 @@ export function buildSiweMessage({
   }
 
   // EIP-4361 requires an address of the EIP-55 checksummed format. Check before
-  // checksum so that the error emitted is `AuthError` and not viem's ​​raw error —
+  // checksum so that the error emitted is `AuthError` and not viem's raw error —
   // This message can go straight to the UI.
   if (!isValidAddress(address)) {
     throw createAuthError("INVALID_AUTH_RESPONSE", "Invalid wallet address.")

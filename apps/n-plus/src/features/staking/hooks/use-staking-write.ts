@@ -1,5 +1,3 @@
-"use client"
-
 import { useCallback, useEffect, useRef, useState } from "react"
 import { parseUnits, type Address, type Hash } from "viem"
 import { useQueryClient } from "@tanstack/react-query"

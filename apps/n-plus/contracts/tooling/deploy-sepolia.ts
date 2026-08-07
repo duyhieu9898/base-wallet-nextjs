@@ -9,7 +9,7 @@ import {
 import { privateKeyToAccount } from "viem/accounts"
 import { sepolia } from "viem/chains"
 
-import { loadEnvConfig } from "@next/env"
+import { loadEnv } from "vite"
 import { compileStakingVault } from "./compiler"
 
 const SEPOLIA_USDC = "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238" as const
@@ -28,7 +28,13 @@ function readPrivateKey(value: string | undefined): Hex {
 }
 
 async function main() {
-  loadEnvConfig(process.cwd())
+  // Vite's loader, same precedence the app uses. The secrets this script needs
+  // are deliberately unprefixed, so they stay out of any client bundle; the
+  // empty prefix loads everything in the .env files into this process only.
+  Object.assign(
+    process.env,
+    loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), ""),
+  )
 
   if (process.env.CONFIRM_SEPOLIA_DEPLOY !== DEPLOY_CONFIRMATION) {
     throw new Error(
@@ -38,7 +44,7 @@ async function main() {
 
   const privateKey = readPrivateKey(process.env.SEPOLIA_DEV_PRIVATE_KEY)
   const account = privateKeyToAccount(privateKey)
-  const transport = http(process.env.NEXT_PUBLIC_RPC_ETHEREUM_SEPOLIA)
+  const transport = http(process.env.VITE_RPC_ETHEREUM_SEPOLIA)
   const publicClient = createPublicClient({ chain: sepolia, transport })
   const walletClient = createWalletClient({
     account,

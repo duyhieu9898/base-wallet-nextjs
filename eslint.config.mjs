@@ -1,6 +1,9 @@
+import js from "@eslint/js"
 import { defineConfig, globalIgnores } from "eslint/config"
-import nextVitals from "eslint-config-next/core-web-vitals"
-import nextTs from "eslint-config-next/typescript"
+import reactHooks from "eslint-plugin-react-hooks"
+import reactRefresh from "eslint-plugin-react-refresh"
+import globals from "globals"
+import tseslint from "typescript-eslint"
 
 /**
  * Public boundary of Web3 foundation.
@@ -114,20 +117,27 @@ const crossAppPattern = {
 }
 
 const eslintConfig = defineConfig([
-  ...nextVitals,
-  ...nextTs,
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
 
-  // `no-html-link-for-pages` checks <a> against a Pages Router directory. This
-  // repository is App Router only, so the rule has nothing to look at and reports
-  // a missing pages directory on every run.
-  //
-  // Turning it off rather than pointing settings.next.rootDir at the apps: that
-  // setting is globbed against process.cwd(), so it only resolves when lint runs
-  // from the workspace root and misfires again from inside an app — which is how
-  // FEATURE_MODULE_CONTRACT.md §6.4 tells people to run it.
   {
+    files: ["**/*.{ts,tsx,mts,mjs}"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: { ...globals.browser, ...globals.node },
+    },
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
     rules: {
-      "@next/next/no-html-link-for-pages": "off",
+      ...reactHooks.configs.recommended.rules,
+      // A route or config module legitimately exports a `Route` object beside its
+      // component; the allowance keeps HMR warnings on real mixed modules only.
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {

@@ -1,5 +1,3 @@
-"use client"
-
 import { useCallback, useLayoutEffect, useRef, useState } from "react"
 import { useSignMessage } from "wagmi"
 import type { Address } from "viem"

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 import { api } from "@/lib/api"
 import { server } from "@/mocks/server"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 describe("api fetch wrapper", () => {
   it("parses a JSON response", async () => {

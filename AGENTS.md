@@ -1,9 +1,15 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Build model
 
-# This is NOT the Next.js you know
+Both applications are **Vite + React SPAs** with **TanStack Router** (file-based
+routes under `src/routes/`, generated `routeTree.gen.ts`). There is no Next.js,
+no server rendering, no prerendering, and no API routes anywhere in this
+repository — do not reintroduce a framework convention that assumes one.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+- Routes live in `src/routes/`; page components in `src/pages/`.
+- Environment variables are `VITE_*`, read through `import.meta.env`.
+- Output is static assets in `dist/`.
+
+Rationale and the decisions behind it: [vite-migration.md](docs/plans/active/vite-migration.md).
 
 ## Current State & Ecosystem Vision
 

@@ -1,5 +1,3 @@
-"use client"
-
 import type { ReactNode } from "react"
 
 import { useAuth } from "@/features/auth/hooks/use-auth"

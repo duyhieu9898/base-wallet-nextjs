@@ -31,7 +31,7 @@ export function useEvmBalances() {
   })
 
   // If you don't have an account, don't make any contract calls — avoid using zero addresses
-  // make fake values ​​just to satisfy the style.
+  // make fake values just to satisfy the style.
   const tokenContracts = useMemo(
     () =>
       account

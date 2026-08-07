@@ -1,6 +1,6 @@
 # EVM Adoption Guide
 
-Use this repository as a starting point for a Next.js **EVM** dApp. It is a
+Use this repository as a starting point for a Vite + React **EVM** dApp. It is a
 reference foundation and demo, not a production application or a promise that
 every included module belongs in the resulting product.
 
@@ -37,7 +37,7 @@ only the modules that the application needs:
 | ------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
 | `apps/n-plus/src/features/auth/`                             | EVM EOA SIWE + MSW reference. It is not a production backend, RBAC model, or multi-wallet auth solution.                 |
 | `apps/n-plus/src/features/staking/` and `contracts/`         | A small feature and contract fixture showing feature-local ownership. Replace it with the product contract or remove it. |
-| `apps/n-plus/src/app/web3-lab/` và `components/web3/`        | Development composition and reusable EVM UI examples. Keep, trim, or remove them deliberately.                           |
+| `apps/n-plus/src/pages/web3-lab.tsx` và `components/web3/`   | Development composition and reusable EVM UI examples. Keep, trim, or remove them deliberately.                           |
 | Local transaction history and fee/review UI                  | Optional EVM modules. They do not replace an indexer or backend audit trail.                                             |
 | Transaction feedback UI                                      | Optional ephemeral UI. It mirrors the write lifecycle but never replaces receipt tracking or local transaction history.  |
 | [`../CHAIN_FAMILY_TEMPLATE.md`](../CHAIN_FAMILY_TEMPLATE.md) | Documentation for a future chain family only; it is not a runtime or SDK integration.                                    |

@@ -17,7 +17,7 @@ The admin application has its own record:
 
 - Ethereum Sepolia (`11155111`)
 - Ethereum Mainnet (`1`)
-- The default EVM chain comes from `NEXT_PUBLIC_DEFAULT_CHAIN_ID`; it falls back
+- The default EVM chain comes from `VITE_DEFAULT_CHAIN_ID`; it falls back
   to Sepolia when unset. The selected value must exist in the EVM registry.
 
 ## Adopted capabilities
@@ -41,7 +41,7 @@ The admin application has its own record:
 
 - `apps/n-plus/src/features/auth/` owns session state, retry rules, and the wallet-binding
   guard.
-- `apps/n-plus/src/app/providers.tsx` composes auth around the reusable Web3 provider;
+- `apps/n-plus/src/providers/app-providers.tsx` composes auth around the reusable Web3 provider;
   `packages/web3-evm` must not import application auth.
 
 ## Known deviations

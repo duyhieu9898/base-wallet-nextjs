@@ -1,23 +1,11 @@
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
-
 import { Web3Lab } from "@/components/web3/web3-lab"
 import { LanguageSwitcher } from "@/i18n/language-switcher"
 
-export const metadata: Metadata = {
-  title: "Web3 Lab",
-  description: "Onchain development lab for EVM networks.",
-}
-
 /**
- * Route dev-only. Gate equals `notFound()` in production (Next 16 removes `export const dynamic`,
- * Use `process.env.NODE_ENV` as the standard lever).
+ * Development-only. The production gate is on the route (`src/routes/web3-lab.tsx`)
+ * so this module is never reached, and never bundled, in a production build.
  */
 export default function Web3LabPage() {
-  if (process.env.NODE_ENV === "production") {
-    notFound()
-  }
-
   return (
     <main className="mx-auto max-w-3xl space-y-6 px-6 py-12">
       <div className="flex items-center justify-between">

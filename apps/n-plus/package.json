@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest",
@@ -20,10 +20,10 @@
     "@base-ui/react": "^1.6.0",
     "@nln/web3-evm": "workspace:*",
     "@tanstack/react-query": "^5.101.4",
+    "@tanstack/react-router": "^1.170.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^1.28.0",
-    "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "tailwind-merge": "^3.6.0",
@@ -33,9 +33,9 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@next/env": "16.2.12",
     "@playwright/test": "^1.62.1",
-    "@tailwindcss/postcss": "^4",
+    "@tailwindcss/vite": "^4.3.3",
+    "@tanstack/router-plugin": "^1.168.26",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^7.0.0",
     "@testing-library/react": "^16.3.2",
@@ -50,6 +50,7 @@
     "solc": "0.8.36",
     "tailwindcss": "^4",
     "tsx": "^4.23.1",
+    "vite": "^8.2.1",
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.1.10"
   }

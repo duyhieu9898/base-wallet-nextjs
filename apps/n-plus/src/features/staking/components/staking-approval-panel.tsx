@@ -1,5 +1,3 @@
-"use client"
-
 import { getEvmExplorerUrl, type useApproveEvmToken } from "@nln/web3-evm"
 import { TransactionReviewCard } from "@/components/web3/evm/common/transaction-review-card"
 import { TransactionStatus } from "@/components/web3/evm/common/transaction-status"

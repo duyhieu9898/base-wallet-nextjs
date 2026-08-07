@@ -10,7 +10,7 @@
  * configures the foundation from outside without editing a line inside it.
  */
 
-import { loadEnvConfig } from "@next/env"
+import { loadEnv } from "vite"
 
 import { configureEvmRuntime } from "@nln/web3-evm/config"
 import { runEvmSmoke } from "@nln/web3-evm/testing"
@@ -34,10 +34,20 @@ function parseChainIdArg(argv: readonly string[]): number | null {
 }
 
 async function main() {
-  // Same loader and same precedence Next itself uses, so a script verifies the
-  // configuration the app actually runs with. `pnpm --filter n-plus`
-  // invokes this from the app directory, which is the project dir it wants.
-  loadEnvConfig(process.cwd())
+  // Same loader and same precedence Vite itself uses, so this script verifies
+  // the configuration the app actually runs with. `pnpm --filter n-plus`
+  // invokes it from the app directory, which is the project dir it wants.
+  //
+  // The app reads configuration from `import.meta.env`, which Vite replaces at
+  // build time and Node does not define at all. Populating it here is what lets
+  // one config module serve both the bundle and this script.
+  const env = loadEnv(
+    process.env.NODE_ENV ?? "development",
+    process.cwd(),
+    "VITE_",
+  )
+  const meta = import.meta as unknown as { env?: Record<string, string> }
+  meta.env = { ...(meta.env ?? {}), ...env }
 
   // Imported after the env is loaded: the config parses environment variables at
   // module scope, so importing it earlier would read an empty environment.

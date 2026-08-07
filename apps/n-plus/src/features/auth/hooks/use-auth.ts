@@ -1,5 +1,3 @@
-"use client"
-
 import type { AuthError } from "@/features/auth/domain/auth-error"
 import {
   isAuthResolving,

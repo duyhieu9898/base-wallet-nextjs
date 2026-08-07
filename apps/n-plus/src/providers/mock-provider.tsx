@@ -1,15 +1,13 @@
-"use client"
-
 import { useEffect, useState, type ReactNode } from "react"
 
 type MockProviderProps = {
   children: ReactNode
 }
 
-const isMockingEnabled = process.env.NEXT_PUBLIC_API_MOCKING === "enabled"
+const isMockingEnabled = import.meta.env.VITE_API_MOCKING === "enabled"
 
 /**
- * Only start the MSW worker when `NEXT_PUBLIC_API_MOCKING=enabled`. Worker okay
+ * Only start the MSW worker when `VITE_API_MOCKING=enabled`. Worker okay
  * dynamic import to not include mock code in the bundle when mocking is disabled.
  *
  * Delay app rendering until the worker is ready for the first auth query to hit
