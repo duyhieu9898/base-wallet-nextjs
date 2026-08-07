@@ -74,6 +74,12 @@ It also records **product-side candidates** for a shared Base Foundation Package
 - **Scope Status**: Target Product Intake / Solana-based Platform (`apps/neura` & `apps/neura-admin`).
 - **Description**: Solana-based NRA ⇄ NRA Staking Platform (Multi-Pools, Fixed/Flexible Terms, Claim/Compound, Reservation).
 - **Repository Impact**: Triển khai dưới dạng sibling package song song `@nln/web3-solana` (`packages/web3-solana`) khi khởi chạy. Trạng thái hỗ trợ runtime chi tiết xem [`CAPABILITIES.md`](../foundation/CAPABILITIES.md).
+- **Ba ràng buộc ảnh hưởng thiết kế màn hình** — đọc trước khi vẽ màn Neura:
+  1. **Không có lịch sử on-chain.** Chain chỉ giữ trạng thái hiện tại; mọi màn lịch sử/báo cáo/TVL phải lấy từ indexer off-chain, không phải từ đọc chain.
+  2. **Không có cron on-chain.** Reward tích lũy không tự về ví — Member phải tự bấm. Màn hình không được trình bày reward tích lũy như đã nhận.
+  3. **Reward giữ chỗ lúc Stake.** Sức chứa Pool thay đổi theo thời gian và lệnh Stake có thể bị từ chối vì Vault hết chỗ; màn Stake phải hiện sức chứa còn lại **trước** khi submit.
+
+  Chi tiết và trích dẫn spec: [`solana-runtime-requirement.md`](../foundation/solana-runtime-requirement.md).
 
 ---
 

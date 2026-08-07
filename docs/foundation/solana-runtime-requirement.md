@@ -1,79 +1,158 @@
 # Solana Runtime Requirement Record
 
-This record exists because `CHAIN_FAMILY_TEMPLATE.md` requires it: an approved
-application requirement must be written down **before** any code is written for a
-new chain family. Without it, `@nln/web3-solana` is not authorised to start, and
-`CAPABILITIES.md` cannot list Solana above `Deferred`.
+`CHAIN_FAMILY_TEMPLATE.md` requires an approved application requirement written
+down **before** any code is written for a new chain family. Without it,
+`@nln/web3-solana` is not authorised to start and `CAPABILITIES.md` cannot list
+Solana above `Deferred`.
 
-Status: **approved requirement, implementation not started.** Solana is
-`Planned` in [`CAPABILITIES.md`](CAPABILITIES.md).
+Status: **approved requirement, implementation not started.** Solana is `Planned`
+in [`CAPABILITIES.md`](CAPABILITIES.md).
+
+Source specification:
+`docs/local-docs/NLN-181_project1-neura/02_docs/01_requirement/`
+(`01_business-requirement_v0.1.md`, `03_functions-requirement_v0.1.md`).
+Every claim below is cited; anything the spec does not answer is marked **OPEN**
+rather than guessed.
 
 ## Application requirement
 
 The Neura System — `apps/neura` (product) and `apps/neura-admin` (operator
 console) — is a Solana staking platform. EVM cannot serve it: the product is
-specified against SPL tokens, program-derived vaults and Solana transaction
-semantics, not against ERC-20 contracts.
+specified against SPL tokens, program-derived vaults and Solana program
+instructions, not ERC-20 contracts.
 
-Source specification: `docs/local-docs/NLN-181_project1-neura/02_docs/01_requirement/`.
-Product scope summary: [`../product/nln-feature-source-map.md`](../product/nln-feature-source-map.md) §1.3.
+Product scope summary:
+[`../product/nln-feature-source-map.md`](../product/nln-feature-source-map.md) §1.3.
 
-Shape of what the runtime must support, from the specification:
+### What the runtime must support
 
 - multiple independent pools, each with its own stake token, reward token, stake
-  vault and reward vault;
+  vault and reward vault (§3);
 - one position per stake action — positions are never merged, topped up or
-  transferred;
-- stake, unstake (partial or full), claim and compound as user-initiated
-  transactions;
-- no on-chain scheduling. Solana has no on-chain cron, so every reward action is
-  an explicit user transaction. The runtime must never present a pending reward
-  as automatically settled.
+  transferred, and the owner is immutable (§4, Definitions);
+- `stake`, `unstake`, `claim`, `compound` as member-initiated instructions, plus
+  `fund_rewards` which **anyone** may call (§10 table);
+- an admin surface calling `initialize`, `propose_admin`, `accept_admin`,
+  `set_treasury`, `set_global_pause`, `create_pool`, `update_pool`,
+  `set_pool_pause`, `cancel_pool`, `close_pool`, `withdraw_excess_rewards`,
+  `withdraw_excess_stake` (§10 table).
+
+Instruction names are snake_case and the program has an upgrade authority, so the
+program is Anchor-shaped. The frontend consumes it; it does not own it.
+
+## Three constraints that change frontend architecture
+
+These are not staking details. They shape what the runtime package may and may
+not do, so they are recorded before design starts.
+
+### 1. There is no on-chain history
+
+> Hệ thống on-chain chỉ giữ **trạng thái hiện tại**, không giữ lịch sử. Toàn bộ
+> lịch sử giao dịch, biểu đồ TVL, báo cáo doanh thu phải do **indexer off-chain**
+> dựng lại từ các sự kiện hệ thống. (§10, and Notes & Assumptions 7)
+
+Consequences:
+
+- Screens `B040300 Position History` and `B040401 Wallet History` cannot be
+  served by reading chain state. They need the indexer, which is a **backend**
+  concern — `CAPABILITIES.md` already lists indexer as a non-goal of the
+  foundation, and that does not change here.
+- `@nln/web3-solana` must not grow an event-scanning or log-replay layer to
+  compensate. If it does, it has become an indexer.
+- The EVM answer to local history (decision `0012`) does not port. It reconciles
+  pending entries against receipts; Solana's confirmation model and the absence
+  of on-chain history make that a different problem, and it needs its own
+  decision when the need is real.
+
+### 2. Nothing settles by itself
+
+> Solana không có cron on-chain — Member **phải tự bấm**. Không bấm thì không có
+> gì xảy ra. (§8)
+
+Accrued reward is not settled reward. The runtime and every feature built on it
+must present accrued value as a claim the user still has to make, never as a
+balance already received. Rendering it as settled would be the "fake fallback"
+that `ARCHITECTURE.md` §2 forbids.
+
+### 3. Reward is reserved at stake time, and the reservation can reject the stake
+
+> Ngay khi Stake, hệ thống tính Reward tối đa của Position và **giữ chỗ** trước
+> trong Reward Vault. Nếu Reward Vault không đủ chỗ trống, lệnh Stake bị từ chối
+> (`InsufficientRewardLiquidity`). (Definitions, §4)
+
+Pool capacity is therefore a moving quantity, and a stake can fail for a reason
+the user cannot see in their own balance. The spec asks the web app to surface
+remaining capacity **before** submission (§Edge Case 3, and §9). That is a
+preflight requirement on the write path, not a UI nicety — it belongs in the
+same place as obligation 1 of `FEATURE_MODULE_CONTRACT.md` §5.
 
 ## The seven pre-code decisions
 
-`CHAIN_FAMILY_TEMPLATE.md` §"Before writing code" requires all seven. Items
-marked **OPEN** are not yet decided; each one must be closed before the code it
-governs is written, and this record updated in the same change.
+`CHAIN_FAMILY_TEMPLATE.md` §"Before writing code" requires all seven. Each OPEN
+item must be closed before the code it governs is written, and this record
+updated in the same change.
 
 ### 1. Supported networks and wallet connectors
 
-- **OPEN** — network. Devnet for development is assumed; the production cluster
+- **OPEN — cluster.** Devnet for development is assumed; the production cluster
   is a customer decision and must not be hardcoded into the package, exactly as
   the EVM runtime does not hardcode its production chain.
-- **OPEN** — wallet connector. The specification requires connect, disconnect,
-  ownership proof by signature and session persistence, but names no wallet or
-  adapter library.
+- **OPEN — wallet connector.** The spec requires connect, disconnect, ownership
+  proof by signature and session persistence (§1) but names no wallet or adapter
+  library.
 
 ### 2. Account/identity model and authentication
 
-Decided by the specification:
+Decided by the spec:
 
-- the wallet address is the identity; there is no password;
+- the wallet address is the identity; there is no password (§2);
 - ownership is proven by wallet signature, and a login session is bound to the
-  verified wallet address;
-- admin access is granted by the connected wallet matching the admin address in
-  Global Config — connecting any other wallet is refused.
+  verified wallet address (§1, §2, screen `A020100`);
+- admin identity is on-chain: `initialize` runs once, callable only by the wallet
+  holding the program upgrade authority, and admin transfer is a two-step
+  `propose_admin` / `accept_admin` (§10). The console authorises against chain
+  state, not against a role table.
 
-This mirrors the EVM application's SIWE shape but is **not** SIWE and must not
-reuse `features/auth` from an EVM application. Message format and session
-transport are application concerns, not runtime concerns.
+**OPEN — and the spec says so itself:**
 
-- **OPEN** — the signed-message format and its replay protection.
+> Wallet Management & Authentication ở mức tối giản: … chưa có đặc tả chi tiết
+> (thời hạn session, cơ chế chữ ký, xử lý lỗi…). Cần bổ sung input trước khi viết
+> Screen Requirements hoặc API spec. (Notes & Assumptions 5)
+
+So the signed-message format, its replay protection and session lifetime are
+unanswered **in the product spec**, not merely undecided here. This needs product
+input before the auth feature is built. It does not block the runtime package,
+because authentication is application-owned in this architecture — SIWE lives in
+`apps/n-plus/src/features/auth/`, not in `@nln/web3-evm`, and the Solana
+equivalent belongs in `apps/neura` the same way.
 
 ### 3. Read, write, preflight and confirmation semantics
 
-- **OPEN and blocking.** This is the item the family cannot start without,
-  because it defines the runtime's terminal evidence.
+**This is the blocking item.** `ARCHITECTURE.md` §6 requires every family to
+define its own terminal confirmation evidence and forbids concluding success
+without it. EVM's answer is receipt status. Solana's answer is different and must
+be stated before any write path exists, because obligations 1, 2, 6 and 8 of
+`FEATURE_MODULE_CONTRACT.md` §5 have no mechanism to point at until it is.
 
-`../ARCHITECTURE.md` §6 requires every family to define its own terminal
-confirmation evidence and forbids concluding success without it. EVM's answer is
-receipt status; Solana's answer is not receipt status and must be stated
-explicitly — which commitment level counts as terminal, how a dropped or expired
-blockhash is represented, and what a signature alone does and does not prove.
+What has to be decided, and the recommendation for each:
 
-Until this is written, feature obligations 1, 2, 6 and 8 of
-`FEATURE_MODULE_CONTRACT.md` §5 have no Solana mechanism to point at.
+| Question                                     | Recommendation                                                                                  |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Which commitment counts as terminal evidence | `finalized`. `confirmed` is fast but reorg-able, and this app moves user funds                  |
+| What `confirmed` is allowed to drive         | Optimistic UI only — never a success conclusion, never a once-per-signature side effect         |
+| What a signature alone proves                | That the transaction was submitted. Nothing else. It is the EVM hash, and it is not evidence    |
+| Expired blockhash                            | A distinct terminal state, not an error and not a success — the transaction will never land     |
+| Preflight                                    | `simulateTransaction` against the connected account, mapping Anchor error codes to typed errors |
+| Dropped transaction                          | Needs an explicit timeout policy and a user-visible "not landed" state                          |
+
+The recommendation is `finalized` because the alternative fails in exactly the
+way this product cannot tolerate: a `confirmed` claim that later reorgs would
+have shown the user a reward they did not receive, and would have run
+once-per-signature side effects for a transaction that never happened.
+
+**This is a recommendation, not a decision.** Someone with authority over the
+product has to accept it, and this record has to be updated with that acceptance,
+before `packages/web3-solana/` is created.
 
 ### 4. RPC provider, rate limit and failure policy
 
@@ -81,32 +160,62 @@ Until this is written, feature obligations 1, 2, 6 and 8 of
   EVM apply here (`CAPABILITIES.md`, "RPC health và fallback"): provider
   ownership, failover policy, retry budget, rate-limit semantics, observability,
   consistency requirements.
+- Solana adds one the EVM runtime never faced: a `finalized` commitment costs
+  latency, so the read path and the write-confirmation path may legitimately want
+  different commitments. That choice is part of item 3, not a tuning knob.
 
 ### 5. Asset metadata source and validation
 
-Decided by the specification:
+Decided by the spec:
 
 - assets are **standard SPL tokens**; Token-2022 is explicitly not supported;
-- decimals ≤ 18, and stake token decimals may differ from reward token decimals.
+- decimals ≤ 18, and stake-token decimals may differ from reward-token decimals
+  (§3, constraint 6, `InvalidMintDecimals`).
 
 The decimals mismatch is a correctness requirement, not a display concern: the
-specification records that skipping the decimal conversion underpays rewards by
-a factor of 1,000 with no error raised. Registry validation must enforce declared
-decimals against on-chain metadata, as the EVM registry does for ERC-20.
+spec records that skipping the decimal conversion underpays rewards by a factor
+of 1,000 **with no error raised** (§Edge Case 5). Registry validation must check
+declared decimals against on-chain mint metadata, as the EVM registry does for
+ERC-20.
 
 - **OPEN** — the metadata source of record and where the token registry lives.
 
 ### 6. Program ownership and deployment verification
 
-- **OPEN.** Program IDs, IDL ownership and per-cluster deployment records. Per
-  decision `0016` the deployment registry belongs to the application and the
-  interface belongs to the feature that uses it — the package owns neither.
+Known: the instruction set (§10), Anchor-shaped naming, and that admin authority
+derives from the program upgrade authority.
+
+- **OPEN** — program IDs per cluster, IDL ownership and versioning, and how a
+  deployment is verified.
+
+Per decision `0016` the deployment registry belongs to the application and the
+interface belongs to the feature that uses it — the package owns neither. The IDL
+is Solana's equivalent of an ABI and follows the same rule.
 
 ### 7. Test network, live-read smoke and safe write verification
 
 - **OPEN.** The Solana equivalents of the four proof boundaries in decision
   `0010`. The layering is family-neutral and already applies; only the scripts
   and the test cluster are undecided.
+
+## What the eight feature obligations need from this runtime
+
+`FEATURE_MODULE_CONTRACT.md` §5 states obligations; each runtime supplies the
+mechanism. This is the checklist the implementer has to fill, not a design.
+Obligations 3, 4, 5 and 7 are behavioural and already satisfied by any correct
+implementation; 1, 2, 6 and 8 need a Solana answer, and all four depend on item 3
+above.
+
+| #   | Obligation                  | What Solana must supply                                                       |
+| --- | --------------------------- | ----------------------------------------------------------------------------- |
+| 1   | Preflight readiness         | Wallet/cluster readiness, plus remaining pool capacity (see constraint 3)     |
+| 2   | Preflight simulation        | `simulateTransaction` with the connected account, before any signature prompt |
+| 3   | Review before confirm       | Behavioural — unchanged                                                       |
+| 4   | Duplicate-submit guard      | Behavioural — unchanged; keyed on signature rather than hash                  |
+| 5   | Stale-operation isolation   | Reset on change of account, cluster, pool or position                         |
+| 6   | Terminal evidence only      | **Blocked on item 3**                                                         |
+| 7   | Once-per-submission effects | Behavioural — keyed on the terminal reference item 3 defines                  |
+| 8   | Targeted cache invalidation | Which account subscriptions a landed instruction invalidates                  |
 
 ## Boundaries this record does not relax
 
@@ -119,19 +228,30 @@ decimals against on-chain metadata, as the EVM registry does for ERC-20.
   semantics is the only trigger, and there is currently one.
 - Existing EVM decisions are not rewritten to cover Solana. Solana writes its own
   decisions under `docs/foundation/solana/decisions/`, and only when the
-  corresponding semantics are actually implemented.
+  corresponding semantics are actually implemented. That directory does not exist
+  yet, and creating it empty would be documentation ahead of evidence.
 - Solana does not need i18n, toast, reusable components or a dev harness to count
   as a runtime. Definition of done is in `CHAIN_FAMILY_TEMPLATE.md` and lists none
   of those.
+- The package is not an indexer. See constraint 1.
+
+## Out of scope for v0.1
+
+The spec excludes five items as unconfirmed blockers (§Notes & Assumptions 3):
+pause scope (Q-2), emergency exit from a hard lock (Q-3), APR ceiling (Q-4), the
+20% reward-to-wallet ratio (Q-5), and lockup bonus tiers of 6/12/24 months (Q-6).
+
+Q-6 is the one to watch: the spec notes that member-chosen lock terms would be a
+large architecture change. Do not build toward it speculatively.
 
 ## Status transitions
 
-| From          | To            | Trigger                                              |
-| ------------- | ------------- | ---------------------------------------------------- |
-| `Deferred`    | `Planned`     | This record — done                                   |
-| `Planned`     | `In Progress` | `packages/web3-solana/` exists and code has started  |
-| `In Progress` | `Ready`       | `CHAIN_FAMILY_TEMPLATE.md` definition of done is met |
+| From          | To            | Trigger                                                |
+| ------------- | ------------- | ------------------------------------------------------ |
+| `Deferred`    | `Planned`     | This record — done                                     |
+| `Planned`     | `In Progress` | Item 3 accepted **and** `packages/web3-solana/` exists |
+| `In Progress` | `Ready`       | `CHAIN_FAMILY_TEMPLATE.md` definition of done is met   |
 
 Item 3 must be closed before the transition to `In Progress`. The other OPEN
-items must be closed before the code each one governs is written, not
-necessarily before the package is created.
+items must be closed before the code each one governs is written, not necessarily
+before the package is created.
