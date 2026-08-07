@@ -1,0 +1,125 @@
+/*
+ * Connector lines for the unilevel tree.
+ *
+ * Ported from the Hexa `OrganizationalComponent` stylesheet, which draws the tree
+ * with two pseudo-elements per node rather than SVG: a vertical stub dropping from
+ * the parent's row, and a horizontal rail spanning the sibling row. The rail is
+ * clipped to half-width on the first and last sibling so it stops at their centre
+ * instead of overhanging the row.
+ *
+ * Kept as CSS rather than utility classes because the geometry is a set of
+ * interlocking offsets — `--connector-drop` must equal the gap the vertical stub
+ * spans, and the rail must sit at exactly that height. Spread across arbitrary
+ * Tailwind values, changing the spacing means editing the same number in four
+ * places and hoping.
+ *
+ * Colours come from theme tokens, so the tree follows light/dark like everything
+ * else. The original hardcoded #63d8ff / #f4ae35.
+ */
+
+/*
+ * Scroll container for the whole tree.
+ *
+ * The overflow must live here, outside the recursion: a sibling row is inside an
+ * <li> that grows with its children, so scrolling any row individually only moves
+ * a box that has already pushed its ancestors wide. One viewport around the root
+ * is the only element with a width to scroll within.
+ *
+ * `safe center` rather than `center`: a tree wider than the viewport centred the
+ * normal way overflows equally in both directions, and the left overhang is
+ * unreachable because scroll position cannot go negative.
+ */
+.viewport {
+  display: flex;
+  justify-content: safe center;
+  overflow-x: auto;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-bottom: 20px;
+}
+
+.childRow {
+  --connector-drop: 2.75rem;
+  --connector-width: 2px;
+
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  padding-top: calc(var(--connector-drop) + 0.75rem);
+}
+
+/* Room under the deepest row for its expand controls, which hang below the card. */
+.childRowRoot {
+  padding-bottom: 1.25rem;
+}
+
+.branch {
+  position: relative;
+  padding: 0 0.75rem;
+}
+
+/* Vertical stub: drops from the parent row down to the sibling rail. */
+.branch::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(var(--connector-drop) * -1);
+  height: var(--connector-drop);
+  width: var(--connector-width);
+  background-color: var(--border);
+}
+
+/* Horizontal rail: spans the full sibling row. */
+.branch::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: calc(var(--connector-drop) * -1);
+  height: var(--connector-width);
+  width: 100%;
+  background-color: var(--border);
+}
+
+/* First and last sibling: rail runs only to the row's centre, not past the end. */
+.branch:first-child::after {
+  left: 50%;
+  width: 50%;
+}
+
+.branch:last-child::after {
+  left: 0;
+  width: 50%;
+}
+
+/*
+ * Only child: no rail at all, just the vertical stub.
+ *
+ * The original needed a JS-computed `has-one-item` class for this, because a lone
+ * child matches both :first-child and :last-child and the later rule won —
+ * leaving half a rail hanging off one side. A structural selector says it
+ * directly and deletes that class helper.
+ */
+.branch:only-child::after {
+  display: none;
+}
+
+.nodeRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+/* Expand control sits under the node, on the line its children will drop from. */
+.expandButton {
+  position: absolute;
+  bottom: -1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1;
+}

@@ -1,0 +1,13 @@
+{
+  "1": {},
+  "11155111": {
+    "staking-vault": {
+      "address": "0xb786c18d2feb8ea7ee9d3a295203d7b1420abe43",
+      "abi": "TestStakingVault",
+      "version": "test-v1",
+      "parameters": {
+        "usdcAddress": "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
+      }
+    }
+  }
+}

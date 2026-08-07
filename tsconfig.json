@@ -1,0 +1,20 @@
+{
+  "//": "Workspace tooling only. pnpm -r skips the root project, so anything TypeScript that lands in scripts/ would otherwise never be typechecked while validation stayed green (plan \u00a710.1). The .mjs configs are included so this has inputs even when scripts/ holds none; checkJs stays off, they are only here to keep the guard wired.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["esnext"],
+    "allowJs": true,
+    "checkJs": false,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["node"]
+  },
+  "include": ["scripts/**/*.ts", "*.mjs"],
+  "exclude": ["node_modules", "**/scripts/*.local.ts"]
+}

@@ -1,0 +1,75 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# playwright
+playwright-report/
+test-results/
+playwright/.cache/
+
+# next.js
+.next/
+out/
+
+# production
+build/
+
+# misc
+.DS_Store
+*.pem
+
+# editors
+.vscode/
+.idea/
+*.swp
+
+# local tooling settings (settings.json is still committed)
+.claude/settings.local.json
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# dev-only scripts that may reference local secrets
+**/scripts/*.local.ts
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# Harness core maintenance binary
+scripts/bin/harness
+scripts/bin/harness.exe
+
+# Harness local recovery backups (created before replacing project instructions)
+.harness-backup/
+
+# Personal agent skills are local by default. Existing tracked Harness skills
+# remain versioned; do not remove them from the Git index.
+.agents/
+
+# Harness metadata stays local by default. Existing tracked provenance files
+# remain versioned; do not remove them from the Git index.
+.harness-core/
+
+/docs/local-docs/

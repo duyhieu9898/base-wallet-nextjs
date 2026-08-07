@@ -1,0 +1,51 @@
+{
+  "name": "nln-platform",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.34.5",
+  "scripts": {
+    "dev": "pnpm --filter n-plus dev",
+    "dev:admin": "pnpm --filter n-plus-admin dev",
+    "dev:all": "pnpm --parallel --filter \"./apps/*\" dev",
+    "build": "pnpm -r --if-present build",
+    "build:user": "pnpm --filter n-plus build",
+    "build:admin": "pnpm --filter n-plus-admin build",
+    "start": "pnpm --filter n-plus start",
+    "start:admin": "pnpm --filter n-plus-admin start",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "pnpm -r typecheck && pnpm typecheck:tooling",
+    "typecheck:tooling": "tsc -p tsconfig.json --noEmit",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "test": "pnpm --filter n-plus test",
+    "test:run": "pnpm -r test:run",
+    "test:e2e": "pnpm --filter n-plus test:e2e",
+    "test:e2e:ui": "pnpm --filter n-plus test:e2e:ui",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test:run && pnpm build",
+    "staking:compile": "pnpm --filter n-plus staking:compile",
+    "staking:deploy-sepolia": "pnpm --filter n-plus staking:deploy-sepolia",
+    "web3:smoke": "pnpm --filter n-plus web3:smoke",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.12",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
+    "tsx": "^4.23.1",
+    "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,json,md,mdx,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}

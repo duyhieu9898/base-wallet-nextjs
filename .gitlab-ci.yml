@@ -1,0 +1,51 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_PIPELINE_SOURCE == "push" && ($CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop")
+    - when: never
+
+stages:
+  - format
+  - typecheck
+  - lint
+  - test
+  - build
+
+default:
+  image: node:22-bookworm
+  interruptible: true
+  cache:
+    key:
+      files:
+        - pnpm-lock.yaml
+    paths:
+      - .pnpm-store/
+  before_script:
+    - corepack enable
+    - pnpm config set store-dir .pnpm-store
+    - pnpm install --frozen-lockfile
+
+format:
+  stage: format
+  script:
+    - pnpm format:check
+
+typecheck:
+  stage: typecheck
+  script:
+    - pnpm typecheck
+
+lint:
+  stage: lint
+  script:
+    - pnpm lint
+
+test:
+  stage: test
+  script:
+    - pnpm test:run
+
+build:
+  stage: build
+  script:
+    - pnpm build

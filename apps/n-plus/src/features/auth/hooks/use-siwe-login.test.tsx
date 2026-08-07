@@ -1,0 +1,512 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { act, render, screen, waitFor } from "@testing-library/react"
+import { useEffect, type ReactNode } from "react"
+import { beforeEach, describe, expect, it, vi } from "vitest"
+import type { Address } from "viem"
+
+import { type EvmSelection, getDefaultEvmNetwork } from "@nln/web3-evm"
+import { useAuth } from "@/features/auth/hooks/use-auth"
+import { AuthRuntimeProvider } from "@/features/auth/runtime/auth-runtime-provider"
+import {
+  MOCK_ADDRESS,
+  MOCK_OTHER_ADDRESS,
+  mockAuthState,
+  mockOtherSigner,
+  signMockMessage,
+  setMockAuthDelay,
+  setMockAuthFailureMode,
+} from "@/mocks/data/auth-session"
+import { useSiweLogin } from "./use-siwe-login"
+
+const ADDRESS = MOCK_ADDRESS
+const OTHER_ADDRESS = MOCK_OTHER_ADDRESS
+const network = getDefaultEvmNetwork()
+const CHAIN_ID = network.chain.id
+
+function readySelection(
+  account: Address,
+  chainId: number = CHAIN_ID,
+): EvmSelection {
+  return {
+    status: "ready",
+    account,
+    walletChainId: chainId,
+    chainId,
+    network,
+    networks: [network],
+  }
+}
+
+const disconnectedSelection: EvmSelection = {
+  status: "disconnected",
+  account: null,
+  walletChainId: null,
+  chainId: CHAIN_ID,
+  network,
+  networks: [network],
+}
+
+const connectingSelection: EvmSelection = {
+  status: "connecting",
+  account: null,
+  walletChainId: null,
+  chainId: null,
+  network: null,
+  networks: [network],
+}
+
+const unsupportedSelection: EvmSelection = {
+  status: "unsupported",
+  account: ADDRESS,
+  walletChainId: 999_999,
+  chainId: null,
+  network: null,
+  networks: [network],
+}
+
+/**
+ * Small store simulating Wagmi: exchange wallet must do component re-render, like when
+ * User changes account in extension. If just assigning variables, `selectionRef` in
+ * The hook will never see the new value and the test will prove wrong
+ * prove.
+ */
+let currentSelection: EvmSelection = readySelection(ADDRESS)
+const selectionListeners = new Set<() => void>()
+
+function setSelection(next: EvmSelection): void {
+  currentSelection = next
+
+  for (const listener of selectionListeners) {
+    listener()
+  }
+}
+
+/** Mock signing function — test instead to simulate rejection or slow signing. */
+let signMessageImpl: (input: { message: string }) => Promise<`0x${string}`>
+
+vi.mock("@nln/web3-evm", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@nln/web3-evm")>()
+  const { useSyncExternalStore } = await import("react")
+
+  return {
+    ...actual,
+    useEvmSelection: () =>
+      useSyncExternalStore(
+        (listener: () => void) => {
+          selectionListeners.add(listener)
+
+          return () => selectionListeners.delete(listener)
+        },
+        () => currentSelection,
+        () => currentSelection,
+      ),
+  }
+})
+
+vi.mock("wagmi", () => ({
+  useSignMessage: () => ({
+    mutateAsync: (input: { message: string }) => signMessageImpl(input),
+  }),
+}))
+
+beforeEach(() => {
+  setSelection(readySelection(ADDRESS))
+  // Sign it for real with the test key, exactly like the real wallet signs the message.
+  signMessageImpl = ({ message }) => signMockMessage(message)
+})
+
+type HarnessHandle = {
+  signIn: () => Promise<void>
+  logout: () => Promise<void>
+}
+
+type HarnessHolder = { current: HarnessHandle | null }
+
+/**
+ * Each render creates a separate holder, and `handle` only reads the active holder.
+ *
+ * Do not use a module-level variable assigned directly in `useEffect`: the tree of
+ * a previous test might not have finished cleanup when a subsequent test renders. A late
+ * response re-renders the old tree, re-running the effect and overwriting handle with the closure of an
+ * unmounted component — the current test will drive that dead tree and state never
+ * appears on the DOM being asserted. This is a race condition exposed when running suites in parallel.
+ */
+let activeHolderRef: HarnessHolder = { current: null }
+
+const handle: HarnessHandle = {
+  signIn: () => {
+    if (activeHolderRef.current === null) {
+      throw new Error("Harness not ready: call renderHarness() first.")
+    }
+
+    return activeHolderRef.current.signIn()
+  },
+  logout: () => {
+    if (activeHolderRef.current === null) {
+      throw new Error("Harness not ready: call renderHarness() first.")
+    }
+
+    return activeHolderRef.current.logout()
+  },
+}
+
+function Harness({ holderRef }: { holderRef: HarnessHolder }) {
+  const login = useSiweLogin()
+  const auth = useAuth()
+
+  useEffect(() => {
+    holderRef.current = { signIn: login.signIn, logout: auth.logout }
+  })
+
+  return (
+    <div>
+      <span data-testid="status">{auth.state.status}</span>
+      <span data-testid="pending">{String(login.isPending)}</span>
+      <span data-testid="error">{login.error?.code ?? ""}</span>
+      {auth.state.status === "authenticated" && (
+        <span data-testid="address">{auth.state.user.walletAddress}</span>
+      )}
+    </div>
+  )
+}
+
+function renderHarness() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  })
+
+  function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <AuthRuntimeProvider>{children}</AuthRuntimeProvider>
+      </QueryClientProvider>
+    )
+  }
+
+  const holderRef: HarnessHolder = { current: null }
+
+  activeHolderRef = holderRef
+
+  render(<Harness holderRef={holderRef} />, { wrapper: Wrapper })
+
+  return waitFor(() => {
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+  })
+}
+
+/**
+ * Wait for the hook to settle into idle state before test asserts or runs the next action.
+ *
+ * `await handle.signIn()` only says the flow's promise has resolved, not that React
+ * has committed the resulting state. A synchronous assertion immediately after is a weak test: it passes due to
+ * timing rather than behavior, and fails randomly when running suites in parallel.
+ *
+ * `pending` is a settling signal published by the hook itself, so waiting for it waits for the
+ * right thing — not a guessing `setTimeout`.
+ */
+async function settle() {
+  await waitFor(() => {
+    expect(screen.getByTestId("pending")).toHaveTextContent(/^false$/)
+  })
+}
+
+/**
+ * `signIn()` silently no-ops when `canStartLogin` is false — and it is false when runtime
+ * is `bootstrapping`. `renderHarness()` only waits for status to touch
+ * `unauthenticated` the first time; runtime can still transition back to `bootstrapping` afterwards,
+ * in which case the test will assert an error that is never set.
+ *
+ * Wait to exit `bootstrapping` right before driving so the test measures actual behavior instead of timing.
+ */
+async function ready() {
+  await waitFor(() => {
+    expect(screen.getByTestId("status")).not.toHaveTextContent(
+      /^bootstrapping$/,
+    )
+  })
+}
+
+async function signIn() {
+  await ready()
+
+  await act(async () => {
+    await handle.signIn()
+  })
+
+  await settle()
+}
+
+/**
+ * Logout must settle before logging in again: `canStartLogin` rejects while the old
+ * session has not been removed, and the next signIn would silently no-op.
+ */
+async function logout() {
+  await act(async () => {
+    await handle.logout()
+  })
+
+  await waitFor(() => {
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+  })
+}
+
+describe("happy path", () => {
+  it("signs in and binds the session to the signing address", async () => {
+    await renderHarness()
+
+    await signIn()
+
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
+    expect(screen.getByTestId("address")).toHaveTextContent(ADDRESS)
+    expect(mockAuthState.requestCounts.nonce).toBe(1)
+    expect(mockAuthState.requestCounts.verify).toBe(1)
+  })
+
+  it("requests a fresh nonce when signing in again after logout", async () => {
+    await renderHarness()
+
+    await signIn()
+
+    await logout()
+
+    await signIn()
+
+    // The nonce is one-time: the second login cannot reuse the old nonce.
+    expect(mockAuthState.requestCounts.nonce).toBe(2)
+    expect(mockAuthState.requestCounts.verify).toBe(2)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
+  })
+
+  it("is a no-op when a session already exists", async () => {
+    await renderHarness()
+
+    await signIn()
+
+    const nonceCount = mockAuthState.requestCounts.nonce
+
+    await signIn()
+
+    // Do not ask for nonces, do not open wallets, and do not oversign existing sessions.
+    expect(mockAuthState.requestCounts.nonce).toBe(nonceCount)
+    expect(screen.getByTestId("error")).toHaveTextContent("")
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
+  })
+})
+
+describe("wallet preconditions", () => {
+  it("refuses to sign while the wallet is disconnected", async () => {
+    setSelection(disconnectedSelection)
+
+    await renderHarness()
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^WALLET_DISCONNECTED$/,
+    )
+    expect(mockAuthState.requestCounts.nonce).toBe(0)
+  })
+
+  it("refuses to sign while the wallet is still connecting", async () => {
+    setSelection(connectingSelection)
+
+    await renderHarness()
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_NOT_READY$/)
+    expect(mockAuthState.requestCounts.nonce).toBe(0)
+  })
+
+  it("refuses to request a nonce on an unsupported network", async () => {
+    setSelection(unsupportedSelection)
+
+    await renderHarness()
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^UNSUPPORTED_NETWORK$/,
+    )
+    expect(mockAuthState.requestCounts.nonce).toBe(0)
+    expect(mockAuthState.requestCounts.verify).toBe(0)
+  })
+})
+
+describe("signature rejection", () => {
+  it("returns to unauthenticated and stays retryable", async () => {
+    signMessageImpl = () => Promise.reject({ code: 4001 })
+
+    await renderHarness()
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^SIGNATURE_REJECTED$/,
+    )
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+    expect(mockAuthState.requestCounts.verify).toBe(0)
+
+    // You can still re-sign immediately afterwards.
+    signMessageImpl = ({ message }) => signMockMessage(message)
+
+    await signIn()
+
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
+  })
+})
+
+describe("wallet changes mid-flow", () => {
+  it("aborts when the address changes after the nonce is issued", async () => {
+    await renderHarness()
+
+    setMockAuthDelay("nonce", 10)
+
+    await ready()
+
+    const pending = act(async () => {
+      const promise = handle.signIn()
+
+      setSelection(readySelection(OTHER_ADDRESS))
+
+      await promise
+    })
+
+    await pending
+    await settle()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_CHANGED$/)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+    expect(mockAuthState.requestCounts.verify).toBe(0)
+  })
+
+  it("aborts when the address changes while the wallet is signing", async () => {
+    await renderHarness()
+
+    signMessageImpl = async ({ message }) => {
+      setSelection(readySelection(OTHER_ADDRESS))
+
+      return signMockMessage(message)
+    }
+
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_CHANGED$/)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+    expect(mockAuthState.requestCounts.verify).toBe(0)
+  })
+
+  it("aborts when only the chain changes during the operation", async () => {
+    await renderHarness()
+
+    signMessageImpl = async ({ message }) => {
+      setSelection(readySelection(ADDRESS, 1))
+
+      return signMockMessage(message)
+    }
+
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(/^WALLET_CHANGED$/)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+  })
+})
+
+describe("response ownership", () => {
+  it("rejects a verify response bound to a different address", async () => {
+    await renderHarness()
+
+    // Wallet signed with a different address than the address in the message: mock backend refused,
+    // and the frontend guard also does not allow commits.
+    // Sign with a key different from the address written in the message.
+    signMessageImpl = ({ message }) => signMockMessage(message, mockOtherSigner)
+
+    await signIn()
+
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      "SIWE_VERIFY_REJECTED",
+    )
+  })
+
+  it("does not commit a verify response that arrives after logout", async () => {
+    await renderHarness()
+
+    // Log in once to have a session, then start a new login with slow verification.
+    await signIn()
+
+    setMockAuthDelay("verify", 20)
+
+    await ready()
+
+    await act(async () => {
+      const promise = handle.signIn()
+
+      await handle.logout()
+      await promise
+    })
+
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+  })
+
+  it("ignores a duplicate submit while a login is in flight", async () => {
+    await renderHarness()
+
+    setMockAuthDelay("nonce", 10)
+
+    await ready()
+
+    await act(async () => {
+      await Promise.all([handle.signIn(), handle.signIn(), handle.signIn()])
+    })
+
+    await settle()
+
+    expect(mockAuthState.requestCounts.nonce).toBe(1)
+    expect(screen.getByTestId("status")).toHaveTextContent(/^authenticated$/)
+  })
+})
+
+describe("backend failures", () => {
+  it("surfaces a nonce failure without signing", async () => {
+    setMockAuthFailureMode("nonce", "server-error")
+
+    await renderHarness()
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      "NONCE_REQUEST_FAILED",
+    )
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+  })
+
+  it("distinguishes verify unavailability from rejection", async () => {
+    await renderHarness()
+
+    setMockAuthFailureMode("verify", "server-error")
+
+    await signIn()
+
+    expect(screen.getByTestId("error")).toHaveTextContent(
+      /^SIWE_VERIFY_FAILED$/,
+    )
+  })
+
+  it("returns registrationRequired status with ticket and wallet address when user is unregistered", async () => {
+    mockAuthState.unregisteredWallets.add(ADDRESS.toLowerCase())
+
+    await renderHarness()
+    await ready()
+
+    let result: unknown
+    await act(async () => {
+      result = await handle.signIn()
+    })
+
+    await settle()
+
+    expect(result).toEqual({
+      status: "registrationRequired",
+      walletAddress: ADDRESS,
+      registrationTicket: `ticket-${ADDRESS.toLowerCase()}`,
+    })
+    expect(screen.getByTestId("status")).toHaveTextContent(/^unauthenticated$/)
+    expect(screen.getByTestId("error")).toHaveTextContent("")
+  })
+})

@@ -1,0 +1,162 @@
+import { describe, expect, it } from "vitest"
+import { zeroAddress } from "viem"
+
+import {
+  EVM_NATIVE_TOKEN_ADDRESS,
+  EVM_ZERO_ADDRESS,
+  isNativeTokenAddress,
+  isSameAddress,
+  isValidAddress,
+  isValidTransactionHash,
+  isZeroAddress,
+  parseChecksumAddress,
+  shortenAddress,
+  shortenHash,
+  toChecksumAddress,
+  truncateAddress,
+} from "./address.utils"
+
+const ALICE_CHECKSUM = "0x086d9feCB2F117369fAbDB884eC6851b36595444"
+const ALICE_LOWER = "0x086d9fecb2f117369fabdb884ec6851b36595444"
+const BOB = "0x1111111111111111111111111111111111111111"
+const TX_HASH =
+  "0x3a4b91f82c0192e4857b6d19203a11f203b405c6078d91a2b3c4d5e6f7a8b9c0"
+
+describe("address.utils", () => {
+  describe("constants", () => {
+    it("exports valid zero address and native token address", () => {
+      expect(EVM_ZERO_ADDRESS).toBe(zeroAddress)
+      expect(isValidAddress(EVM_ZERO_ADDRESS)).toBe(true)
+      expect(isValidAddress(EVM_NATIVE_TOKEN_ADDRESS)).toBe(true)
+    })
+  })
+
+  describe("isValidAddress", () => {
+    it("returns true for valid checksum and lowercase addresses", () => {
+      expect(isValidAddress(ALICE_CHECKSUM)).toBe(true)
+      expect(isValidAddress(ALICE_LOWER)).toBe(true)
+    })
+
+    it("returns false for null, undefined, empty, or invalid format", () => {
+      expect(isValidAddress(null)).toBe(false)
+      expect(isValidAddress(undefined)).toBe(false)
+      expect(isValidAddress("")).toBe(false)
+      expect(isValidAddress("0xinvalid")).toBe(false)
+      expect(isValidAddress("12345")).toBe(false)
+    })
+  })
+
+  describe("isSameAddress", () => {
+    it("returns true when comparing checksum vs lowercase address", () => {
+      expect(isSameAddress(ALICE_CHECKSUM, ALICE_LOWER)).toBe(true)
+      expect(isSameAddress(ALICE_LOWER, ALICE_CHECKSUM)).toBe(true)
+    })
+
+    it("returns false when addresses differ", () => {
+      expect(isSameAddress(ALICE_CHECKSUM, BOB)).toBe(false)
+    })
+
+    it("returns false if either parameter is null, undefined, or invalid", () => {
+      expect(isSameAddress(ALICE_CHECKSUM, null)).toBe(false)
+      expect(isSameAddress(undefined, ALICE_LOWER)).toBe(false)
+      expect(isSameAddress("0xinvalid", ALICE_LOWER)).toBe(false)
+    })
+  })
+
+  describe("isZeroAddress", () => {
+    it("returns true for zero address in any casing", () => {
+      expect(isZeroAddress(zeroAddress)).toBe(true)
+      expect(isZeroAddress("0x0000000000000000000000000000000000000000")).toBe(
+        true,
+      )
+    })
+
+    it("returns false for normal addresses or null/invalid inputs", () => {
+      expect(isZeroAddress(ALICE_CHECKSUM)).toBe(false)
+      expect(isZeroAddress(null)).toBe(false)
+      expect(isZeroAddress("0xinvalid")).toBe(false)
+    })
+  })
+
+  describe("isNativeTokenAddress", () => {
+    it("returns true for zero address or native token placeholder", () => {
+      expect(isNativeTokenAddress(EVM_ZERO_ADDRESS)).toBe(true)
+      expect(isNativeTokenAddress(EVM_NATIVE_TOKEN_ADDRESS)).toBe(true)
+      expect(isNativeTokenAddress(EVM_NATIVE_TOKEN_ADDRESS.toLowerCase())).toBe(
+        true,
+      )
+    })
+
+    it("returns false for normal ERC20 contract address", () => {
+      expect(isNativeTokenAddress(ALICE_CHECKSUM)).toBe(false)
+      expect(isNativeTokenAddress(null)).toBe(false)
+    })
+  })
+
+  describe("shortenAddress / truncateAddress", () => {
+    it("shortens address with default format (0x086d...5444)", () => {
+      expect(shortenAddress(ALICE_CHECKSUM)).toBe("0x086d...5444")
+      expect(truncateAddress(ALICE_CHECKSUM)).toBe("0x086d...5444")
+    })
+
+    it("supports custom start/end lengths", () => {
+      expect(shortenAddress(ALICE_CHECKSUM, 4, 2)).toBe("0x08...44")
+    })
+
+    it("returns empty string for null, undefined, or invalid inputs", () => {
+      expect(shortenAddress(null)).toBe("")
+      expect(shortenAddress(undefined)).toBe("")
+      expect(shortenAddress("0xinvalid")).toBe("")
+    })
+  })
+
+  describe("isValidTransactionHash", () => {
+    it("accepts a 32-byte hex hash in either casing", () => {
+      expect(isValidTransactionHash(TX_HASH)).toBe(true)
+      expect(
+        isValidTransactionHash(TX_HASH.toUpperCase().replace("0X", "0x")),
+      ).toBe(true)
+    })
+
+    it("rejects addresses, wrong lengths, and empty input", () => {
+      expect(isValidTransactionHash(ALICE_CHECKSUM)).toBe(false)
+      expect(isValidTransactionHash(`${TX_HASH}00`)).toBe(false)
+      expect(isValidTransactionHash(TX_HASH.slice(0, -1))).toBe(false)
+      expect(isValidTransactionHash(null)).toBe(false)
+      expect(isValidTransactionHash(undefined)).toBe(false)
+    })
+  })
+
+  describe("shortenHash", () => {
+    it("shortens a transaction hash with default format", () => {
+      expect(shortenHash(TX_HASH)).toBe("0x3a4b91f8...f7a8b9c0")
+    })
+
+    it("supports custom start/end lengths", () => {
+      expect(shortenHash(TX_HASH, 6, 4)).toBe("0x3a4b...b9c0")
+    })
+
+    it("returns empty string for anything that is not a transaction hash", () => {
+      expect(shortenHash(null)).toBe("")
+      expect(shortenHash(undefined)).toBe("")
+      expect(shortenHash(ALICE_CHECKSUM)).toBe("")
+    })
+  })
+
+  describe("toChecksumAddress & parseChecksumAddress", () => {
+    it("returns checksummed format", () => {
+      expect(toChecksumAddress(ALICE_LOWER)).toBe(ALICE_CHECKSUM)
+      expect(parseChecksumAddress(ALICE_LOWER)).toBe(ALICE_CHECKSUM)
+    })
+
+    it("toChecksumAddress throws for invalid address", () => {
+      expect(() => toChecksumAddress("0xinvalid")).toThrow()
+    })
+
+    it("parseChecksumAddress safely returns null for invalid input", () => {
+      expect(parseChecksumAddress("0xinvalid")).toBeNull()
+      expect(parseChecksumAddress(null)).toBeNull()
+      expect(parseChecksumAddress(undefined)).toBeNull()
+    })
+  })
+})

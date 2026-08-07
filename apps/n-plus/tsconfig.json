@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./src/*"],
+      "@nln/web3-evm": ["../../packages/web3-evm/src/index.ts"],
+      "@nln/web3-evm/address": ["../../packages/web3-evm/src/address/index.ts"],
+      "@nln/web3-evm/errors": ["../../packages/web3-evm/src/errors/index.ts"],
+      "@nln/web3-evm/errors/adapter": [
+        "../../packages/web3-evm/src/errors/adapter/index.ts"
+      ],
+      "@nln/web3-evm/contracts": [
+        "../../packages/web3-evm/src/contracts/index.ts"
+      ],
+      "@nln/web3-evm/config": ["../../packages/web3-evm/src/config/index.ts"],
+      "@nln/web3-evm/provider": [
+        "../../packages/web3-evm/src/provider/index.ts"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules", "scripts/**/*.local.ts"]
+}
