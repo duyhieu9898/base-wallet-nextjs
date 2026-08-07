@@ -36,9 +36,7 @@ Foundation không chứa business logic của một dApp cụ thể.
 
 Foundation tổ chức blockchain support theo các chain-family modules độc lập.
 
-EVM là runtime implementation duy nhất hiện tại. Hướng dẫn trung lập để thêm
-một chain family mới nằm tại `CHAIN_FAMILY_TEMPLATE.md`; không có SDK,
-metadata catalog, hay provider cho family chưa có consumer.
+Trạng thái hỗ trợ chi tiết của từng runtime (EVM, Solana) và danh mục capabilities khả dụng nằm tại [`CAPABILITIES.md`](CAPABILITIES.md). Hướng dẫn trung lập để thêm một chain family mới nằm tại [`CHAIN_FAMILY_TEMPLATE.md`](CHAIN_FAMILY_TEMPLATE.md).
 
 Foundation được xây bằng:
 
@@ -80,23 +78,7 @@ Ví dụ chain family: `EVM`.
 
 Ví dụ network của EVM: Ethereum Mainnet, Sepolia, Arbitrum, Polygon, BSC. Sepolia hoặc Arbitrum không phải chain family khác EVM.
 
-Một chain family khác không phải fallback của EVM. Không tồn tại behavior tự
-chuyển family khi EVM lỗi.
-
-## Operational modes
-
-Các mode khả dụng hiện tại:
-
-| Mode                         | Ý nghĩa                             | Ví dụ                         |
-| ---------------------------- | ----------------------------------- | ----------------------------- |
-| Single-network application   | Một network cụ thể của một family   | Ethereum Mainnet only         |
-| Multi-network, single-family | Nhiều network thuộc cùng một family | Ethereum + Arbitrum + Polygon |
-| Single-family application    | Chỉ bật một chain-family runtime    | EVM-only dApp                 |
-
-Foundation không hardcode network của các mode trên; application adoption/config quyết định.
-
-Multi-family application không phải capability hiện tại: chúng cần ít nhất hai
-runtime đã được triển khai. Xem `CAPABILITIES.md`.
+Một chain family khác không phải fallback của EVM. Không tồn tại behavior tự chuyển family khi EVM lỗi. Chi tiết về các operational modes và capability scope được quản lý duy nhất tại [`CAPABILITIES.md`](CAPABILITIES.md).
 
 ## Production-oriented, không phải production-complete
 

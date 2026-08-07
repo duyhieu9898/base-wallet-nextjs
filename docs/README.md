@@ -36,8 +36,8 @@ and working-memory structure around that truth; it does not install upstream
 This repository separates reusable Web3 foundation material from application
 behavior. Retrieve the smallest relevant surface:
 
-- `ARCHITECTURE.md`: application-level architecture and the boundary with the
-  foundation.
+- `foundation/ARCHITECTURE.md`: reusable Web3 foundation architecture and boundaries.
+- `ARCHITECTURE.md`: stub for application-level architecture when adopting foundation modules.
 - `foundation/`: reusable Web3 architecture, capabilities, extension contract,
   and foundation decisions. Do not read it wholesale for an application feature.
 - `product/foundation-adoption.md`: the application’s chosen foundation modules,

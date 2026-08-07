@@ -73,7 +73,7 @@ nln-platform/
 └── package.json               ← CHỈ tooling, không chứa dependency của app
 ```
 
-Các EVM app dùng chung `@nln/web3-evm` (Neura System sẽ dùng `@nln/web3-solana` khi implement). Mỗi app **sở hữu độc lập**: runtime config · supported networks/tokens · RPC environment · contract deployment data · authentication policy · authorization/RBAC · feature module · product UI · business history · deployment pipeline.
+Các EVM app dùng chung `@nln/web3-evm` (Neura System sẽ tạo `@nln/web3-solana` khi khởi chạy, xem [`CAPABILITIES.md`](../../foundation/CAPABILITIES.md)). Mỗi app **sở hữu độc lập**: runtime config · supported networks/tokens · RPC environment · contract deployment data · authentication policy · authorization/RBAC · feature module · product UI · business history · deployment pipeline.
 
 ### 2.1. Target architecture ≠ execution timing
 
@@ -81,7 +81,8 @@ Chỉ scaffold cặp đang bắt đầu thật. Skeleton trống là thứ phả
 
 ```text
 Bây giờ              apps/n-plus  ·  apps/n-plus-admin
-Neura Link bắt đầu   → thêm apps/neura-link · apps/neura-link-admin
+Neura bắt đầu        → thêm apps/neura  ·  apps/neura-admin (kèm @nln/web3-solana)
+Neura Link bắt đầu   → thêm apps/neura-link  ·  apps/neura-link-admin
 ```
 
 Con số 6 nằm trong kiến trúc để naming, ESLint boundary, validation filter và deploy isolation thiết kế đúng ngay từ đầu — không phải để tạo trước.

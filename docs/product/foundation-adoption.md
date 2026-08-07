@@ -34,10 +34,10 @@ Foundation version: the application and foundation share the same Git commit.
 
 ## Local extensions
 
-- `src/features/auth/` owns session state, retry rules, and the wallet-binding
+- `apps/n-plus/src/features/auth/` owns session state, retry rules, and the wallet-binding
   guard.
-- `src/app/providers.tsx` composes auth around the reusable Web3 provider;
-  `src/web3/` must not import application auth.
+- `apps/n-plus/src/app/providers.tsx` composes auth around the reusable Web3 provider;
+  `packages/web3-evm` must not import application auth.
 
 ## Known deviations
 

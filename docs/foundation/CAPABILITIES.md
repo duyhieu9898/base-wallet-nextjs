@@ -1,8 +1,8 @@
 # Web3 Foundation Capabilities
 
-Tài liệu này mô tả phạm vi hiện tại của reusable Web3 foundation.
+Tài liệu này là **Single Source of Truth (SSOT)** duy nhất cho phạm vi capability và trạng thái hỗ trợ runtime (EVM vs Solana) của reusable Web3 foundation.
 
-Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó chỉ định nghĩa các capability mà foundation này lựa chọn hỗ trợ.
+Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó chỉ định nghĩa các capability mà foundation này lựa chọn hỗ trợ. Tất cả các tài liệu khác (`ARCHITECTURE.md`, `README.md`, `nln-feature-source-map.md`, `plans/`) phải trỏ về file này thay vì tự định nghĩa hoặc lặp lại trạng thái runtime/capability.
 
 ## Trạng thái
 
@@ -15,17 +15,17 @@ Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó ch
 
 ## Implementation status
 
-| Module/capability                    | Trạng thái          |
-| ------------------------------------ | ------------------- |
-| Foundation/application separation    | Ready               |
-| Chain-family module boundary         | Ready               |
-| EVM module (`@nln/web3-evm`)         | Ready               |
-| Solana module (`@nln/web3-solana`)   | In Progress / Ready |
-| EVM multi-network registry           | Ready               |
-| EVM read/write lifecycle             | Ready               |
-| Chain-family implementation template | Ready               |
-| Multi-family provider composition    | Deferred            |
-| Cross-family application UX          | Product-dependent   |
+| Module/capability                    | Trạng thái        |
+| ------------------------------------ | ----------------- |
+| Foundation/application separation    | Ready             |
+| Chain-family module boundary         | Ready             |
+| EVM module (`@nln/web3-evm`)         | Ready             |
+| Solana module (`@nln/web3-solana`)   | Deferred          |
+| EVM multi-network registry           | Ready             |
+| EVM read/write lifecycle             | Ready             |
+| Chain-family implementation template | Ready             |
+| Multi-family provider composition    | Deferred          |
+| Cross-family application UX          | Product-dependent |
 
 ```text
 EVM runtime tồn tại
@@ -203,16 +203,9 @@ Trigger để xem xét lại:
 
 ### Feature contract registry
 
-Chưa triển khai. Quy tắc deferred và boundary nằm trong
-`decisions/0016-feature-contract-registry.md`.
+Foundation generic schema, deployment types và validation helpers đã **Ready** tại `@nln/web3-evm` (`packages/web3-evm/src/contracts/`).
 
-Chỉ thêm khi có feature contract consumer thật như:
-
-- staking;
-- vault;
-- payment;
-- escrow;
-- swap router.
+Application contract deployment registry data thuộc phạm vi **Product-dependent** (đã active tại `apps/n-plus/src/contracts/registry/deployments.json`). Foundation không lưu trữ hay hardcode hợp đồng sản phẩm của ứng dụng. Quy tắc tổ chức nằm trong `decisions/0016-feature-contract-registry.md`.
 
 ### Approval orchestration for feature writes
 

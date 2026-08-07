@@ -69,11 +69,11 @@ It also records **product-side candidates** for a shared Base Foundation Package
     4. _Staking Referral Reward_ (Direct Referral Bonus).
     5. _Team Reward_ (Unilevel Team Bonus across Levels 1–3).
 
-### 1.3 Neura System (Project 1 — `docs/local-docs/NLN-181_project1-neura`) — IN SCOPE (song song với N+)
+### 1.3 Neura System (Project 1 — `docs/local-docs/NLN-181_project1-neura`) — Target Product Spec Intake
 
-- **Scope Status**: In Scope / Solana-based Platform (`apps/neura` & `apps/neura-admin`).
+- **Scope Status**: Target Product Intake / Solana-based Platform (`apps/neura` & `apps/neura-admin`).
 - **Description**: Solana-based NRA ⇄ NRA Staking Platform (Multi-Pools, Fixed/Flexible Terms, Claim/Compound, Reservation).
-- **Repository Impact**: Triển khai dưới dạng sibling package song song `@nln/web3-solana` (`packages/web3-solana`), không gộp vào `@nln/web3-evm`.
+- **Repository Impact**: Triển khai dưới dạng sibling package song song `@nln/web3-solana` (`packages/web3-solana`) khi khởi chạy. Trạng thái hỗ trợ runtime chi tiết xem [`CAPABILITIES.md`](../foundation/CAPABILITIES.md).
 
 ---
 
@@ -113,12 +113,12 @@ It also records **product-side candidates** for a shared Base Foundation Package
 | :------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------- |
 | `02_docs/01_requirement/01_business-requirement_v0.3.md` | Core business logic v0.3: Definitions, NFT Membership (5 Tiers: Bronze to Diamond, prices 500–10,000 USDT, Upgrade rule), NRA ⇄ USDT Staking (4 Lock Periods, APY boost), Unilevel Tree (Series logic, 3-level depth for rank/rewards), 5 Ranks (NFT, Sales, Effective, Referral, Team), 5 Reward Mechanics (Difference, Same-rank, Upgrade, Staking Referral, Team Bonus). | **Neura Link System** (`apps/neura-link`, `apps/neura-link-admin`) |
 
-### 3.3 Neura System (`docs/local-docs/NLN-181_project1-neura/`) — OUT OF SCOPE
+### 3.3 Neura System (`docs/local-docs/NLN-181_project1-neura/`) — Target Product Spec Intake
 
-| Local Relative File Path                                  | Content & Requirement Scope Summary                                                                                                       | Project Mapping & Target App     |
-| :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------- |
-| `02_docs/01_requirement/01_business-requirement_v0.1.md`  | Solana NRA ⇄ NRA Staking Platform business rules (Pools, Positions, Fixed/Flexible terms, Hard-Lock, Conversion Price, APR, Reservation). | **Out of Scope** (External Team) |
-| `02_docs/01_requirement/03_functions-requirement_v0.1.md` | Functional specifications for Solana wallet management, pool configuration, and staking commands.                                         | **Out of Scope** (External Team) |
+| Local Relative File Path                                  | Content & Requirement Scope Summary                                                                                                       | Project Mapping & Target App                                         |
+| :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------- |
+| `02_docs/01_requirement/01_business-requirement_v0.1.md`  | Solana NRA ⇄ NRA Staking Platform business rules (Pools, Positions, Fixed/Flexible terms, Hard-Lock, Conversion Price, APR, Reservation). | **Neura System** (`apps/neura`, `apps/neura-admin` — khi triển khai) |
+| `02_docs/01_requirement/03_functions-requirement_v0.1.md` | Functional specifications for Solana wallet management, pool configuration, and staking commands.                                         | **Neura System** (`apps/neura`, `apps/neura-admin` — khi triển khai) |
 
 ---
 

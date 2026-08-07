@@ -23,7 +23,7 @@ Foundation không quyết định thay application:
 - backend, indexer hoặc analytics;
 - product-specific UI và business rules.
 
-Foundation hiện hỗ trợ hai chain family runtime độc lập: EVM (`@nln/web3-evm`) và Solana (`@nln/web3-solana`).
+Foundation hiện triển khai executable runtime duy nhất cho EVM (`@nln/web3-evm`). Trạng thái hỗ trợ chi tiết của các chain family runtime nằm tại [`CAPABILITIES.md`](CAPABILITIES.md).
 
 ## 2. Design principles
 
@@ -91,8 +91,8 @@ Foundation không import application feature.
 
 ```text
 packages/
-├── web3-evm/             shared workspace package descriptor (@nln/web3-evm)
-└── web3-solana/          sibling workspace package descriptor (@nln/web3-solana)
+└── web3-evm/             shared EVM workspace package descriptor (@nln/web3-evm)
+    (Các chain family mới trong tương lai như @nln/web3-solana sẽ tạo sibling package theo CHAIN_FAMILY_TEMPLATE.md)
 ├── tsconfig.json
 ├── vitest.config.mts     independent package test configuration
 ├── test/

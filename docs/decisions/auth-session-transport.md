@@ -59,7 +59,7 @@ authenticated từ: wallet đang connected, wallet đã từng ký, access token
 còn tồn tại, hay query cache còn dữ liệu user cũ.
 
 Một session chỉ authenticated sau khi backend trả authenticated payload hợp lệ
-qua `POST /auth/siwe/verify` hoặc `POST /auth/refresh`.
+qua `POST /api/auth/siwe/verify` hoặc `POST /api/auth/refresh`.
 
 ### Bootstrap
 
@@ -151,12 +151,12 @@ không hardcode tên từng business feature và không đụng query key của 
 Auth là **application foundation**, không phải reusable Web3 foundation.
 
 ```text
-src/features/auth/  →  dùng public API của  →  src/web3/ (useEvmSelection, wagmi signing)
-src/web3/           →  KHÔNG BAO GIỜ import →  src/features/auth/
+apps/n-plus/src/features/auth/  →  dùng public API của  →  packages/web3-evm (@nln/web3-evm)
+packages/web3-evm               →  KHÔNG BAO GIỜ import →  apps/n-plus/src/features/auth/
 ```
 
-Auth provider không được thêm vào `src/web3/web3-providers.tsx`. Application
-provider composition (`src/app/providers.tsx`) chịu trách nhiệm đó.
+Auth provider không được thêm vào foundation provider. Application
+provider composition (`apps/n-plus/src/app/providers.tsx`) chịu trách nhiệm đó.
 
 ## Required behavior
 
@@ -210,15 +210,15 @@ guarantee đó thuộc backend và backend integration test.
 
 Implementation:
 
-- `src/features/auth/domain/`
-- `src/features/auth/api/`
-- `src/features/auth/runtime/`
-- `src/features/auth/hooks/`
-- `src/features/auth/components/`
-- `src/config/auth.config.ts`
-- `src/lib/query/query-keys.ts`
-- `src/mocks/handlers/auth-handlers.ts`
+- `apps/n-plus/src/features/auth/domain/`
+- `apps/n-plus/src/features/auth/api/`
+- `apps/n-plus/src/features/auth/runtime/`
+- `apps/n-plus/src/features/auth/hooks/`
+- `apps/n-plus/src/features/auth/components/`
+- `apps/n-plus/src/config/auth.config.ts`
+- `apps/n-plus/src/lib/query/query-keys.ts`
+- `apps/n-plus/src/mocks/handlers/auth-handlers.ts`
 
 Tests:
 
-- `src/features/auth/**/*.test.ts(x)`
+- `apps/n-plus/src/features/auth/**/*.test.ts(x)`

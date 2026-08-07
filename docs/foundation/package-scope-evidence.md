@@ -26,72 +26,11 @@ Theo `EXTENSION_CONTRACT.md` §10 và `README.md` "Change policy", một applica
 
 ---
 
-## 2. Current Architecture & Boundary Truth
+## 2. Standing Verdicts & Consumer Evidence
 
-### 2.1. Repository và package structure
+Mọi thông tin về danh mục package, application, và file implementation hiện có được xác định trực tiếp từ cấu trúc repository và `pnpm-workspace.yaml`. File này không lưu trữ lại thông tin đó bằng văn bản thủ công để tránh lệch thông tin khi codebase thay đổi.
 
-| Thành phần            | Trạng thái monorepo hiện hành                                                                                                |
-| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Cấu trúc Monorepo     | Workspace monorepo (`nln-platform`, `pnpm-workspace.yaml` khai báo `packages/*`, `apps/*`)                                   |
-| Số application target | **6 applications** (3 product: `n-plus`, `neura`, `neura-link` + 3 admin: `n-plus-admin`, `neura-admin`, `neura-link-admin`) |
-| Workspace packages    | **2 packages** (`packages/web3-evm` cho EVM apps, `packages/web3-solana` cho Solana apps)                                    |
-| Framework chuẩn       | Next.js App Router cho cả 6 applications                                                                                     |
-| Root repository       | Chỉ chứa tooling chung (`prettier`, `eslint`, `husky`, `lint-staged`, `typescript`, `tsx`)                                   |
-
-### 2.2. Public API
-
-`src/web3/evm/index.ts` là barrel duy nhất, chia hai tier đúng như `EXTENSION_CONTRACT.md` §3.2:
-
-- **Tier A**: `useEvmSelection`, `useEvmWallet`, `useEvmNetwork`, 4 read hook balances, 2 read hook allowances, 3 write hook (`useSendEvmNative`, `useSendEvmToken`, `useApproveEvmToken`), fee/receipt/history hooks, domain types, registry selectors, address helpers, 9 reusable component, `PendingReceiptReconciler`.
-- **Tier B**: `useEvmWriteLifecycle`, `assertEvmWriteReady`, `deriveEvmWriteStatus`, error taxonomy, `isUserRejectedWalletRequest`, history storage writers, `buildEvmWriteInvalidationFilters`, strict registry selectors.
-
-`EvmProvider` **cố ý không** nằm trong barrel; composition đi qua `@/web3/web3-providers`.
-
-ESLint đã enforce hai chiều:
-
-- `src/web3/**` không được import `@/features`, `@/app`, `@/contracts`;
-- `src/{features,components,app,providers,contracts,lib,hooks,mocks}/**` chỉ được import 3 public path (`@/web3/evm`, `@/web3/evm/address`, `@/web3/evm/errors`);
-- UI layer bị chặn import `useWriteContract`/`useSendTransaction` từ `wagmi`.
-
-Điểm quan trọng: **boundary đã tồn tại và đã được máy kiểm tra**. Phần lớn giá trị mà một package extraction thường mang lại đã được thu về rồi — đó là lý do extraction là bước cơ học chứ không phải refactor.
-
-### 2.3. Import coupling — bốn khoản nợ chặn extraction
-
-**Trạng thái:** các khoản nợ import coupling đã được trả hoàn toàn. Nguyên văn ghi lại vì nó giải thích lý do boundary phải được đóng trước khi chuyển file package.
-
-1. **Foundation components → application UI + i18n.** 8 file dưới `src/web3/evm/components/**` import `@/components/ui/{button,card,input,label}`, `@/i18n/use-translation`, và `@/components/web3/common/stage-badge`, `@/components/web3/common/transaction-feedback`. Chiều phụ thuộc này ngược với `EXTENSION_CONTRACT.md` §11 nhưng ESLint hiện không chặn.
-2. **Registry → application config.** `evm-registry.adapter.ts:1` và `evm-network.registry.ts:4` import `@/config/web3.config`. Foundation đang **đọc application config trực tiếp** thay vì nhận injection.
-3. **Env name hardcode trong foundation.** `evm-network.registry.ts:139-143` đọc `NEXT_PUBLIC_RPC_ETHEREUM_SEPOLIA` và `NEXT_PUBLIC_RPC_ETHEREUM_MAINNET` theo tên cố định — không tái dùng được cho app có network khác mà không sửa foundation.
-4. **Provider init side effect ở module load.** `wagmi-config.adapter.ts` kết thúc bằng `export const wagmiConfig = createWagmiConfigFromRegistry()`. Import module này là dựng wagmi config ngay. Factory đã tách sẵn nên đây là khoản nợ rẻ nhất.
-
-Ngoài ra có một **leak định danh feature vào foundation**: `evm-transaction-history.ts:44` định nghĩa `StakingHistoryItem` và đưa vào union `EvmTransactionHistoryItem`; barrel re-export ở Tier B. Foundation không được "biết staking" (`EXTENSION_CONTRACT.md` §11). Đây là chứng cứ rõ nhất rằng sức ép từ feature đầu tiên đã bẻ cong boundary — lý do phải **đóng boundary trước**, không phải chuyển file trước.
-
-### 2.4. Provider composition
-
-```text
-app/providers.tsx → QueryProvider → Web3Providers → EvmProvider(WagmiProvider) → auth runtime
-```
-
-`Web3Providers` là composition point duy nhất, mount đúng một family runtime. Auth compose _bên ngoài_ Web3Providers.
-
-### 2.5. Registry/config ownership
-
-- `EVM_NETWORKS`: Sepolia (11155111) + Mainnet (1).
-- Default chain: `NEXT_PUBLIC_DEFAULT_CHAIN_ID`, fallback Sepolia.
-- Feature contract registry (`0016`) **đã tồn tại**: `src/contracts/registry/deployments.json` — chain `1` rỗng, chain `11155111` có đúng một entry `staking-vault` → `TestStakingVault`, `version: "test-v1"`.
-
-### 2.6. Implemented vs planned
-
-| Domain               | Planned (source map) | Specified (local-docs) | Implemented (src/)                |
-| -------------------- | -------------------- | ---------------------- | --------------------------------- |
-| Wallet + SIWE auth   | N+, Neura Link       | A020100                | ✅ `features/auth/` (MSW backend) |
-| Staking              | N+, Neura Link       | B020101–B020106 (UI)   | ⚠️ demo vault Sepolia, test ABI   |
-| Lending              | N+                   | B020201–B020205 (UI)   | ❌                                |
-| Membership NFT       | Neura Link           | A040100–A040300 (UI)   | ❌                                |
-| MLM tree/rank/reward | N+, Neura Link       | B030100–B030400 (UI)   | ❌                                |
-| Admin portal         | N+, Neura Link       | C010100–C080100        | ❌                                |
-
-Screen design specs là **màn hình**, không phải contract specs. Không file nào trong `docs/local-docs/` cung cấp ABI, spender policy, approval amount policy, hay địa chỉ deployment cho contract nào ngoài staking vault test.
+Dưới đây là bằng chứng đo được cho tiêu chí "≥2 implemented consumers" và các verdict "chưa tạo package nào" còn hiệu lực.
 
 ---
 
@@ -174,16 +113,16 @@ Không được làm tạm: fallback im lặng che read failure — vi phạm "N
 
 Đây là phần được hỏi lại nhiều nhất. Mỗi dòng có evidence ở §3.
 
-| Proposed package           | Verdict      | Evidence / Role                                                                                                                                                                   |
-| -------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@nln/web3-evm`            | **Accepted** | Foundation package cho EVM apps (`n-plus`, `neura-link`).                                                                                                                         |
-| `@nln/web3-solana`         | **Accepted** | Sibling foundation package cho Solana apps (`neura`, `neura-admin`).                                                                                                              |
-| `@nln/staking-sdk`         | **REJECT**   | Cả N+ và Neura Link đều chưa có ABI, chưa có địa chỉ. Deployment duy nhất là `TestStakingVault test-v1`. Chia sẻ theo tên "staking" là điều `EXTENSION_CONTRACT.md` §5 cấm thẳng. |
-| `@nln/mlm-sdk`             | **REJECT**   | 0 dòng code MLM trong `src/`. Tree traversal + rank calculation là indexer/backend domain. Chưa có contract, chưa có API contract, chưa có consumer.                              |
-| `@nln/rpc-observability`   | **REJECT**   | `grep -rln "reportError\|observability" src/` → 0 hit. `0017`: reporter chỉ thêm khi có production observability requirement.                                                     |
-| `@nln/ui-components`       | **DEFER**    | `src/components/ui/` có 4 primitive shadcn-generated. Không duplication thật, không consumer thứ hai.                                                                             |
-| `@nln/transaction-planner` | **DEFER**    | Xem §4. Một consumer.                                                                                                                                                             |
-| Shared config packages     | **DEFER**    | `tsconfig.json`, `eslint.config.mjs` phục vụ đúng một app. Extract trước khi có app thứ hai là tooling cost không đổi lấy gì.                                                     |
+| Proposed package           | Verdict             | Evidence / Role                                                                                                                                                                   |
+| -------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nln/web3-evm`            | **Accepted**        | Foundation package cho EVM apps (`n-plus`, `neura-link`).                                                                                                                         |
+| `@nln/web3-solana`         | **Accepted Target** | Ứng viên Sibling foundation package khi dApp Solana (`neura`, `neura-admin`) triển khai theo `CHAIN_FAMILY_TEMPLATE.md`. Trạng thái hiện tại: `Deferred` (xem `CAPABILITIES.md`). |
+| `@nln/staking-sdk`         | **REJECT**          | Cả N+ và Neura Link đều chưa có ABI, chưa có địa chỉ. Deployment duy nhất là `TestStakingVault test-v1`. Chia sẻ theo tên "staking" là điều `EXTENSION_CONTRACT.md` §5 cấm thẳng. |
+| `@nln/mlm-sdk`             | **REJECT**          | 0 dòng code MLM trong `src/`. Tree traversal + rank calculation là indexer/backend domain. Chưa có contract, chưa có API contract, chưa có consumer.                              |
+| `@nln/rpc-observability`   | **REJECT**          | `grep -rln "reportError\|observability" src/` → 0 hit. `0017`: reporter chỉ thêm khi có production observability requirement.                                                     |
+| `@nln/ui-components`       | **DEFER**           | `src/components/ui/` có 4 primitive shadcn-generated. Không duplication thật, không consumer thứ hai.                                                                             |
+| `@nln/transaction-planner` | **DEFER**           | Xem §4. Một consumer.                                                                                                                                                             |
+| Shared config packages     | **DEFER**           | `tsconfig.json`, `eslint.config.mjs` phục vụ đúng một app. Extract trước khi có app thứ hai là tooling cost không đổi lấy gì.                                                     |
 
 Khi ai đó đề xuất một trong số này, câu hỏi đầu tiên là: **consumer thứ hai đã implement chưa?** — không phải "có hợp lý không".
 
