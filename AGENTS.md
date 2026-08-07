@@ -9,7 +9,7 @@ repository — do not reintroduce a framework convention that assumes one.
 - Environment variables are `VITE_*`, read through `import.meta.env`.
 - Output is static assets in `dist/`.
 
-Rationale and the decisions behind it: [vite-migration.md](docs/plans/active/vite-migration.md).
+Rationale and the decisions behind it: [vite-migration.md](docs/plans/completed/vite-migration.md).
 
 ## Current State & Ecosystem Vision
 
@@ -24,6 +24,28 @@ Rationale and the decisions behind it: [vite-migration.md](docs/plans/active/vit
 - **Application architecture** (app ↔ runtime mapping, dependency direction): [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - **Build sequence**: [foundation-multi-app-execution.md](docs/plans/active/foundation-multi-app-execution.md).
 - **Product blueprint**: [nln-feature-source-map.md](docs/product/nln-feature-source-map.md) — intake map of draft specs, read for product scope, not for foundation policy.
+
+## Reference repositories on this machine
+
+Two sibling checkouts next to this repository. Neither is a dependency and
+neither is ours to modify — read them, copy from them deliberately, never import
+across.
+
+- `../interface` — a pristine clone of `Uniswap/interface` (upstream remote, no
+  local commits). Useful because it ships **real Solana support**:
+  `@solana/wallet-adapter-react`, `@solana/web3.js`,
+  `packages/uniswap/src/data/solanaConnection/`,
+  `packages/uniswap/src/features/providers/getSolanaConnection.ts`,
+  `apps/web/src/connection/signSolanaTransaction.tsx`, and an EVM/SVM platform
+  split in `buildAccountAddressesByPlatform.ts`. Read it before designing
+  `@nln/web3-solana`.
+  **Caveat that matters:** its swap path delegates confirmation to the Jupiter
+  execute API and marks success from Jupiter's response, so it does **not**
+  answer what terminal on-chain evidence should be. See
+  [solana-runtime-requirement.md](docs/foundation/solana-runtime-requirement.md) §3.
+- `../shadcn-admin` — the Vite + TanStack Router admin template `n-plus-admin`
+  was built from. Same stack as this repo now, so it is a direct copy source
+  including the routing layer.
 
 <!-- HARNESS:BEGIN -->
 

@@ -4,7 +4,7 @@ Date: 2026-08-07
 
 ## Status
 
-Active
+Completed
 
 ## Outcome
 
@@ -163,7 +163,7 @@ code beyond one cookie read, so it isolates tooling risk from product risk.
 
 ## Result
 
-Complete, pending review. Two commits: `5b6f4da` (admin), plus the product app
+Complete and validated. Two commits: `5b6f4da` (admin), plus the product app
 and workspace cleanup.
 
 Delivered:

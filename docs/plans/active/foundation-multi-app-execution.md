@@ -111,7 +111,7 @@ Toàn bộ giá trị thật của Next — RSC, server data, streaming, route h
 
 `shadcn-admin` giờ là nguồn copy **thẳng**, kể cả routing layer, vì nó vốn là Vite + TanStack Router.
 
-Chi tiết thi công và những gì phát sinh: [vite-migration.md](vite-migration.md).
+Chi tiết thi công và những gì phát sinh: [vite-migration.md](../completed/vite-migration.md).
 
 ### 2.3. Dependency direction
 

@@ -101,6 +101,14 @@ updated in the same change.
   proof by signature and session persistence (§1) but names no wallet or adapter
   library.
 
+  Prior art rather than a decision: `../interface` uses
+  `@solana/wallet-adapter-react` with `@solana/web3.js`, and keeps signing behind
+  a single registered function (`apps/web/src/connection/signSolanaTransaction.tsx`)
+  so the rest of the app never touches the adapter directly. That shape matches
+  this repository's own boundary rules — the wallet stays behind the runtime
+  package's public API — and is the obvious starting point unless something
+  argues against it.
+
 ### 2. Account/identity model and authentication
 
 Decided by the spec:
@@ -150,9 +158,46 @@ way this product cannot tolerate: a `confirmed` claim that later reorgs would
 have shown the user a reward they did not receive, and would have run
 once-per-signature side effects for a transaction that never happened.
 
+#### Evidence from a production Solana frontend, including what weakens the above
+
+`../interface` (clone of `Uniswap/interface`) ships live Solana support. Two
+findings, and they do not both point the same way.
+
+It documents the trade-off in
+`packages/uniswap/src/data/solanaConnection/getSolanaParsedTokenAccountsByOwnerQueryOptions.ts`:
+
+| Level       | Time    | Safety                                 |
+| ----------- | ------- | -------------------------------------- |
+| `processed` | ~400ms  | ~5% rollback risk                      |
+| `confirmed` | ~1-2s   | No rollback in Solana's 5-year history |
+| `finalized` | ~12-13s | Completely irreversible                |
+
+They use `confirmed` for on-chain balance reads, explicitly so the balance
+updates quickly after a swap.
+
+This is a real argument against a blanket `finalized`: 12-13 seconds of waiting
+on every claim, unstake and compound is a material UX cost, and the rollback risk
+being defended against has not been observed in five years. Whoever decides item
+3 should weigh that rather than take the recommendation above at face value. A
+defensible middle is `confirmed` as terminal evidence for user-facing flow with
+`finalized` reserved for anything irreversible or reconciled against money — but
+that split has to be a decision, not a default.
+
+The second finding is why this reference cannot settle the question. In
+`apps/web/src/state/sagas/transactions/solana.ts` the swap path sends through the
+**Jupiter execute API** and marks `TransactionStatus.Success` from Jupiter's
+`status` field, then refetches balances after a fixed 3-second delay with the
+comment that the transaction "hasn't been fully confirmed yet". They never run
+their own commitment-level confirmation loop — they outsourced terminal evidence
+to an aggregator.
+
+Neura talks directly to an Anchor program. There is no aggregator to outsource
+to, so this decision has to be made here and cannot be copied.
+
 **This is a recommendation, not a decision.** Someone with authority over the
-product has to accept it, and this record has to be updated with that acceptance,
-before `packages/web3-solana/` is created.
+product has to accept it — or accept `confirmed`, with the reasoning recorded —
+and this record has to be updated with that acceptance, before
+`packages/web3-solana/` is created.
 
 ### 4. RPC provider, rate limit and failure policy
 
