@@ -2,6 +2,10 @@
 
 Tài liệu này định nghĩa cách application và feature được phép sử dụng, giới hạn và mở rộng Web3 foundation.
 
+Nội dung ở đây là **family-neutral**: nó áp dụng cho mọi chain family. Public
+surface, tier và extension checklist của một runtime cụ thể thuộc tài liệu của
+runtime đó — EVM: [`evm/EXTENSION_CONTRACT.md`](evm/EXTENSION_CONTRACT.md).
+
 ## 1. Nguyên tắc chung
 
 Application được phép:
@@ -34,11 +38,14 @@ Foundation không quyết định thay application những mục trên.
 
 Việc một dApp "tạm giả định khách hàng dùng EVM" là quyết định của application project, không phải foundation invariant.
 
-Ghi quyết định đó trong application docs:
+Ghi quyết định đó trong application docs, một record cho mỗi application:
 
 ```text
-docs/product/foundation-adoption.md
+docs/product/<app>/foundation-adoption.md
 ```
+
+Bảng tổng hợp application ↔ runtime nằm ở
+[`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) §2.
 
 Ví dụ:
 
@@ -100,76 +107,36 @@ Bypass foundation safety là architecture violation.
 ## 3. Public consumption boundary
 
 Application tiêu thụ public API của family module đã adopt. Family module quyết
-định public surface của mình; file tree bên trong là private.
+định public surface của mình; file tree bên trong là private, và ESLint enforce
+ranh giới đó.
 
-### 3.1. Public paths của EVM module
+Foundation không liệt kê public path ở đây. Mỗi runtime khai báo public
+entrypoint của chính nó, tường minh, không suy ra từ việc application đang import
+gì:
 
 ```text
-@nln/web3-evm                runtime API (hooks, domain types, registry selectors)
-@nln/web3-evm/address        pure address primitives, React-free và wagmi-free
-@nln/web3-evm/errors         pure error taxonomy, React-free và wagmi-free
-@nln/web3-evm/errors/adapter Viem/Wagmi RPC error normalization adapter
-@nln/web3-evm/contracts      generic contract deployment types và hydration helpers (0016)
-@nln/web3-evm/registry       pure registry read selectors (explorer URL, network lookup), React-free và wagmi-free
-@nln/web3-evm/config         runtime configuration injection leaf
-@nln/web3-evm/provider       EvmProvider và wagmi config adapter
-src/providers/web3-providers.tsx application provider composition root
+EVM     evm/EXTENSION_CONTRACT.md §1 và §2
 ```
 
-Mọi path khác dưới `packages/web3-evm/src/**` là internal. ESLint enforce ranh giới này.
+Ba quy tắc áp dụng cho mọi family:
 
-Ba leaf path pure (`address`, `errors`, `registry`) tồn tại vì lý do kỹ thuật cụ thể: pure domain code (ví dụ
-SIWE message building, wallet binding, MSW handlers) cần address/error helper
-nhưng không được kéo cả EVM runtime — provider, wagmi config và mọi hook — vào
-module graph của mình.
+1. **Public surface là khai báo, không phải quan sát.** Một path không được liệt
+   kê là internal, kể cả khi nó import được.
+2. **Provider không nằm trong barrel chính.** Provider composition đi qua
+   `@/providers/web3-providers` của application, nơi application chọn family
+   runtime nào được mount. Package không tự quyết định điều đó.
+3. **Primitive mở rộng dành cho feature là public có kiểm soát.** Một family có
+   thể export primitive để feature tự dựng contract-specific write flow, nhưng
+   feature dùng chúng vẫn phải giữ nguyên safety obligation của runtime — xem
+   `FEATURE_MODULE_CONTRACT.md` §5. Export một primitive không phải là miễn trừ
+   nghĩa vụ.
 
-`registry` phục vụ cùng lý do đó cho chain metadata: admin application render
-wallet address và transaction hash thành explorer link nhưng không bao giờ connect
-wallet, nên không được buộc phải phụ thuộc `wagmi` và `@tanstack/react-query`.
-Leaf này chỉ chứa read selector; mọi write flow và hook vẫn nằm sau barrel chính.
+Application UI không được, với bất kỳ family nào:
 
-Vì lý do đó `EvmProvider` **không** nằm trong barrel chính của `@nln/web3-evm`. Provider composition
-đi qua `@/providers/web3-providers`, nơi application chọn family runtime nào được
-mount.
-
-### 3.2. Hai tier của `@nln/web3-evm`
-
-**Tier A — Application API.** Hooks, domain types và registry selectors mà UI
-dùng trực tiếp. Chúng đã đóng gói sẵn toàn bộ safety invariant của foundation.
-
-**Tier B — Feature Extension API.** Primitive để một feature tự triển khai
-contract-specific write flow theo `0015`: `useEvmWriteLifecycle`,
-`assertEvmWriteReady`, `deriveEvmWriteStatus`, `EvmWeb3Error`,
-`createEvmWeb3Error`, `toEvmWeb3Error`, `isUserRejectedWalletRequest` và các
-registry selector dạng strict.
-
-Tier B là public **có kiểm soát**. Feature dùng Tier B bắt buộc:
-
-- thực hiện `Prepare → Review → Confirm`;
-- simulation với connected account trước khi mở wallet request;
-- đi qua `useEvmWriteLifecycle` cho mọi submission;
-- không kết luận success chỉ từ transaction hash;
-- giữ stale-operation protection khi account/chain/token/spender đổi;
-- coi receipt là terminal evidence duy nhất cho success/revert;
-- giữ side effects (callback, invalidation, history) once-per-hash.
-
-Feature hook được phép gọi write hook của Wagmi cho contract của chính nó — đó
-là điều `0015` quy định — miễn là đi qua lifecycle guard ở trên. UI layer thì
-không: component không submit transaction trực tiếp.
-
-Application UI nên tiêu thụ:
-
-- Tier A hooks;
-- exported domain types;
-- exported registry selectors;
-- reusable components dưới `apps/<app>/src/components/web3/`.
-
-Application UI không nên trực tiếp:
-
-- gọi Viem public client cho flow foundation đã hỗ trợ;
-- gọi `writeContract` hoặc `sendTransaction`;
-- tự map Viem/Wagmi errors;
-- tự invalidate Wagmi query cache;
+- gọi thẳng low-level client cho flow mà runtime đã hỗ trợ;
+- submit transaction trực tiếp từ component;
+- tự map lỗi của thư viện bên dưới;
+- tự invalidate cache do runtime sở hữu;
 - đọc internal refs/state của write hooks;
 - import internal test helpers.
 
@@ -246,19 +213,20 @@ Feature được phép thêm feature-specific error codes.
 Feature không được:
 
 - thay đổi meaning của foundation error codes;
-- biến `SIMULATION_REVERTED` thành mined revert;
-- suy `success` hoặc `reverted` khi chưa có receipt;
+- trình bày một preflight/simulation failure như một failure đã lên chain;
+- kết luận terminal status khi runtime chưa cung cấp terminal evidence của nó;
 - hiển thị raw RPC payload không được sanitize.
 
-Feature error có thể wrap foundation error và giữ original cause.
+Feature error có thể wrap foundation error và giữ original cause. Error code cụ
+thể và phase semantics thuộc từng runtime — EVM: `evm/EXTENSION_CONTRACT.md` §3.
 
 ## 8. Cache ownership
 
-Foundation-owned data:
+Runtime-owned data (tên cụ thể tùy family):
 
-- balance;
-- allowance;
-- receipt;
+- account asset balances;
+- spending authorization state, nếu family có khái niệm đó;
+- transaction confirmation evidence;
 - registry metadata;
 - local Web3 transaction history.
 
@@ -271,7 +239,7 @@ Feature-owned data:
 - backend transaction metadata;
 - user-specific application records.
 
-Feature không mirror foundation-owned balance/allowance sang store riêng nếu không có requirement và invalidation policy rõ.
+Feature không mirror runtime-owned data sang store riêng nếu không có requirement và invalidation policy rõ.
 
 ## 9. Application restrictions
 
@@ -312,9 +280,9 @@ Foundation change phải:
 ```text
 Application feature
       ↓ uses
-Web3 foundation public API
+Family runtime public API
       ↓
-Wagmi / Viem / Query
+Thư viện và SDK bên dưới của runtime đó
 ```
 
 Không hợp lệ:
@@ -329,11 +297,15 @@ Foundation không được biết staking, payment, vault hoặc application-spe
 
 ## 12. Foundation adoption record
 
-Khi repository được phát triển thành một application cụ thể, application nên tạo:
+Mỗi application giữ record riêng của mình:
 
 ```text
-docs/product/foundation-adoption.md
+docs/product/<app>/foundation-adoption.md
 ```
+
+Một record cho mỗi application, kể cả khi hai application cùng adopt một runtime:
+network, restriction và deviation của chúng khác nhau. Bảng tổng hợp application
+↔ runtime nằm ở [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) §2.
 
 Nội dung tối thiểu:
 
@@ -370,85 +342,16 @@ Foundation commit/version: <value>
 
 Application docs chỉ link foundation decisions cần thiết, không copy toàn bộ foundation internals.
 
-## 13. EVM extension checklists
+## 13. Thêm một chain-family runtime
 
-### 13.1. Thêm EVM network
+Checklist mở rộng bên trong một runtime (thêm network, token, read hook, write
+hook, feature contract) thuộc tài liệu của runtime đó — EVM:
+[`evm/EXTENSION_CONTRACT.md`](evm/EXTENSION_CONTRACT.md) §5.
 
-1. Thêm chain vào network registry.
-2. Thêm RPC environment override nếu cần.
-3. Thêm token map cho chain nếu có supported ERC-20.
-4. Kiểm tra explorer/native metadata.
-5. Chạy registry tests.
-6. Chạy:
+Mục này chỉ nói về việc thêm **một family mới**.
 
-```bash
-pnpm web3:smoke -- --chainId <chainId>
-```
-
-Không thêm network bằng cách hardcode chain trong component hoặc hook.
-
-### 13.2. Thêm ERC-20 token
-
-1. Thêm entry vào `evm-tokens.json`.
-2. Dùng address làm key.
-3. Khai báo đúng `expectedDecimals`.
-4. Không duplicate normalized address.
-5. Chạy runtime validation tests.
-6. Chạy live smoke để đối chiếu metadata.
-
-### 13.3. Thêm read hook
-
-Bắt buộc:
-
-- gate theo selection ready;
-- dùng registry;
-- dùng canonical query keys;
-- tái sử dụng pure builder/mapper khi có service;
-- normalize typed errors;
-- xác định partial failure policy;
-- có pure tests và hook tests.
-
-### 13.4. Thêm write hook
-
-Bắt buộc:
-
-- object input signature;
-- `assertEvmWriteReady`;
-- prepare/review/confirm flow;
-- simulation với account nếu là contract write;
-- immutable submission snapshot;
-- duplicate-submit guards;
-- operation ownership;
-- receipt evidence;
-- typed errors;
-- once-per-hash side effects;
-- targeted invalidation;
-- submission, rejection, revert và stale-operation tests.
-
-### 13.5. Thêm feature contract
-
-Trước khi thêm registry dùng chung, phải có feature thật.
-
-Feature cần xác định:
-
-- supported chains;
-- address per chain;
-- ABI ownership;
-- enabled state;
-- deployment validation;
-- read/write boundaries;
-- invalidation rules;
-- error semantics.
-
-Business-specific contracts nên bắt đầu ở feature layer.
-
-### 13.6. Thêm chain-family runtime
-
-Checklist này áp dụng khi thêm một chain-family runtime mới.
-
-Một chain family mới không được ép vào EVM abstractions nếu semantics khác.
-
-Cần xác định riêng:
+Một chain family mới không được ép vào abstraction của một family đã có nếu
+semantics khác. Cần xác định riêng:
 
 - wallet selection;
 - account model;
@@ -457,13 +360,19 @@ Cần xác định riêng:
 - reads/writes;
 - error taxonomy;
 - provider boundaries;
-- cache ownership.
+- cache ownership;
+- terminal confirmation evidence.
 
 Ngoài ra:
 
-- shared core chỉ chứa concepts thực sự đồng nhất;
-- không promote một shared core type trước khi có hai real consumers;
-- application choice không đồng nghĩa foundation change: bật/tắt một family trong một dApp không phải lý do sửa foundation decision.
+- family mới là sibling package, không nằm trong package của family khác;
+- shared core chỉ chứa concepts thực sự đồng nhất, và chỉ sau khi có **hai
+  runtime đã implement** chứng minh điều đó;
+- application choice không đồng nghĩa foundation change: bật/tắt một family
+  trong một dApp không phải lý do sửa foundation decision.
+
+Requirement record bắt buộc trước khi viết code, ownership list và definition of
+done: [`CHAIN_FAMILY_TEMPLATE.md`](CHAIN_FAMILY_TEMPLATE.md).
 
 ## 14. Decision filters
 

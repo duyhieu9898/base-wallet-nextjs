@@ -1,5 +1,9 @@
 # 0010 Testing strategy
 
+Scope: **family-neutral.** Bốn tầng proof và trách nhiệm của mỗi tầng đúng với
+mọi chain family. Tên script, mock library và test network là instance của từng
+runtime; chúng được nêu ở đây làm ví dụ hiện hành (EVM), không phải là rule.
+
 ## Purpose
 
 Không một tầng test nào chứng minh được toàn bộ Web3 behavior: mock không chứng minh RPC hoạt động, live read không chứng minh write path, và write thật không chạy deterministic trong CI. Mỗi tầng phải chịu trách nhiệm cho một loại rủi ro.
@@ -34,61 +38,63 @@ Không cần network.
 
 ### 2. Hook tests
 
-- mock Wagmi;
-- dùng `QueryClient` thật;
+- mock lớp chain-access của runtime — EVM: Wagmi;
+- dùng query client thật, không mock;
 - không chạm blockchain.
 
 Kiểm tra:
 
 - selection reset;
-- simulation account binding;
+- preflight account binding;
 - write lifecycle;
 - duplicate submissions;
 - stale operation ownership;
-- receipt callbacks once-per-hash;
+- confirmation callbacks once-per-terminal-reference — EVM: once-per-hash receipt callbacks;
 - cache invalidation;
 - history persistence isolation;
-- recovery sau simulation/submission failure.
+- recovery sau preflight/submission failure.
 
 ### 3. Live read smoke tests
+
+Kiểm tra:
+
+- RPC reachability;
+- supported network registry;
+- live asset metadata đọc từ chain;
+- registry/on-chain metadata agreement.
+
+Script là của từng runtime. EVM hiện tại:
 
 ```bash
 pnpm web3:smoke
 pnpm web3:smoke -- --chainId <chainId>
 ```
 
-Kiểm tra:
-
-- RPC reachability;
-- supported chain registry;
-- live token `symbol`;
-- live token `decimals`;
-- registry/on-chain metadata agreement.
-
 Smoke tests chỉ đọc và cleanup timers qua `try...finally`.
 
 ### 4. Local testnet writes
 
-Current reference script:
+Mỗi runtime cung cấp script write của riêng nó cho test network của nó. EVM
+reference hiện tại:
 
 ```text
 scripts/web3-sepolia-send.local.ts
 ```
 
-Sepolia là reference test network hiện tại, không phải foundation requirement.
+Sepolia là reference test network của EVM, không phải foundation requirement.
 
 Application có thể thay hoặc bổ sung local write script cho test network được adopt, nhưng phải giữ:
 
 - test-only wallet;
 - private key chỉ trong local environment;
 - non-production funds;
-- explicit receipt verification;
+- explicit verification bằng terminal evidence của runtime đó;
 - không chạy mặc định trong CI.
 
 ## Boundaries
 
 - Mock tests không chứng minh RPC endpoint hoặc registry metadata khớp on-chain.
-- `QueryClient` không được mock trong hook tests; mock che mất invalidation, dedupe và refetch thật.
+- Query client không được mock trong hook tests; mock che mất invalidation, dedupe và refetch thật. EVM dùng TanStack `QueryClient`.
 - Smoke tests không chứng minh write path.
 - Local write script không chạy mặc định trong CI: cần funded wallet và private key, tạo rủi ro bảo mật và kết quả không deterministic.
 - Không claim một command đã pass nếu chưa thực sự chạy.
@@ -107,6 +113,9 @@ Deferred:
 - Quality gates: `pnpm typecheck`, `pnpm lint`, `pnpm format:check`, `pnpm test:run`, `pnpm build`.
 
 ## Code and tests
+
+Instance hiện tại là EVM. Family runtime mới bổ sung mục của riêng nó, không sửa
+các đường dẫn dưới đây.
 
 Implementation:
 

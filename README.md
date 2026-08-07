@@ -20,10 +20,13 @@ NLN Frontend is a pnpm monorepo hosting the shared EVM foundation package (`@nln
 │       └── contracts/         # Solidity test fixture and its tooling
 ├── scripts/                   # Workspace tooling (live RPC smoke entry)
 └── docs/                      # Architectural decisions, foundation specs, and plans
+    ├── ARCHITECTURE.md        # Application architecture: which app adopts which runtime
     └── foundation/
-        ├── ARCHITECTURE.md
+        ├── ARCHITECTURE.md            # Family-neutral foundation rules
         ├── EXTENSION_CONTRACT.md
-        └── FEATURE_MODULE_CONTRACT.md
+        ├── FEATURE_MODULE_CONTRACT.md
+        └── evm/                       # The EVM runtime: architecture, contracts,
+                                       # adoption guide and EVM decisions
 ```
 
 The root `package.json` carries tooling only — formatting, linting, git hooks and
@@ -37,7 +40,9 @@ this layout exists for.
 
 Start with [`docs/README.md`](docs/README.md):
 
-- **Architecture**: [`docs/foundation/ARCHITECTURE.md`](docs/foundation/ARCHITECTURE.md)
+- **Application architecture**: [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — which app adopts which runtime
+- **Foundation architecture**: [`docs/foundation/ARCHITECTURE.md`](docs/foundation/ARCHITECTURE.md) — family-neutral
+- **EVM runtime**: [`docs/foundation/evm/ARCHITECTURE.md`](docs/foundation/evm/ARCHITECTURE.md)
 - **Extension Contract**: [`docs/foundation/EXTENSION_CONTRACT.md`](docs/foundation/EXTENSION_CONTRACT.md)
 - **Feature Module Contract**: [`docs/foundation/FEATURE_MODULE_CONTRACT.md`](docs/foundation/FEATURE_MODULE_CONTRACT.md)
 

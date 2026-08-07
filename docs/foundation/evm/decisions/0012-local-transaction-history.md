@@ -34,7 +34,7 @@ của feature. `contract-write` là kind cho write không thuộc ba loại kia 
 
 `FeatureActivityRecord` (`id` · `transactionHash` · `feature` · `action` ·
 `createdAt`) là **liên kết** do foundation định nghĩa; mọi field khác do feature tự
-sở hữu. Không có shape liên kết cố định thì membership và lending sẽ tự nghĩ ra hai
+sở hữu. Không có shape liên kết cố định thì membership và staking sẽ tự nghĩ ra hai
 cách nối business data vào transaction — đúng thứ việc tách này sinh ra để tránh.
 
 Storage key:
@@ -51,7 +51,7 @@ lại, không migrate.
 tiên lên production — sau đó đổi schema cần migration, không phải bump key.
 
 Vì sao phải đổi: `v2` để item schema là union đóng theo `action`, nên mỗi feature
-mới phải mở rộng union bên trong foundation. Membership, lending và staking đều cần
+mới phải mở rộng union bên trong foundation. Membership, staking và MLM đều cần
 variant riêng; ba feature đâm vào một union đóng cùng lúc là va chạm chắc chắn, và
 nó buộc foundation phải "biết staking" — điều `EXTENSION_CONTRACT.md` §11 cấm.
 

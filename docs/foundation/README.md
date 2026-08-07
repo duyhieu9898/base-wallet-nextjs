@@ -38,13 +38,17 @@ Foundation tổ chức blockchain support theo các chain-family modules độc 
 
 Trạng thái hỗ trợ chi tiết của từng runtime (EVM, Solana) và danh mục capabilities khả dụng nằm tại [`CAPABILITIES.md`](CAPABILITIES.md). Hướng dẫn trung lập để thêm một chain family mới nằm tại [`CHAIN_FAMILY_TEMPLATE.md`](CHAIN_FAMILY_TEMPLATE.md).
 
-Foundation được xây bằng:
+Foundation không có một technology stack duy nhất — mỗi lớp có stack riêng:
 
-- Next.js App Router;
-- TypeScript;
-- Wagmi;
-- Viem;
-- TanStack Query.
+```text
+Host / reference applications   Next.js App Router · React · TypeScript
+EVM runtime (@nln/web3-evm)     Wagmi · Viem · TanStack Query
+Family runtime tiếp theo        dependencies riêng của nó
+```
+
+Wagmi và Viem là dependency của **runtime EVM**, không phải của foundation. Một
+family runtime khác mang stack khác, và điều đó không làm nó kém "foundation"
+hơn.
 
 Foundation giúp một feature dApp mới bắt đầu từ nền móng đã có invariant rõ ràng, thay vì mỗi feature tự xây lại wallet, read, write và transaction lifecycle.
 
@@ -92,20 +96,41 @@ Danh sách đầy đủ non-goals nằm trong `CAPABILITIES.md`.
 
 ## Authority map
 
-| Tài liệu                | Trách nhiệm                                                                                    |
-| ----------------------- | ---------------------------------------------------------------------------------------------- |
-| `ARCHITECTURE.md`       | Cấu trúc, module ownership, module classification, adoption flow, public API và trust boundary |
-| `CAPABILITIES.md`       | Foundation đã cung cấp, deferred, product-dependent và non-goals                               |
-| `EXTENSION_CONTRACT.md` | Quy tắc application/feature sử dụng và mở rộng foundation                                      |
-| `ADOPTION_GUIDE.md`     | Cách copy base, cấu hình runtime và chọn các reference module                                  |
-| `decisions/`            | Rule hiện hành của foundation theo từng responsibility                                         |
+Tài liệu chia theo ba lớp. Đừng trộn chúng: một rule cần tới các từ `receipt`,
+`chainId`, ERC-20, allowance, spender, Wagmi hay Viem để phát biểu được thì nó
+thuộc lớp runtime, không phải lớp foundation.
 
-| Tài liệu bổ trợ              | Trách nhiệm                                                                        |
+### Lớp foundation — family-neutral
+
+| Tài liệu                     | Trách nhiệm                                                                        |
 | ---------------------------- | ---------------------------------------------------------------------------------- |
-| `FEATURE_MODULE_CONTRACT.md` | Host capability và cấu trúc chuẩn của một feature module                           |
+| `ARCHITECTURE.md`            | Family package isolation, ownership split, dependency direction, trust principles  |
+| `CAPABILITIES.md`            | SSOT của capability scope và runtime status                                        |
+| `EXTENSION_CONTRACT.md`      | Quy tắc application/feature sử dụng và mở rộng foundation                          |
+| `FEATURE_MODULE_CONTRACT.md` | Host capability, anatomy và 8 safety obligation của feature module                 |
 | `CHAIN_FAMILY_TEMPLATE.md`   | Checklist bắt buộc trước khi thêm một chain family mới — tài liệu, không phải code |
+| `decisions/`                 | Rule đúng với mọi family (`0010`, `0014`, `0017`)                                  |
 
-Ngoài bốn tài liệu authority trên, `package-scope-evidence.md` ghi bằng chứng đo được về scope và các verdict "chưa tạo package nào". Nó **không phải authority** — khi mâu thuẫn, `decisions/` và ba tài liệu đầu bảng thắng.
+### Lớp runtime — mỗi family một thư mục
+
+| Tài liệu                         | Trách nhiệm                                                        |
+| -------------------------------- | ------------------------------------------------------------------ |
+| `evm/ARCHITECTURE.md`            | Module ownership, public API, flows, terminal evidence             |
+| `evm/EXTENSION_CONTRACT.md`      | Public paths, Tier A/B, extension checklists                       |
+| `evm/FEATURE_MODULE_CONTRACT.md` | Cơ chế EVM cho 8 safety obligation                                 |
+| `evm/ADOPTION_GUIDE.md`          | Cách adopt runtime EVM cho một dApp mới                            |
+| `evm/decisions/`                 | Rule riêng của EVM (`0001`–`0009`, `0011`, `0012`, `0015`, `0016`) |
+
+Solana chưa có thư mục runtime. Requirement đã được ghi tại
+[`solana-runtime-requirement.md`](solana-runtime-requirement.md); `solana/` được
+tạo khi implementation bắt đầu.
+
+### Lớp application
+
+Không nằm ở đây. Application ↔ runtime mapping và monorepo architecture nằm ở
+[`../ARCHITECTURE.md`](../ARCHITECTURE.md).
+
+Ngoài các tài liệu authority trên, `package-scope-evidence.md` ghi bằng chứng đo được về scope và các verdict "chưa tạo package nào". Nó **không phải authority** — khi mâu thuẫn, `decisions/` và các tài liệu authority thắng.
 
 ## Foundation và application
 
@@ -152,10 +177,10 @@ Không cần đọc toàn bộ foundation decisions.
 
 Đọc:
 
-1. `ARCHITECTURE.md`;
+1. `ARCHITECTURE.md` nếu chạm ranh giới giữa các family, hoặc `<family>/ARCHITECTURE.md` nếu chỉ chạm một runtime;
 2. `CAPABILITIES.md`;
-3. `EXTENSION_CONTRACT.md`;
-4. decision liên quan;
+3. `EXTENSION_CONTRACT.md` và `<family>/EXTENSION_CONTRACT.md`;
+4. decision liên quan — kiểm tra đúng thư mục scope;
 5. implementation và tests liên quan.
 
 ### Thêm một abstraction dùng chung

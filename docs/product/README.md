@@ -10,12 +10,24 @@ files after actual product domains, such as `overview.md`, `billing.md`,
 
 ## Current Project Contract
 
-- [`foundation-adoption.md`](foundation-adoption.md): application choices when
-  adopting the reusable Web3 foundation.
-- [`../decisions/auth-session-transport.md`](../decisions/auth-session-transport.md):
-  the current SIWE authentication and session contract.
 - [`nln-feature-source-map.md`](nln-feature-source-map.md): a non-authoritative
   inventory of local feature-source material awaiting product review.
+- [`../decisions/auth-session-transport.md`](../decisions/auth-session-transport.md):
+  the current SIWE authentication and session contract.
+
+### Foundation adoption records
+
+One record per application — not one per product system, and not one shared
+record. Two applications adopting the same runtime still differ in networks,
+restrictions and deviations.
+
+- [`n-plus/foundation-adoption.md`](n-plus/foundation-adoption.md) — product app, EVM.
+- [`n-plus-admin/foundation-adoption.md`](n-plus-admin/foundation-adoption.md) — admin app, EVM, read-only surface.
+- `neura/`, `neura-admin/`, `neura-link/`, `neura-link-admin/` — written when each
+  app is scaffolded. Do not pre-create them with invented values.
+
+The application ↔ runtime summary table lives in
+[`../ARCHITECTURE.md`](../ARCHITECTURE.md) §2. These records hold the detail.
 
 Add feature-specific product documents here when a feature introduces durable
 user-visible behavior that is not already owned by one of those documents.

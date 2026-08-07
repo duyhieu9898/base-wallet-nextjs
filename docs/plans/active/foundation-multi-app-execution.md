@@ -2,7 +2,7 @@
 
 Kế hoạch thi công cho monorepo `nln-platform`, target 6 application (3 product + 3 admin) trên các foundation package.
 
-> **Target 6 Application:** Monorepo bao gồm **N+ System** (`apps/n-plus` & `apps/n-plus-admin`), **Neura System** (`apps/neura` & `apps/neura-admin`), và **Neura Link System** (`apps/neura-link` & `apps/neura-link-admin`), mỗi product system có admin app riêng. `apps/n-plus` — app duy nhất đang tồn tại — nội dung của nó (SIWE auth, staking demo, web3-lab) là reference application của foundation, và N+ có staking NRA⇄USDT nên nó là điểm khởi đầu thật.
+> **Target 6 Application:** Monorepo bao gồm **N+ System** (`apps/n-plus` & `apps/n-plus-admin`), **Neura System** (`apps/neura` & `apps/neura-admin`), và **Neura Link System** (`apps/neura-link` & `apps/neura-link-admin`), mỗi product system có admin app riêng. `apps/n-plus` và `apps/n-plus-admin` là hai app đang tồn tại; nội dung của `apps/n-plus` (SIWE auth, staking demo, web3-lab) là reference application của foundation, và N+ có Flexible USDT Staking nên nó là điểm khởi đầu thật.
 
 **Capacity:** 3 người. 4 workstream có thể overlap, nhưng **tối đa 3 workstream chạy thật cùng lúc** (§9).
 
@@ -280,13 +280,13 @@ Phải quyết `0014` **trước khi gõ dòng đầu tiên của 4.3**, không 
 
 ### 4.4. Tách history hai tầng
 
-`0012` dòng 54: item schema là **union đóng theo `action`**. Membership, lending và staking đều cần variant — ba feature đâm vào một union đóng cùng lúc là va chạm chắc chắn.
+`0012` dòng 54: item schema là **union đóng theo `action`**. Membership và staking đều cần variant — nhiều feature đâm vào một union đóng cùng lúc là va chạm chắc chắn.
 
 Không feature registry, không arbitrary metadata. App compose hai nguồn khi hiển thị.
 
 #### Schema chốt trước khi code
 
-Chưa chốt schema thì membership và lending sẽ tự nghĩ ra hai cách liên kết history khác nhau — đúng thứ §4.4 sinh ra để tránh.
+Chưa chốt schema thì membership và staking sẽ tự nghĩ ra hai cách liên kết history khác nhau — đúng thứ §4.4 sinh ra để tránh.
 
 ```ts
 // Foundation — mechanical record
@@ -300,7 +300,7 @@ export type EvmMechanicalTransactionRecord = BaseHistoryItem & {
 export type FeatureActivityRecord = {
   id: string
   transactionHash: Hash
-  feature: string // "staking" | "membership" | "lending"
+  feature: string // "staking" | "membership" | "mlm"
   action: string // nghiệp vụ, feature tự định nghĩa
   createdAt: number
 }
@@ -374,7 +374,7 @@ Enforcement phải phủ **cả bốn đường**: alias import · workspace pac
 PHẢI PASS    apps/n-plus → @nln/web3-evm
 PHẢI FAIL    apps/n-plus → apps/n-plus-admin
 PHẢI FAIL    apps/n-plus → ../neura-link/src/*
-PHẢI FAIL    feature membership → feature lending
+PHẢI FAIL    feature membership → feature staking
 ```
 
 Rule không có fixture chứng minh là rule chưa tồn tại.
@@ -562,7 +562,7 @@ Feature không import provider implementation khi nó chỉ cần hàm dịch.
 
 Đã đúng sẵn, cần giữ: **zero cross-feature import**, và `features/staking/index.ts` đã là public barrel.
 
-### 6.2. Deliverable — `docs/foundation/FEATURE_MODULE_CONTRACT.md`
+### 6.2. Deliverable — `docs/foundation/FEATURE_MODULE_CONTRACT.md` (family-neutral) và `docs/foundation/evm/FEATURE_MODULE_CONTRACT.md` (cơ chế EVM)
 
 Host capability contract (5 path trên, ghi rõ là _bắt buộc_ chứ không phải internals tùy ý phụ thuộc) · feature structure chuẩn · luật · checklist copy.
 
@@ -577,9 +577,9 @@ apps/neura-link/src/features/membership/                  ← product
 apps/neura-link-admin/src/features/membership-management/ ← admin
 ```
 
-| Product feature                                                   | Admin feature                                                                                                    |
-| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| purchase / upgrade membership · staking · lending · MLM user view | membership config · staking pool mgmt · lending mgmt · reward config · user/rank mgmt · treasury/operator action |
+| Product feature                                         | Admin feature                                                                                     |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| purchase / upgrade membership · staking · MLM user view | membership config · staking pool mgmt · reward config · user/rank mgmt · treasury/operator action |
 
 Cùng domain nhưng **không import nhau** — hai app khác deployment và khác permission model.
 
@@ -624,7 +624,7 @@ Next cho cả 6 (§2.2) gỡ được rào framework. Rào còn lại là ngữ 
 
 ---
 
-## 7. Track 3 — Membership và Lending
+## 7. Track 3 — Membership
 
 Transaction-plan verdict **DEFER** giữ nguyên.
 
@@ -671,12 +671,16 @@ Product và admin cùng dự án dùng cùng deployment manifest về mặt nộ
 Không dùng chung một file. `docs/foundation/` là authority chung; mỗi app có bản adoption riêng:
 
 ```text
-apps/<app>/docs/product/foundation-adoption.md   ← 6 bản
+docs/product/<app>/foundation-adoption.md   ← 6 bản
 ```
+
+Path này do `EXTENSION_CONTRACT.md` §12 quy định. Không đặt dưới `apps/<app>/docs/` — hiện không app nào có thư mục `docs/`, và tách đôi nơi chứa tài liệu là đúng thứ lượt SSOT vừa dọn.
 
 Mỗi bản ghi: foundation version / workspace dependency · network config · module đang bật · optional module đã gỡ · ràng buộc riêng của product · ai sở hữu deployment.
 
-Lưu ý: `docs/product/foundation-adoption.md` hiện có câu "application và foundation share cùng Git commit" — đúng trong monorepo, nhưng phải viết lại nếu về sau tách repo (§1.2).
+Đã tồn tại: `n-plus` và `n-plus-admin`. Hai app này adopt cùng runtime nhưng ở độ sâu khác nhau (admin chỉ dùng pure leaves, không `wagmi`/`react-query`) — đó chính là lý do không dùng chung một file.
+
+Lưu ý: các bản hiện có ghi "application và foundation share cùng Git commit" — đúng trong monorepo, nhưng phải viết lại nếu về sau tách repo (§1.2).
 
 ### 8.3. `contracts/` và `scripts/` — giao chủ trước Track 1 (R2)
 
@@ -713,28 +717,28 @@ Xét lại khi có product contract thật với ABI và địa chỉ. Nếu v�
 
 ## 9. Phân công
 
-| Track                        | Ai                | Chặn ai                                            |
-| ---------------------------- | ----------------- | -------------------------------------------------- |
-| Track 0 — readiness          | Foundation        | Chặn 4 việc ở §9.1, **không phải tất cả**          |
-| Track 1 — workspace          | Foundation        | Chặn admin Web3 integration                        |
-| Track 2 — module contract    | Song song Track 0 | **Chặn 2 thành viên mới**                          |
-| Track 3 — membership/lending | 2 thành viên      | Chờ Track 2                                        |
-| `n-plus-admin`               | Thành viên admin  | Port routing + non-Web3 làm ngay; Web3 chờ Track 1 |
-| MLM                          | sau               | Chờ **API contract backend**, không phải web3      |
+| Track                     | Ai                | Chặn ai                                            |
+| ------------------------- | ----------------- | -------------------------------------------------- |
+| Track 0 — readiness       | Foundation        | Chặn 4 việc ở §9.1, **không phải tất cả**          |
+| Track 1 — workspace       | Foundation        | Chặn admin Web3 integration                        |
+| Track 2 — module contract | Song song Track 0 | **Chặn 2 thành viên mới**                          |
+| Track 3 — membership      | 2 thành viên      | Chờ Track 2                                        |
+| `n-plus-admin`            | Thành viên admin  | Port routing + non-Web3 làm ngay; Web3 chờ Track 1 |
+| MLM                       | sau               | Chờ **API contract backend**, không phải web3      |
 
 MLM chủ yếu là read + backend/indexer. Xác định API contract sớm để track này không đứng chờ nhầm thứ.
 
 ### 9.0. Capacity thật — 3 người, không phải 4 vai
 
-Bảng trên liệt kê 6 dòng nhưng chỉ có 3 người. Không cam kết membership, lending và admin migration cùng chạy full speed.
+Bảng trên liệt kê 6 dòng nhưng chỉ có 3 người. Không cam kết membership, MLM và admin migration cùng chạy full speed.
 
 ```text
 Người 1   Track 0 → Track 1 → review Track 2
 Người 2   draft Track 2 → Membership
-Người 3   Admin Next migration → Lending sau khi admin shell ổn
+Người 3   Admin Next migration → MLM sau khi admin shell ổn
 ```
 
-Hệ quả phải chấp nhận: **lending bắt đầu sau membership**, không song song. Nếu muốn membership và lending thật sự song song thì admin migration phải giới hạn ở routing/shell tối thiểu trong lúc chờ — chọn một, không chọn cả hai.
+Hệ quả phải chấp nhận: **MLM bắt đầu sau membership**, không song song. Nếu muốn membership và MLM thật sự song song thì admin migration phải giới hạn ở routing/shell tối thiểu trong lúc chờ — chọn một, không chọn cả hai.
 
 Đây là ràng buộc capacity, không phải ràng buộc kỹ thuật.
 
@@ -746,7 +750,7 @@ Bảng trên từng ghi "chặn tất cả" trong khi chính §6 và §9 lại c
 Track 0 CHẶN
   · workspace extraction của web3 package
   · admin Web3 integration
-  · membership/lending write flow dùng foundation
+  · membership/MLM write flow dùng foundation
   · nhân bản foundation sang consumer mới
 
 Track 0 KHÔNG CHẶN
@@ -762,7 +766,7 @@ Bước 1 : 4.6 docs authority (song song) · 4.1 config injection · 4.2 wagmi 
 Bước 2 : 4.3 component ownership · 4.4 history hai tầng · 4.5 ESLint error
 Bước 3 : Track 1 workspace migration + deploy spike
 Song song: Track 2 module contract + staking thành reference
-Sau đó : Track 3 membership + lending
+Sau đó : Track 3 membership + MLM
 Chưa làm: RPC fallback · observability package · UI/staking/MLM package · transaction-plan coordinator
 ```
 

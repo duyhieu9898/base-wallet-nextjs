@@ -36,13 +36,22 @@ and working-memory structure around that truth; it does not install upstream
 This repository separates reusable Web3 foundation material from application
 behavior. Retrieve the smallest relevant surface:
 
-- `foundation/ARCHITECTURE.md`: reusable Web3 foundation architecture and boundaries.
-- `ARCHITECTURE.md`: stub for application-level architecture when adopting foundation modules.
-- `foundation/`: reusable Web3 architecture, capabilities, extension contract,
-  and foundation decisions. Do not read it wholesale for an application feature.
-- `product/foundation-adoption.md`: the application’s chosen foundation modules,
-  networks, restrictions, and local extensions.
-- `decisions/`: lasting application decisions, including SIWE session transport.
+Documentation is layered. Retrieve the layer the task belongs to, not all three:
+
+- `ARCHITECTURE.md`: **application architecture** — which application adopts
+  which chain-family runtime, monorepo shape, dependency direction.
+- `foundation/`: **family-neutral foundation authority** — architecture,
+  capabilities, extension contract, feature module contract, chain-family
+  template, and the decisions that hold for every family. Do not read it
+  wholesale for an application feature.
+- `foundation/evm/`: **the EVM runtime** — module ownership, public API,
+  adoption guide, EVM feature mechanics, and EVM decisions. A rule that mentions
+  `receipt`, `chainId`, ERC-20, allowance, Wagmi or Viem lives here, not one
+  level up.
+- `product/<app>/foundation-adoption.md`: one record per application — its chosen
+  runtime, networks, restrictions, and local extensions.
+- `decisions/`: lasting application decisions, including SIWE session transport
+  and i18n/hydration policy.
 - `DECISIONS.md`: legacy redirect to the foundation decision index; new
   application decisions belong in `decisions/`.
 

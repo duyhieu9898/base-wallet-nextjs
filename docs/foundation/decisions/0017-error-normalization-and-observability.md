@@ -1,5 +1,10 @@
 # 0017 Error normalization and observability
 
+Scope: **family-neutral.** The rule is one domain error type per boundary,
+normalization at the boundary, and no vendor reporter before a requirement.
+`EvmWeb3Error` is the current runtime instance; a second family adds its own
+error type here rather than reusing EVM's.
+
 ## Purpose
 
 The application needs truthful, domain-specific errors for UI and control flow,
@@ -12,7 +17,8 @@ Errors remain domain-specific:
 
 - `ApiError` represents HTTP transport and response metadata.
 - `AuthError` represents authentication and wallet-signing outcomes.
-- `EvmWeb3Error` represents EVM reads, writes and transaction lifecycle.
+- The adopted chain-family runtime supplies one error type covering its reads,
+  writes and transaction lifecycle. Today that is `EvmWeb3Error`.
 
 Each boundary maps unknown external errors to its domain error type while
 preserving the original value in `cause`. Application code does not replace a
@@ -38,10 +44,11 @@ added only with a production observability requirement.
 
 ## Boundaries
 
-- `AuthError` and `EvmWeb3Error` are not merged into one broad application
-  error union. Their codes drive different safety and UI behavior.
-- UI does not display `cause`, raw `ApiError.details`, or raw Viem/Wagmi error
-  messages.
+- `AuthError` and a runtime error type are not merged into one broad application
+  error union. Their codes drive different safety and UI behavior. Neither are
+  two runtimes' error types merged with each other.
+- UI does not display `cause`, raw `ApiError.details`, or raw errors from the
+  runtime's underlying library — for EVM, Viem/Wagmi messages.
 - Foundation does not report errors to a vendor, send browser-global errors or
   add a catch-all error boundary before a product requirement exists.
 - A future reporter must receive a redacted event envelope, not arbitrary raw

@@ -20,7 +20,7 @@ import nextTs from "eslint-config-next/typescript"
  *   main barrel so importing a hook does not pull a Wagmi client into the graph,
  *   but the application composition root still needs a public path to it.
  *
- * See `packages/web3-evm/src/index.ts` and `docs/foundation/EXTENSION_CONTRACT.md`.
+ * See `packages/web3-evm/src/index.ts` and `docs/foundation/evm/EXTENSION_CONTRACT.md`.
  */
 const WEB3_PUBLIC_PATHS = [
   "@nln/web3-evm",
@@ -124,7 +124,7 @@ const eslintConfig = defineConfig([
   // Turning it off rather than pointing settings.next.rootDir at the apps: that
   // setting is globbed against process.cwd(), so it only resolves when lint runs
   // from the workspace root and misfires again from inside an app — which is how
-  // FEATURE_MODULE_CONTRACT.md §7.4 tells people to run it.
+  // FEATURE_MODULE_CONTRACT.md §6.4 tells people to run it.
   {
     rules: {
       "@next/next/no-html-link-for-pages": "off",

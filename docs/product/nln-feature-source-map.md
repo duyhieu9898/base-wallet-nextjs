@@ -6,7 +6,7 @@ This document serves as the **master intake map** linking local draft specificat
 
 > **Neura System (`NLN-181_project1-neura`) is IN SCOPE and being developed in parallel with N+ System.** It is a Solana-based NRA ⇄ NRA Staking Platform (Project 1). EVM-based apps (`N+`, `Neura Link`) share `@nln/web3-evm`, while Solana-based apps (`Neura`) will adopt `@nln/web3-solana` when implemented.
 
-It also records **product-side candidates** for a shared Base Foundation Package. Those are candidates, not policy: this is an application/product document, and per `EXTENSION_CONTRACT.md` §10 it cannot set foundation policy. Foundation authority lives in `docs/foundation/` (`ARCHITECTURE.md`, `CAPABILITIES.md`, `EXTENSION_CONTRACT.md`, `decisions/`); the build sequence lives in [foundation-multi-app-execution.md](../plans/active/foundation-multi-app-execution.md). Where this file and those disagree, they win.
+It also records **product-side candidates** for a shared Base Foundation Package. Those are candidates, not policy: this is an application/product document, and per `EXTENSION_CONTRACT.md` §10 it cannot set foundation policy. Foundation authority lives in `docs/foundation/` (`ARCHITECTURE.md`, `CAPABILITIES.md`, `EXTENSION_CONTRACT.md`, `FEATURE_MODULE_CONTRACT.md`, `decisions/`, `evm/`); the build sequence lives in [foundation-multi-app-execution.md](../plans/active/foundation-multi-app-execution.md). Where this file and those disagree, they win.
 
 ---
 
@@ -26,9 +26,9 @@ It also records **product-side candidates** for a shared Base Foundation Package
                   ┌────────────────────────────────┐ ┌────────────────────────────────┐
                   │   N+ System (NLN-1 — đang làm) │ │ Neura Link System (NLN-180 — sau)│
                   │ ────────────────────────────── │ │ ────────────────────────────── │
-                  │ • Lending: USDT ⇄ USDT         │ │ • Membership: 5 NFT Tiers      │
-                  │ • Staking: NRA ⇄ USDT          │ │ • Staking: NRA ⇄ USDT          │
-                  │ • MLM: Unilevel Personal/Team  │ │ • MLM: Full 5-Rank / 5-Reward  │
+                  │ • Staking: Flexible USDT       │ │ • Membership: 5 NFT Tiers      │
+                  │ • MLM: Unilevel Personal/Team  │ │ • Staking: NRA ⇄ USDT          │
+                  │   (no Lending, no NFT tier)    │ │ • MLM: Full 5-Rank / 5-Reward  │
                   └────────────────────────────────┘ └────────────────────────────────┘
 ```
 
@@ -86,7 +86,6 @@ It also records **product-side candidates** for a shared Base Foundation Package
 | **Foundation** | RPC Health & Telemetry           |             ✅             |            ✅             |             ✅             |                 App `reportError` (`0017`) — §4.2                 |
 | **Membership** | 5 NFT Tiers Purchase & Upgrade   |             ❌             |            ❌             |    ✅ (Bronze..Diamond)    |                        Application Package                        |
 | **Staking**    | Staking Platform                 | ✅ (Flexible USDT Staking) | ✅ (Solana NRA/NRA Pools) | ✅ (NRA/USDT + NFT Boost)  |                 Feature-local — REJECT (§6 evid.)                 |
-| **Lending**    | Lending Protocol                 |             ❌             |            ❌             |             ❌             |                        Application Package                        |
 | **MLM Tree**   | Unilevel Tree Structure          |     ✅ (Unilevel Tree)     |            ❌             |   ✅ (Unilevel + Series)   |                  Backend/indexer — REJECT (§4.3)                  |
 | **MLM Rank**   | Rank System                      |   ✅ (Monthly P/T Rank)    |            ❌             | ✅ (NFT/Sales/Effective/T) |                        Application Package                        |
 | **MLM Reward** | Referral & Unilevel Team Bonus   |   ✅ (Team Bonus L1-L3)    |            ❌             | ✅ (5-Tier Reward Engine)  |                  Backend/indexer — REJECT (§4.3)                  |
@@ -144,12 +143,13 @@ To scale efficiently across **N+ System** and **Neura Link System**, we evaluate
 
 1. **Multi-step Web3 Workflows**:
    - _Neura Link (P2)_: Buying or upgrading Membership NFT requires: `USDT.approve(spender, amount)` ➔ `NFTMarketplace.buyOrUpgrade(tierId)`.
-   - _Neura Link & N+ (P2, P3)_: Staking NRA ⇄ USDT requires: `USDT.approve(stakingContract, amount)` ➔ `StakingPool.stake(amount)`.
-   - _N+ (P3)_: Lending USDT requires: `USDT.approve(lendingPool, amount)` ➔ `LendingPool.deposit(amount)`.
+   - _Neura Link (P2)_: Staking NRA ⇄ USDT requires: `USDT.approve(stakingContract, amount)` ➔ `StakingPool.stake(amount)`.
+   - _N+ (P3)_: Flexible USDT Staking requires: `USDT.approve(stakingContract, amount)` ➔ `StakingPool.stake(amount)`.
 
    Shared **shape** is not a shared invariant: membership upgrade carries a prior
-   tier, lending carries health factor and collateral, staking carries lock
-   duration. Collapsing them early is what `EXTENSION_CONTRACT.md` §5.4 forbids.
+   tier, N+ staking carries PV accrual and a rank-derived unstake limit, Neura
+   Link staking carries lock duration and an NFT-tier APY boost. Collapsing them
+   early is what `EXTENSION_CONTRACT.md` §5.4 forbids.
 
 2. **Standardized Transaction State Pipeline**:
    - Per-flow lifecycle already owned by the foundation (`0008`) and reviewed
@@ -193,7 +193,7 @@ To scale efficiently across **N+ System** and **Neura Link System**, we evaluate
 #### Observed need (why it is on the list):
 
 1. **RPC Reliability & Failover Pools**:
-   - Web3 dApps handling MLM unilevel queries, live APY updates, and lending health factors incur heavy RPC call volumes.
+   - Web3 dApps handling MLM unilevel queries and live APY updates incur heavy RPC call volumes.
    - Provides a multi-endpoint RPC fallback pool (Primary RPC ➔ Backup RPC 1 ➔ Backup RPC 2) with automated health scoring and latency ranking.
    - Mitigates rate-limiting (`429 Too Many Requests`) via client-side request batching and exponential backoff strategies.
 2. **Web3 Observability & Telemetry**:
@@ -244,6 +244,6 @@ runtime actually exists; a Solana runtime, when required, becomes a parallel
    - Track 0 package-readiness on `@nln/web3-evm` (config injection, no module-load init, UI/i18n decoupling, two-tier history), then Track 1 workspace migration. See execution plan §4–§5.
    - `@nln/transaction-planner` and `@nln/rpc-observability` are **not** in this phase — see the verdicts in §4.
 2. **Phase 2 (N+ System Implementation — `apps/n-plus` & `apps/n-plus-admin`)**:
-   - Implement USDT ⇄ USDT Lending, NRA ⇄ USDT Staking, and Personal/Team Rank Unilevel MLM.
+   - Implement Flexible USDT Staking and Personal/Team Rank Unilevel MLM. No Lending, no NFT membership — see §1.1.
 3. **Phase 3 (Neura Link System Implementation — `apps/neura-link` & `apps/neura-link-admin`)**:
    - Implement NFT Membership (5 tiers + upgrade), NRA ⇄ USDT Staking, and full 5-Rank / 5-Reward Unilevel MLM.

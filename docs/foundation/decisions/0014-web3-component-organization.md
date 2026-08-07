@@ -1,5 +1,9 @@
 # 0014 Web3 component organization
 
+Scope: **family-neutral.** Ranh giới là design-system dependency, không phải
+semantics của một chain family — nên nó áp dụng cho mọi family package.
+`@nln/web3-evm` là instance hiện tại.
+
 ## Purpose
 
 Components mang tên `Web3Lab*` hoặc gắn chặt vào playground không tái sử dụng được trong dApp thật. Playground phải gỡ được khỏi production mà không kéo theo các component sản phẩm.
@@ -9,8 +13,8 @@ Components mang tên `Web3Lab*` hoặc gắn chặt vào playground không tái 
 Ranh giới là **design system dependency**, không phải EVM semantics.
 
 ```text
-Foundation (@nln/web3-evm)   hook · domain state · type · pure model · state derivation
-Application               mọi presentation render bằng design system
+Family package (vd @nln/web3-evm)   hook · domain state · type · pure model · state derivation
+Application                         mọi presentation render bằng design system
 ```
 
 Foundation **không export presentation**. Component render bằng `@/components/ui`,

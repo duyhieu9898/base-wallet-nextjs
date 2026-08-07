@@ -1,12 +1,17 @@
-# Foundation Adoption
+# Foundation Adoption — `apps/n-plus`
+
+Application: `n-plus` (N+ System product application).
 
 Foundation: `base-wallet-nextjs`, maintained in this repository.
 
 Foundation version: the application and foundation share the same Git commit.
 
+The admin application has its own record:
+[`../n-plus-admin/foundation-adoption.md`](../n-plus-admin/foundation-adoption.md).
+
 ## Adopted runtime
 
-- EVM runtime is adopted.
+- `@nln/web3-evm`. Full runtime: provider, wallet connection, reads and writes.
 
 ## Supported networks and default network
 

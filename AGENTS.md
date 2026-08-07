@@ -7,15 +7,17 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Current State & Ecosystem Vision
 
-- **Present Stage**: Hardening the single EVM foundation, `@nln/web3-evm` (network/token registry, SIWE auth, Wagmi/Viem providers, read/write hooks, transaction lifecycle). It currently lives at `src/web3/evm/` and is not yet a workspace package.
+- **Present Stage**: Hardening the single EVM runtime, `@nln/web3-evm` (network/token registry, Wagmi/Viem provider, read/write hooks, transaction lifecycle, error taxonomy). It is a workspace package at `packages/web3-evm/`. SIWE auth is application-owned (`apps/n-plus/src/features/auth/`), not part of the package.
 - **Target**: One pnpm workspace monorepo, shared packages (`@nln/web3-evm`, `@nln/web3-solana`) serving **6 applications** (3 product + 3 admin). Not separate repositories — see the execution plan §1.
-  1. **N+ System** — in progress, `apps/n-plus` & `apps/n-plus-admin`: USDT ⇄ USDT Lending, NRA ⇄ USDT Staking, Unilevel MLM (Personal & Team Ranks).
+  1. **N+ System** — in progress, `apps/n-plus` & `apps/n-plus-admin`: Flexible USDT Staking, Unilevel MLM (Personal & Team Ranks). No Lending, no NFT membership.
   2. **Neura System** — in progress in parallel, `apps/neura` & `apps/neura-admin`: Solana NRA ⇄ NRA Staking Platform (Multi-Pools, Fixed/Flexible Terms, Claim/Compound, Reservation).
   3. **Neura Link System** — after N+ & Neura, `apps/neura-link` & `apps/neura-link-admin`: 5 NFT Membership Tiers, NRA ⇄ USDT Staking, Full 5-Rank / 5-Reward Unilevel MLM.
-- **No other `@nln/*` package is approved.** `transaction-planner`, `rpc-observability`, `mlm-sdk`, `staking-sdk` and `ui-components` are DEFER/REJECT candidates. Before proposing one, answer: **has a second consumer been implemented?** Evidence and verdicts: [package-scope-evidence.md](file:///home/hieund/Documents/BAP/NLN/nln-frontend/docs/foundation/package-scope-evidence.md).
-- **Authority order**: `docs/foundation/` (`ARCHITECTURE.md`, `CAPABILITIES.md`, `EXTENSION_CONTRACT.md`, `decisions/`) → current code → `docs/plans/`. Product documents, including the source map, never set foundation policy (`EXTENSION_CONTRACT.md` §10).
-- **Build sequence**: [foundation-multi-app-execution.md](file:///home/hieund/Documents/BAP/NLN/nln-frontend/docs/plans/active/foundation-multi-app-execution.md).
-- **Product blueprint**: [nln-feature-source-map.md](file:///home/hieund/Documents/BAP/NLN/nln-frontend/docs/product/nln-feature-source-map.md) — intake map of draft specs, read for product scope, not for foundation policy.
+- **Three separate layers.** Do not conflate them: **foundation** (family-neutral rules, `docs/foundation/`) ≠ **family runtime** (`docs/foundation/evm/`, later `docs/foundation/solana/`) ≠ **which runtime an application adopts** (`docs/ARCHITECTURE.md`). A rule naming `receipt`, `chainId`, ERC-20, allowance, Wagmi or Viem is an EVM runtime rule and belongs under `docs/foundation/evm/`.
+- **No other `@nln/*` package is approved.** `transaction-planner`, `rpc-observability`, `mlm-sdk`, `staking-sdk` and `ui-components` are DEFER/REJECT candidates. Before proposing one, answer: **has a second consumer been implemented?** Evidence and verdicts: [package-scope-evidence.md](docs/foundation/package-scope-evidence.md).
+- **Authority order**: `docs/foundation/` (`ARCHITECTURE.md`, `CAPABILITIES.md`, `EXTENSION_CONTRACT.md`, `FEATURE_MODULE_CONTRACT.md`, `decisions/`, and the per-family `evm/` subtree) → current code → `docs/plans/`. Product documents, including the source map, never set foundation policy (`EXTENSION_CONTRACT.md` §10).
+- **Application architecture** (app ↔ runtime mapping, dependency direction): [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+- **Build sequence**: [foundation-multi-app-execution.md](docs/plans/active/foundation-multi-app-execution.md).
+- **Product blueprint**: [nln-feature-source-map.md](docs/product/nln-feature-source-map.md) — intake map of draft specs, read for product scope, not for foundation policy.
 
 <!-- HARNESS:BEGIN -->
 

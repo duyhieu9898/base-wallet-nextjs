@@ -2,16 +2,39 @@
 
 Tài liệu này là **Single Source of Truth (SSOT)** duy nhất cho phạm vi capability và trạng thái hỗ trợ runtime (EVM vs Solana) của reusable Web3 foundation.
 
-Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó chỉ định nghĩa các capability mà foundation này lựa chọn hỗ trợ. Tất cả các tài liệu khác (`ARCHITECTURE.md`, `README.md`, `nln-feature-source-map.md`, `plans/`) phải trỏ về file này thay vì tự định nghĩa hoặc lặp lại trạng thái runtime/capability.
+Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó chỉ định nghĩa các capability mà foundation này lựa chọn hỗ trợ. Tất cả các tài liệu khác — `ARCHITECTURE.md`, `README.md`, `../ARCHITECTURE.md`, các tài liệu runtime dưới `evm/`, `nln-feature-source-map.md`, `plans/` — phải trỏ về file này thay vì tự định nghĩa hoặc lặp lại trạng thái runtime/capability.
 
 ## Trạng thái
 
-| Trạng thái          | Ý nghĩa                                                             |
-| ------------------- | ------------------------------------------------------------------- |
-| `Ready`             | Đã được triển khai trong foundation                                 |
-| `Deferred`          | Có thể bổ sung khi có consumer hoặc operational requirement rõ ràng |
-| `Product-dependent` | Thuộc application hoặc feature cụ thể                               |
-| `Non-goal`          | Không trở thành trách nhiệm mặc định của foundation                 |
+| Trạng thái          | Ý nghĩa                                                                                          |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| `Ready`             | Executable runtime hoàn chỉnh, đạt definition of done                                            |
+| `In Progress`       | Implementation đã tồn tại nhưng chưa đạt definition of done                                      |
+| `Planned`           | Requirement đã được chấp nhận và ghi nhận; implementation chưa bắt đầu                           |
+| `Deferred`          | Chưa có requirement được chấp nhận; bổ sung khi có consumer hoặc operational requirement rõ ràng |
+| `Product-dependent` | Thuộc application hoặc feature cụ thể                                                            |
+| `Non-goal`          | Không trở thành trách nhiệm mặc định của foundation                                              |
+
+Lifecycle một chiều:
+
+```text
+Deferred → Planned → In Progress → Ready
+```
+
+Không bao giờ ghi một ô ở dạng `In Progress / Ready`. Một capability ở đúng một
+trạng thái tại một thời điểm; nếu không xác định được thì trạng thái là cái thấp
+hơn.
+
+Điều kiện chuyển trạng thái của một chain-family runtime:
+
+- `Deferred → Planned`: application requirement được chấp nhận **và** ghi nhận
+  theo [`CHAIN_FAMILY_TEMPLATE.md`](CHAIN_FAMILY_TEMPLATE.md) mục "Before writing
+  code". Chưa có record đó thì chưa phải `Planned`.
+- `Planned → In Progress`: package tồn tại và code đã bắt đầu.
+- `In Progress → Ready`: đạt "Definition of done" của `CHAIN_FAMILY_TEMPLATE.md`
+  — provider, selection state, ít nhất một read và một write flow thật,
+  confirmation evidence, typed errors, focused tests, application adoption
+  documentation.
 
 ## Implementation status
 
@@ -20,12 +43,17 @@ Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó ch
 | Foundation/application separation    | Ready             |
 | Chain-family module boundary         | Ready             |
 | EVM module (`@nln/web3-evm`)         | Ready             |
-| Solana module (`@nln/web3-solana`)   | Deferred          |
+| Solana module (`@nln/web3-solana`)   | Planned           |
 | EVM multi-network registry           | Ready             |
 | EVM read/write lifecycle             | Ready             |
 | Chain-family implementation template | Ready             |
 | Multi-family provider composition    | Deferred          |
 | Cross-family application UX          | Product-dependent |
+
+`@nln/web3-solana` là `Planned`: requirement của Neura System đã được chấp nhận
+và ghi tại [`solana-runtime-requirement.md`](solana-runtime-requirement.md).
+Chưa có package, chưa có code. Nó chuyển sang `In Progress` khi
+`packages/web3-solana/` tồn tại.
 
 ```text
 EVM runtime tồn tại
@@ -126,7 +154,18 @@ foundation bị khóa cứng vào một EVM dApp
 - Storage side-effect isolation.
 - Maximum history size và deduplication.
 
-## Ready application shell
+## Reference application shell — **không phải capability của foundation package**
+
+Các mục dưới đây thuộc `apps/n-plus`, không thuộc `@nln/web3-evm` hay bất kỳ
+family package nào. Decision `0014` chốt: foundation không export presentation;
+application sở hữu presentation. Chúng được liệt kê ở đây vì chúng là reference
+implementation kèm theo repository, và một application adopt runtime có thể copy,
+thay thế hoặc bỏ hẳn chúng.
+
+Hệ quả quan trọng cho family runtime thứ hai: `@nln/web3-solana` **không** cần
+i18n, toast, component hay web3-lab để được coi là một runtime. Definition of
+done nằm ở `CHAIN_FAMILY_TEMPLATE.md`, và không mục nào trong danh sách này thuộc
+đó.
 
 - Reusable Web3 domain components.
 - Transaction feedback provider for UI-only write progress. A feature calls
@@ -205,7 +244,7 @@ Trigger để xem xét lại:
 
 Foundation generic schema, deployment types và validation helpers đã **Ready** tại `@nln/web3-evm` (`packages/web3-evm/src/contracts/`).
 
-Application contract deployment registry data thuộc phạm vi **Product-dependent** (đã active tại `apps/n-plus/src/contracts/registry/deployments.json`). Foundation không lưu trữ hay hardcode hợp đồng sản phẩm của ứng dụng. Quy tắc tổ chức nằm trong `decisions/0016-feature-contract-registry.md`.
+Application contract deployment registry data thuộc phạm vi **Product-dependent** (đã active tại `apps/n-plus/src/contracts/registry/deployments.json`). Foundation không lưu trữ hay hardcode hợp đồng sản phẩm của ứng dụng. Quy tắc tổ chức nằm trong `evm/decisions/0016-feature-contract-registry.md`.
 
 ### Approval orchestration for feature writes
 
@@ -233,11 +272,14 @@ Chỉ thêm khi deterministic integration tests trở nên cần thiết.
 
 Hook/domain invariants hiện được ưu tiên. Application cụ thể bổ sung UI tests theo user flows thật.
 
-### Additional chain-family runtime
+### Additional chain-family runtime beyond Solana
 
-Chỉ triển khai khi có application requirement. Start from
-`CHAIN_FAMILY_TEMPLATE.md`; do not add an SDK, metadata
-catalog, or universal multi-chain type beforehand.
+Solana không còn nằm ở mục này — nó đã là `Planned`, xem bảng
+"Implementation status".
+
+Một family thứ ba chỉ triển khai khi có application requirement được chấp nhận và
+ghi nhận theo `CHAIN_FAMILY_TEMPLATE.md`. Không thêm SDK, metadata catalog hay
+universal multi-chain type trước đó.
 
 ### Multi-network EVM application
 

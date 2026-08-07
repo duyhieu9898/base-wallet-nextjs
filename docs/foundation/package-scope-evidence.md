@@ -2,7 +2,7 @@
 
 **Đây không phải authority document và không phải plan.** Nó lưu trữ các verdict "chưa tạo package nào" còn hiệu lực.
 
-Authority vẫn là `ARCHITECTURE.md`, `CAPABILITIES.md`, `EXTENSION_CONTRACT.md` và `decisions/`. Kế hoạch thi công nằm ở [foundation-multi-app-execution.md](../plans/active/foundation-multi-app-execution.md).
+Authority vẫn là `ARCHITECTURE.md`, `CAPABILITIES.md`, `EXTENSION_CONTRACT.md`, `decisions/` và `evm/decisions/`. Kế hoạch thi công nằm ở [foundation-multi-app-execution.md](../plans/active/foundation-multi-app-execution.md).
 
 ## Trạng thái kiến trúc
 
@@ -47,7 +47,6 @@ Thang: `Planned` = có tên trong source map · `Specified` = có screen/busines
 | RPC fallback                | Planned        | Planned        | **0**                                              | ❌                        |
 | Observability / telemetry   | Planned        | Planned        | **0**                                              | ❌                        |
 | Staking SDK                 | Planned        | Planned        | **1** demo, test ABI                               | ❌                        |
-| Lending                     | Specified (UI) | —              | **0**                                              | ❌                        |
 | Membership NFT              | —              | Specified (UI) | **0**                                              | ❌                        |
 | MLM tree / rank / reward    | Specified (UI) | Specified (UI) | **0**                                              | ❌                        |
 | UI primitives               | Planned        | Planned        | **1** — 4 shadcn primitive                         | ❌                        |
@@ -71,7 +70,7 @@ Ma trận này là công cụ trả lời câu "sao chưa tách package X?" — 
 | Safety invariants phải giữ       | Approval và primary transaction là hai authorization riêng, review riêng, wallet prompt riêng; primary bị khóa tới khi **approval receipt** chứng minh success — hash không đủ; duplicate-submit guard; stale-operation isolation; receipt là terminal evidence; side effect once-per-hash. |
 | Forbidden generic APIs           | `useTransaction(arbitraryAbi, fn, callbacks)`; auto-approve-then-submit trong một tương tác; "execution graph" nhận mọi contract call; nonce management/replacement; giả định mọi ERC-20/NFT action đều cần approval.                                                                       |
 
-Về luận cứ "cả ba flow đều là `approve → primary`": đó là **hình dạng**, không phải invariant. Membership upgrade có state trước đó (tier hiện tại), lending có health factor và collateral, staking có lock duration. Gộp sớm chính là điều `EXTENSION_CONTRACT.md` §5.4 cấm — "abstraction không được che mất contract/domain differences".
+Về luận cứ "các flow đều là `approve → primary`": đó là **hình dạng**, không phải invariant. Membership upgrade có state trước đó (tier hiện tại), N+ staking có PV accrual và unstake limit theo rank, Neura Link staking có lock duration và APY boost theo NFT tier. Gộp sớm chính là điều `EXTENSION_CONTRACT.md` §5.4 cấm — "abstraction không được che mất contract/domain differences".
 
 Đường đi khi có specs: pilot **feature-local lần thứ hai** viết độc lập, rồi so sánh hai implementation. Duplication thật xuất hiện ở đâu thì promote đúng chỗ đó. Execution plan §7 là kế hoạch cho đúng việc này.
 
@@ -113,16 +112,16 @@ Không được làm tạm: fallback im lặng che read failure — vi phạm "N
 
 Đây là phần được hỏi lại nhiều nhất. Mỗi dòng có evidence ở §3.
 
-| Proposed package           | Verdict             | Evidence / Role                                                                                                                                                                   |
-| -------------------------- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@nln/web3-evm`            | **Accepted**        | Foundation package cho EVM apps (`n-plus`, `neura-link`).                                                                                                                         |
-| `@nln/web3-solana`         | **Accepted Target** | Ứng viên Sibling foundation package khi dApp Solana (`neura`, `neura-admin`) triển khai theo `CHAIN_FAMILY_TEMPLATE.md`. Trạng thái hiện tại: `Deferred` (xem `CAPABILITIES.md`). |
-| `@nln/staking-sdk`         | **REJECT**          | Cả N+ và Neura Link đều chưa có ABI, chưa có địa chỉ. Deployment duy nhất là `TestStakingVault test-v1`. Chia sẻ theo tên "staking" là điều `EXTENSION_CONTRACT.md` §5 cấm thẳng. |
-| `@nln/mlm-sdk`             | **REJECT**          | 0 dòng code MLM trong `src/`. Tree traversal + rank calculation là indexer/backend domain. Chưa có contract, chưa có API contract, chưa có consumer.                              |
-| `@nln/rpc-observability`   | **REJECT**          | `grep -rln "reportError\|observability" src/` → 0 hit. `0017`: reporter chỉ thêm khi có production observability requirement.                                                     |
-| `@nln/ui-components`       | **DEFER**           | `src/components/ui/` có 4 primitive shadcn-generated. Không duplication thật, không consumer thứ hai.                                                                             |
-| `@nln/transaction-planner` | **DEFER**           | Xem §4. Một consumer.                                                                                                                                                             |
-| Shared config packages     | **DEFER**           | `tsconfig.json`, `eslint.config.mjs` phục vụ đúng một app. Extract trước khi có app thứ hai là tooling cost không đổi lấy gì.                                                     |
+| Proposed package           | Verdict             | Evidence / Role                                                                                                                                                                                                                                                   |
+| -------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nln/web3-evm`            | **Accepted**        | Foundation package cho EVM apps (`n-plus`, `neura-link`).                                                                                                                                                                                                         |
+| `@nln/web3-solana`         | **Accepted Target** | Sibling foundation package cho dApp Solana (`neura`, `neura-admin`), triển khai theo `CHAIN_FAMILY_TEMPLATE.md`. Trạng thái hiện tại: `Planned` — requirement đã ghi tại [`solana-runtime-requirement.md`](solana-runtime-requirement.md), xem `CAPABILITIES.md`. |
+| `@nln/staking-sdk`         | **REJECT**          | Cả N+ và Neura Link đều chưa có ABI, chưa có địa chỉ. Deployment duy nhất là `TestStakingVault test-v1`. Chia sẻ theo tên "staking" là điều `EXTENSION_CONTRACT.md` §5 cấm thẳng.                                                                                 |
+| `@nln/mlm-sdk`             | **REJECT**          | 0 dòng code MLM trong `src/`. Tree traversal + rank calculation là indexer/backend domain. Chưa có contract, chưa có API contract, chưa có consumer.                                                                                                              |
+| `@nln/rpc-observability`   | **REJECT**          | `grep -rln "reportError\|observability" src/` → 0 hit. `0017`: reporter chỉ thêm khi có production observability requirement.                                                                                                                                     |
+| `@nln/ui-components`       | **DEFER**           | `src/components/ui/` có 4 primitive shadcn-generated. Không duplication thật, không consumer thứ hai.                                                                                                                                                             |
+| `@nln/transaction-planner` | **DEFER**           | Xem §4. Một consumer.                                                                                                                                                                                                                                             |
+| Shared config packages     | **DEFER**           | `tsconfig.json`, `eslint.config.mjs` phục vụ đúng một app. Extract trước khi có app thứ hai là tooling cost không đổi lấy gì.                                                                                                                                     |
 
 Khi ai đó đề xuất một trong số này, câu hỏi đầu tiên là: **consumer thứ hai đã implement chưa?** — không phải "có hợp lý không".
 

@@ -1,149 +1,189 @@
-# Feature Module Contract (`FEATURE_MODULE_CONTRACT.md`)
+# Feature Module Contract
 
-This document defines the specification and boundary rules for feature modules across applications in the NLN ecosystem.
+This document defines the boundary rules for feature modules in every NLN
+application, on every chain family.
+
+It is family-neutral by construction. A rule that can only be stated with the
+words `receipt`, `chainId`, ERC-20, allowance, spender, Wagmi or Viem is not in
+this document — it belongs to the runtime that owns those concepts:
+
+- EVM: [`evm/FEATURE_MODULE_CONTRACT.md`](evm/FEATURE_MODULE_CONTRACT.md)
+
+A feature module must satisfy **this** contract plus the contract of the runtime
+its application adopted. Which application adopts which runtime:
+[`../ARCHITECTURE.md`](../ARCHITECTURE.md) §2.
 
 ---
 
-## 1. Executive Summary & Goals
+## 1. Purpose
 
-Feature modules encapsulate discrete business capabilities (e.g., Staking, Membership, Lending, MLM). To enable high maintainability and safe feature copying between applications, feature modules MUST follow a standardized anatomy and a formal **Host Capability Contract**.
+Feature modules encapsulate discrete business capabilities — staking, membership,
+MLM rank and reward, treasury operations. To stay maintainable and to survive
+being copied into another application, they follow a standard anatomy and a
+formal host capability contract.
 
 ---
 
 ## 2. Host Capability Contract
 
-Feature modules do not exist in isolation; they run within host applications. To remain portable and decoupled from host application internals, a feature module MAY ONLY depend on the approved **5 Host Capabilities**:
+A feature module runs inside a host application. To stay portable and decoupled
+from host internals, it may depend only on the five approved host capabilities:
 
-| Host Capability             | Import Path                                                                                                                                | Purpose                                                                                       |
-| :-------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------- |
-| **EVM Foundation**          | `@nln/web3-evm` (or leaf paths `@nln/web3-evm/address`, `@nln/web3-evm/errors`, `@nln/web3-evm/errors/adapter`, `@nln/web3-evm/contracts`) | Network selection, wallet connection, EVM reads, writes, transaction history, error taxonomy. |
-| **Contract Registry**       | `@/contracts/registry/contract-registry`                                                                                                   | Host deployment addresses and contract ABI resolution.                                        |
-| **Shared UI Primitives**    | `@/components/ui/{button,input,...}`                                                                                                       | Design system UI primitives.                                                                  |
-| **Transaction Feedback UI** | `@/components/web3/common/transaction-feedback`                                                                                            | Host transaction feedback modal, drawer, and status presentation.                             |
-| **Translation Hook**        | `@/i18n/use-translation`                                                                                                                   | Public translation hook (`useTranslation`). Feature modules MUST NOT import `i18n-provider`.  |
+| Host Capability             | Purpose                                                                                                                                             |
+| :-------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Chain-family runtime**    | The `@nln/web3-<family>` package the application adopted: network selection, wallet connection, reads, writes, transaction history, error taxonomy. |
+| **Contract Registry**       | `@/contracts/registry/contract-registry` — host deployment addresses and contract/program resolution.                                               |
+| **Shared UI Primitives**    | `@/components/ui/{button,input,...}` — design system primitives.                                                                                    |
+| **Transaction Feedback UI** | `@/components/web3/common/transaction-feedback` — host transaction feedback surface.                                                                |
+| **Translation Hook**        | `@/i18n/use-translation` — public translation hook. Feature modules must not import `i18n-provider`.                                                |
 
-### Feature Import Restrictions
+Exactly one chain-family runtime appears in this list for a given application,
+and it is the one that application adopted. A feature in an EVM application
+depends on `@nln/web3-evm`; a feature in a Solana application depends on
+`@nln/web3-solana`. A feature never depends on a runtime its host did not adopt,
+and never on two.
 
-Feature modules MUST NOT import:
+### Import restrictions
+
+Feature modules must not import:
 
 - Host application pages or App Router layouts (`@/app/*`).
 - Host root providers or composition wrappers (`@/providers/*`).
-- Application bootstrap leaves of the Web3 package (`@nln/web3-evm/config` or `@nln/web3-evm/provider`).
+- Application bootstrap leaves of a runtime package (its `config` or `provider`
+  entrypoints). Provider composition is the host's job.
 - Other business feature modules (`feature A ↛ feature B`).
-- Admin feature modules from product applications or vice versa.
+- Admin feature modules from product applications, or the reverse.
 
 ---
 
 ## 3. Standard Feature Module Anatomy
 
-Every feature module MUST follow this standard folder structure under `apps/<app>/src/features/<feature-name>/`:
+Every feature module follows this structure under
+`apps/<app>/src/features/<feature-name>/`:
 
 ```text
 src/features/<feature-name>/
 ├── domain/            # Domain schemas, business types, feature-specific error helpers
 ├── components/        # Feature UI components & action panels
-├── hooks/             # Feature business logic hooks (e.g., useStakingPosition, useStakingWrite)
-├── contracts/         # Feature-specific contract ABIs & deployment selectors
+├── hooks/             # Feature business logic hooks
+├── contracts/         # Feature-specific contract/program interfaces & deployment selectors
 ├── history/           # Feature business activity storage & composition
 ├── mocks/             # MSW handlers & unit test mocks
 └── index.ts           # Public barrel exporting ONLY approved public interfaces
 ```
 
-### Public Barrel (`index.ts`) Invariant
+### Public barrel invariant
 
-The `index.ts` file acts as the public boundary of the feature module. Only symbols exported from `index.ts` are accessible to host application pages. Internal helpers, private hooks, or mock implementations MUST NOT be imported directly from deep subpaths outside the feature module.
-
----
-
-## 4. Product vs. Admin Feature Module Isolation
-
-Applications in the NLN ecosystem are categorized into **Product Applications** (`n-plus`, `neura`, `neura-link`) and **Admin Applications** (`n-plus-admin`, `neura-admin`, `neura-link-admin`).
-
-- **Product Features** (e.g., `features/staking`, `features/membership`, `features/lending`):
-  - Focus on end-user interactions: deposit, stake, claim, purchase membership, request loan.
-  - Rely on Product SIWE Auth composed at the application level.
-- **Admin Features** (e.g., `features/staking-management`, `features/membership-management`, `features/lending-management`):
-  - Focus on admin operations: pool parameter configuration, treasury actions, reward rate updates, user management.
-  - Rely on Admin RBAC Auth composed at the application level.
-
-### Rule: Zero Cross-Import Between Product & Admin Features
-
-Even when Product and Admin features relate to the same business domain (e.g. Staking), they MUST NOT import code from each other. They run in separate deployment units with different security boundaries and permission models. Shared artifacts MUST be limited to Solidity ABIs and deployment metadata.
+`index.ts` is the public boundary of the feature module. Only symbols exported
+from it are reachable by host application pages. Internal helpers, private hooks
+and mock implementations must not be imported from deep subpaths outside the
+module.
 
 ---
 
-## 5. Auth & RBAC Strategy
+## 4. Product and Admin isolation
 
-Authentication gating is composed by the host application (e.g., at page or layout composition level). A business feature module MUST NOT import `features/auth` or any other authentication feature directly.
+Applications are either **product** (`n-plus`, `neura`, `neura-link`) or
+**admin** (`n-plus-admin`, `neura-admin`, `neura-link-admin`).
 
-- **Product SIWE Auth**: Handled by host application page wrappers via SIWE session tokens.
-- **Admin RBAC Auth**: Handled by host admin application page wrappers via RBAC roles.
+- **Product features** focus on end-user interaction — stake, claim, purchase,
+  withdraw — and rely on product authentication composed at the application
+  level.
+- **Admin features** focus on operator actions — pool parameters, treasury
+  actions, reward configuration, user management — and rely on admin RBAC
+  composed at the application level.
 
----
+### Rule: zero cross-import between product and admin
 
-## 6. Feature Transaction Safety & Test Contract (8 Safety Groups)
-
-Every feature hook executing EVM transactions (such as `useStakingWrite`) MUST implement and test the following 8 standard safety lifecycle groups:
-
-1. **Preflight Readiness**: Verify network write readiness (`assertEvmWriteReady`) and verify allowance & approval state when the flow spends an ERC-20 token.
-2. **Simulation Before Request**: Perform contract simulation (`useSimulateContract`) before opening any wallet signature prompt.
-3. **Review Before Confirm**: Require explicit user review step before broadcasting transaction to wallet.
-4. **Duplicate-Submit Guard**: Prevent duplicate wallet submissions via `useEvmWriteLifecycle`.
-5. **Stale-Operation Isolation**: Isolate and reset stale operation state when connected account, chain, token, or spender changes.
-6. **Terminal Receipt Evidence**: Treat transaction receipt as the sole terminal evidence for success/revert, never concluding success solely from transaction hash.
-7. **Once-Per-Hash Side Effects**: Ensure history storage and domain callbacks execute exactly once per mined transaction hash.
-8. **Targeted Cache Invalidation**: Run targeted QueryClient invalidation (`buildEvmWriteInvalidationFilters`) upon receipt confirmation without purging unrelated global caches.
+Even for the same business domain, product and admin features must not import
+from each other. They are separate deployment units with different security
+boundaries and permission models. Shared artefacts are limited to contract
+ABIs/IDLs and deployment metadata.
 
 ---
 
-## 7. Copy Checklist
+## 5. Feature transaction safety obligations
 
-The reason this contract exists is that a feature module must survive being
-copied into another application. `features/staking` is the reference
-implementation for that — a reference, not a shared SDK. Follow this in order.
+These obligations hold for **every** feature that submits a transaction, on any
+chain family. They are stated as obligations, not as mechanisms; the runtime
+supplies the mechanism, and the runtime's own feature contract names it.
 
-### 7.1. Copy the shape, not the business logic
+1. **Preflight readiness.** Verify the runtime reports write readiness before
+   building a transaction, and verify any authorization state the flow depends
+   on.
+2. **Preflight simulation.** Simulate or dry-run against the connected account
+   before opening a wallet signature prompt. Never open a wallet prompt for a
+   transaction that has not been checked.
+3. **Review before confirm.** Require an explicit user review step before
+   broadcasting. A feature never collapses prepare and submit into one action.
+4. **Duplicate-submit guard.** A single user intent produces at most one
+   submission. Guarding must not depend on React render timing.
+5. **Stale-operation isolation.** When the connected account, network, or any
+   input the submission was built from changes, the in-flight operation is
+   isolated and reset. A result must never be attributed to the wrong context.
+6. **Terminal evidence only.** A feature concludes success or failure only from
+   the terminal confirmation evidence its runtime defines. A submission
+   identifier returned by a wallet or provider is not that evidence.
+7. **Once-per-submission side effects.** History writes and domain callbacks run
+   exactly once per confirmed submission, keyed by that submission's terminal
+   reference.
+8. **Targeted cache invalidation.** On confirmation, invalidate only the queries
+   the transaction affected. Never purge unrelated global cache.
 
-| Copy                                | Do not copy                                          |
-| :---------------------------------- | :--------------------------------------------------- |
-| Folder anatomy (§3)                 | Contract ABIs and prepared call data                 |
-| Write lifecycle wiring (§6)         | Business rules — lock periods, tiers, health factors |
-| Test contract — all 8 safety groups | Domain errors specific to the source feature         |
-| Public barrel discipline            | Deployment addresses                                 |
+Obligations 3, 4, 5 and 7 are behavioural and identical across families.
+Obligations 1, 2, 6 and 8 are behavioural too, but their evidence and API differ
+per family — the runtime's feature contract states which call satisfies each.
 
-Copying `use-staking-write.ts` wholesale carries staking's own assumptions into a
+Skipping any of these is not a faster feature. It is a different and less safe
+transaction model.
+
+---
+
+## 6. Copy Checklist
+
+This contract exists because a feature module must survive being copied into
+another application. Copy within the same chain family; a feature does not port
+across families, because its contract interactions do not.
+
+### 6.1. Copy the shape, not the business logic
+
+| Copy                              | Do not copy                                           |
+| :-------------------------------- | :---------------------------------------------------- |
+| Folder anatomy (§3)               | Contract ABIs/IDLs and prepared call data             |
+| Write lifecycle wiring (§5)       | Business rules — lock periods, tiers, rank thresholds |
+| Test contract — all 8 obligations | Domain errors specific to the source feature          |
+| Public barrel discipline          | Deployment addresses                                  |
+
+Copying a write hook wholesale carries the source feature's assumptions into a
 feature that does not share them. Take its structure and its tests; write the
-builders, ABIs and domain errors for the new contract.
+builders, interfaces and domain errors for the new contract.
 
-### 7.2. Before copying — check the target application
+### 6.2. Before copying — check the target application
 
-The module depends on 5 host capabilities (§2). A target application missing any
-of them will fail to compile, and the person copying should not have to guess
-which import is the problem:
+The module depends on the five host capabilities (§2). A target application
+missing any of them fails to compile, and the person copying should not have to
+guess which import is the problem:
 
 ```text
-□ @nln/web3-evm            declared in the app's package.json
+□ the adopted @nln/web3-<family> package   declared in the app's package.json
 □ @/contracts/registry/contract-registry   exists, or is created with the feature
 □ @/components/ui/{button,input}           design system primitives present
 □ @/components/web3/common/transaction-feedback   host feedback surface present
 □ @/i18n/use-translation                   translation hook present
 ```
 
-Direct npm dependencies the reference module uses — the target app must declare
-each one it actually imports, not rely on resolving them through a parent
-directory (that is a phantom dependency, and it breaks when the app moves):
+Direct npm dependencies must each be declared by the target app, not resolved
+through a parent directory — that is a phantom dependency and it breaks when the
+app moves. Which dependencies those are is family-specific; the runtime's
+feature contract lists them.
+
+### 6.3. After copying — rewire
 
 ```text
-react · wagmi · viem · @tanstack/react-query
-```
-
-### 7.3. After copying — rewire
-
-```text
-□ Add the contract to the app's src/contracts/registry/deployments.json,
-  keyed by chain ID and contract key (0016)
-□ Add the ABI under the feature's own contracts/ folder — a feature owns its ABI,
-  the registry owns the deployment metadata
+□ Add the contract to the app's contract deployment registry, keyed by
+  network and contract key (0016)
+□ Add the interface (ABI/IDL) under the feature's own contracts/ folder — a
+  feature owns its interface, the registry owns the deployment metadata
 □ Rewrite the feature's deployment selector for the new contract key
 □ Replace domain types, builders and errors — they are contract-specific
 □ Keep the public barrel: export only what host pages need
@@ -152,7 +192,7 @@ react · wagmi · viem · @tanstack/react-query
 Self-imports through `@/features/<name>/...` need no rewiring: `@/` resolves
 inside each application, so they keep pointing at the copy.
 
-### 7.4. Verify — the copy is not done until these pass
+### 6.4. Verify — the copy is not done until these pass
 
 ```text
 □ pnpm --filter <app> typecheck
@@ -161,12 +201,7 @@ inside each application, so they keep pointing at the copy.
 □ pnpm --filter <app> build
 ```
 
-Lint is doing real work here, not style checking. It is what catches the two
-mistakes this contract exists to prevent: importing another feature, and
-importing across applications. Both are errors, and both cover relative traversal
-as well as the alias — `../../other-app/src/...` resolves for real in a workspace.
-
-The 8 safety groups (§6) are not optional for a copied feature. A write flow that
-skips simulation, review or receipt evidence is not a faster version of the
-reference — it is a different and less safe transaction model, and `0011` and
-`0015` forbid it regardless of which application it lives in.
+Lint is doing real work here, not style checking. It catches the two mistakes
+this contract exists to prevent: importing another feature, and importing across
+applications. Both are errors, and both cover relative traversal as well as the
+alias — `../../other-app/src/...` resolves for real in a workspace.

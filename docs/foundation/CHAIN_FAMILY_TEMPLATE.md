@@ -29,6 +29,12 @@ two implemented families prove that an invariant and semantics are identical.
 
 ## Before writing code
 
+Record the application requirement and decide the seven items below. Until that
+record exists, the family is not authorised to start and `CAPABILITIES.md` cannot
+list it above `Deferred`.
+
+Current example: [`solana-runtime-requirement.md`](solana-runtime-requirement.md).
+
 Record the application requirement and decide:
 
 1. supported networks and wallet connectors;
@@ -42,7 +48,11 @@ Record the application requirement and decide:
 ## Definition of done
 
 The family becomes an executable runtime only when it has a provider,
-selection state, at least one real read and write flow, receipt/confirmation
-evidence, typed errors, focused tests, and application adoption documentation.
+selection state, at least one real read and write flow, its own defined terminal
+confirmation evidence, typed errors, focused tests, and application adoption
+documentation. Terminal evidence means whatever that chain actually proves
+execution with — do not assume it is a receipt, and do not borrow another
+family's definition.
+
 Until then, keep this template unchanged and do not add SDK dependencies or
 metadata catalogs.

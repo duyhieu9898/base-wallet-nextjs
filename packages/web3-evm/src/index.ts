@@ -27,7 +27,7 @@
  * ## Tier B — Feature Extension API
  *
  * Primitives for an application feature to implement its own contract-specific write
- * flow according to `docs/foundation/decisions/0015-feature-write-flows-and-approval-orchestration.md`.
+ * flow according to `docs/foundation/evm/decisions/0015-feature-write-flows-and-approval-orchestration.md`.
  *
  * Tier B is **controlled** public, not an accidental export. Tier B consumers MUST:
  *
