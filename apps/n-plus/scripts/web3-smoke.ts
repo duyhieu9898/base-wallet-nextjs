@@ -38,16 +38,14 @@ async function main() {
   // the configuration the app actually runs with. `pnpm --filter n-plus`
   // invokes it from the app directory, which is the project dir it wants.
   //
-  // The app reads configuration from `import.meta.env`, which Vite replaces at
-  // build time and Node does not define at all. Populating it here is what lets
-  // one config module serve both the bundle and this script.
-  const env = loadEnv(
-    process.env.NODE_ENV ?? "development",
-    process.cwd(),
-    "VITE_",
+  // Loaded into `process.env`, not into `import.meta.env`: the latter is
+  // per-module, so assigning it here would leave the config module's own
+  // `import.meta` untouched. `@/config/env` reads `process.env` whenever
+  // `import.meta.env` is absent, which is the case under tsx.
+  Object.assign(
+    process.env,
+    loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "VITE_"),
   )
-  const meta = import.meta as unknown as { env?: Record<string, string> }
-  meta.env = { ...(meta.env ?? {}), ...env }
 
   // Imported after the env is loaded: the config parses environment variables at
   // module scope, so importing it earlier would read an empty environment.

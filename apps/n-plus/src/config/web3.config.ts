@@ -8,6 +8,7 @@ import {
 } from "@nln/web3-evm/config"
 
 import evmTokensJson from "./evm-tokens.json"
+import { readEnv } from "@/config/env"
 
 /**
  * Application-owned Web3 configuration.
@@ -66,7 +67,7 @@ export const evmNetworks: readonly EvmNetworkConfig[] = Object.freeze([
     key: "ethereum-sepolia",
     family: "evm" as const,
     chain: sepolia,
-    rpcUrlOverride: import.meta.env.VITE_RPC_ETHEREUM_SEPOLIA || undefined,
+    rpcUrlOverride: readEnv("VITE_RPC_ETHEREUM_SEPOLIA") || undefined,
     tokens: hydrateTokens(rawEvmTokensMap[sepolia.id]),
     faucets: Object.freeze([
       {
@@ -81,7 +82,7 @@ export const evmNetworks: readonly EvmNetworkConfig[] = Object.freeze([
     key: "ethereum-mainnet",
     family: "evm" as const,
     chain: mainnet,
-    rpcUrlOverride: import.meta.env.VITE_RPC_ETHEREUM_MAINNET || undefined,
+    rpcUrlOverride: readEnv("VITE_RPC_ETHEREUM_MAINNET") || undefined,
     tokens: hydrateTokens(rawEvmTokensMap[mainnet.id]),
     faucets: Object.freeze([]),
   },
@@ -89,9 +90,7 @@ export const evmNetworks: readonly EvmNetworkConfig[] = Object.freeze([
 
 export const evmRuntimeConfig: EvmRuntimeConfig = createEvmRuntimeConfig({
   networks: evmNetworks,
-  defaultChainId: resolveDefaultEvmChainId(
-    import.meta.env.VITE_DEFAULT_CHAIN_ID,
-  ),
+  defaultChainId: resolveDefaultEvmChainId(readEnv("VITE_DEFAULT_CHAIN_ID")),
 })
 
 export const web3Config = {

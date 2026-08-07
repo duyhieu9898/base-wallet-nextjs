@@ -18,7 +18,7 @@ Bằng chứng đo được và các verdict "chưa tạo package nào" nằm �
 | App hiện tại       | Thành một app trong workspace. **Không xóa code nào**, giữ cả `web3-lab` và staking demo       |
 | Auth               | Product SIWE và admin auth là **hai candidate riêng**, promote độc lập (§6.4)                  |
 | Số application     | **3 product + 3 admin = 6**, mỗi product một admin riêng (§2)                                  |
-| Framework          | **Next.js cho cả 6**. Template UI Vite/shadcn của `shadcn-admin` viết lại routing layer (§2.2) |
+| Framework          | **Vite + React + TanStack Router cho cả 6** (§2.2)                                             |
 
 ### 1.1. Vì sao workspace thay vì publish package
 
@@ -44,7 +44,7 @@ Clone + xóa **chỉ giải quyết vế thứ nhất**. Nó không xử lý: hi
 Chính xác thì foundation **không** agnostic theo nghĩa tổng quát. Nó phụ thuộc React, Wagmi React, TanStack React Query, browser wallet behavior, và `"use client"` ở nhiều module.
 
 ```text
-Foundation là React-based EVM package, host được bởi Next.js hoặc bởi
+Foundation là React-based EVM package, host được bởi bất kỳ React host nào, hiện tại là Vite, hoặc bởi
 React host khác, sau khi application config, SSR behavior và presentation
 coupling được tách ra.
 ```
@@ -87,13 +87,31 @@ Neura Link bắt đầu   → thêm apps/neura-link  ·  apps/neura-link-admin
 
 Con số 6 nằm trong kiến trúc để naming, ESLint boundary, validation filter và deploy isolation thiết kế đúng ngay từ đầu — không phải để tạo trước.
 
-### 2.2. Framework — Next.js cho cả 6
+### 2.2. Framework — Vite + React + TanStack Router cho cả 6
 
-**Quyết định:** cả 3 product và cả 3 admin dùng Next.js. Không để mỗi admin tự chọn.
+**Quyết định:** cả 3 product và cả 3 admin dùng Vite + React + TanStack Router (file-based routes `src/routes/`, generated `routeTree.gen.ts`). Không để mỗi app tự chọn.
 
-Chi phí đã biết và chấp nhận: template UI admin (`shadcn-admin`, nguồn copy template build UI admin) là Vite 8 + TanStack Router file-based (`src/routes/`, `routeTree.gen.ts`). Routing layer phải viết lại sang Next.js App Router; `components/`, `features/`, `styles/`, `lib/` giữ lại và copy sang các admin app (`apps/*-admin`). Trả một lần ở admin đầu tiên.
+Quyết định này **thay thế quyết định Next.js trước đó**. Bản trước chốt Next.js cho cả 6 và chấp nhận chi phí viết lại routing layer của `shadcn-admin` sang App Router. Chi phí đó đã trả ở `n-plus-admin` — rồi được hoàn lại, vì Next không được dùng cho việc gì nó tồn tại để làm.
 
-Đổi lại: một chuẩn duy nhất cho folder structure, auth, routing, environment, testing, deployment, onboarding — và không copy feature giữa product ↔ admin vì khác đối tượng, khác session/permission model và khác business logic.
+Đo được tại thời điểm đổi (`dfb18bf`):
+
+```text
+                        n-plus   n-plus-admin
+page                       3          18
+next/* import              5          12
+API route handler          1           0
+middleware                none       none
+generateMetadata / SSG    none       none
+server data fetching      none       none
+```
+
+Toàn bộ giá trị thật của Next — RSC, server data, streaming, route handler, middleware — bằng 0. Một wallet dApp là client-side theo bản chất: ví, ký, wagmi đều chỉ chạy ở client. SEO và Open Graph được xác nhận **không cần**, kể cả cho MLM referral link — đó là điều kiện duy nhất từng biện hộ cho server rendering.
+
+Đổi lại vẫn giữ nguyên: một chuẩn duy nhất cho folder structure, auth, routing, environment, testing, deployment, onboarding — và không copy feature giữa product ↔ admin vì khác đối tượng, khác session/permission model và khác business logic.
+
+`shadcn-admin` giờ là nguồn copy **thẳng**, kể cả routing layer, vì nó vốn là Vite + TanStack Router.
+
+Chi tiết thi công và những gì phát sinh: [vite-migration.md](vite-migration.md).
 
 ### 2.3. Dependency direction
 
@@ -424,7 +442,7 @@ Không bảo toàn history riêng của template `shadcn-admin` → copy file UI
 
 `nln-frontend` → `apps/n-plus` **giữ nguyên nội dung**, gồm `web3-lab` và staking demo. `ARCHITECTURE.md` §5 đã xếp `web3-lab` là reference/dev-only nên nó ở lại được; gate khỏi production build sau.
 
-`shadcn-admin` (template UI admin) → `apps/n-plus-admin`: đây là nguồn copy UI template để xây dựng các admin app. Chỉ mang sang `components/`, `features/`, `styles/`, `lib/`, `hooks/`. Routing layer (`src/routes/`, `routeTree.gen.ts`, `main.tsx`) viết lại theo App Router (§2.2) — không copy.
+`shadcn-admin` (template UI admin) → `apps/n-plus-admin`: đây là nguồn copy UI template để xây dựng các admin app. Mang sang `components/`, `features/`, `styles/`, `lib/`, `hooks/` **và cả routing layer** (`src/routes/`, `main.tsx`) — cùng stack nên copy thẳng (§2.2). `routeTree.gen.ts` do plugin sinh, không copy tay.
 
 **Đây là migration thật, không phải đổi thư mục route.** Phải audit thêm, mỗi thứ đều có thể nằm rải trong `components/`/`features/` chứ không chỉ trong `routes/`:
 
@@ -717,14 +735,14 @@ Xét lại khi có product contract thật với ABI và địa chỉ. Nếu v�
 
 ## 9. Phân công
 
-| Track                     | Ai                | Chặn ai                                            |
-| ------------------------- | ----------------- | -------------------------------------------------- |
-| Track 0 — readiness       | Foundation        | Chặn 4 việc ở §9.1, **không phải tất cả**          |
-| Track 1 — workspace       | Foundation        | Chặn admin Web3 integration                        |
-| Track 2 — module contract | Song song Track 0 | **Chặn 2 thành viên mới**                          |
-| Track 3 — membership      | 2 thành viên      | Chờ Track 2                                        |
-| `n-plus-admin`            | Thành viên admin  | Port routing + non-Web3 làm ngay; Web3 chờ Track 1 |
-| MLM                       | sau               | Chờ **API contract backend**, không phải web3      |
+| Track                     | Ai                | Chặn ai                                          |
+| ------------------------- | ----------------- | ------------------------------------------------ |
+| Track 0 — readiness       | Foundation        | Chặn 4 việc ở §9.1, **không phải tất cả**        |
+| Track 1 — workspace       | Foundation        | Chặn admin Web3 integration                      |
+| Track 2 — module contract | Song song Track 0 | **Chặn 2 thành viên mới**                        |
+| Track 3 — membership      | 2 thành viên      | Chờ Track 2                                      |
+| `n-plus-admin`            | Thành viên admin  | Copy shell + non-Web3 làm ngay; Web3 chờ Track 1 |
+| MLM                       | sau               | Chờ **API contract backend**, không phải web3    |
 
 MLM chủ yếu là read + backend/indexer. Xác định API contract sớm để track này không đứng chờ nhầm thứ.
 
@@ -735,10 +753,12 @@ Bảng trên liệt kê 6 dòng nhưng chỉ có 3 người. Không cam kết me
 ```text
 Người 1   Track 0 → Track 1 → review Track 2
 Người 2   draft Track 2 → Membership
-Người 3   Admin Next migration → MLM sau khi admin shell ổn
+Người 3   Admin shell (copy thẳng từ shadcn-admin) → MLM sau khi shell ổn
 ```
 
-Hệ quả phải chấp nhận: **MLM bắt đầu sau membership**, không song song. Nếu muốn membership và MLM thật sự song song thì admin migration phải giới hạn ở routing/shell tối thiểu trong lúc chờ — chọn một, không chọn cả hai.
+Hệ quả phải chấp nhận: **MLM bắt đầu sau membership**, không song song. Nếu muốn membership và MLM thật sự song song thì admin shell phải giới hạn ở routing/shell tối thiểu trong lúc chờ — chọn một, không chọn cả hai.
+
+Lưu ý: dòng "Admin Next migration" ở bản trước đã biến mất khỏi bảng — công việc đó không còn tồn tại sau §2.2. Capacity giải phóng ra thuộc về người 3.
 
 Đây là ràng buộc capacity, không phải ràng buộc kỹ thuật.
 
@@ -794,7 +814,7 @@ Danh sách kiểm tra tự động trước khi release:
 | `pnpm lint`         | **PASS** | exit 0                                          |
 | `pnpm format:check` | **PASS** | exit 0                                          |
 | `pnpm test:run`     | **PASS** | 55 file, 527 test                               |
-| `pnpm build`        | **PASS** | Next 16.2.12 Turbopack, 4 route                 |
+| `pnpm build`        | **PASS** | Vite 8, static bundle mỗi app                   |
 | `pnpm web3:smoke`   | **PASS** | 2/2 network · 3 token · 3 balance · 3 allowance |
 
 Live read baseline này quan trọng vì Track 0 sẽ đổi registry và RPC handling — có before/after để đối chiếu.
