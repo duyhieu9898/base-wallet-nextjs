@@ -10,11 +10,41 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as R401RouteImport } from './routes/401'
+import { Route as R403RouteImport } from './routes/403'
+import { Route as R404RouteImport } from './routes/404'
+import { Route as R500RouteImport } from './routes/500'
+import { Route as R503RouteImport } from './routes/503'
 import { Route as Web3LabRouteImport } from './routes/web3-lab'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R401Route = R401RouteImport.update({
+  id: '/401',
+  path: '/401',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R403Route = R403RouteImport.update({
+  id: '/403',
+  path: '/403',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R404Route = R404RouteImport.update({
+  id: '/404',
+  path: '/404',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R500Route = R500RouteImport.update({
+  id: '/500',
+  path: '/500',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const R503Route = R503RouteImport.update({
+  id: '/503',
+  path: '/503',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Web3LabRoute = Web3LabRouteImport.update({
@@ -25,27 +55,48 @@ const Web3LabRoute = Web3LabRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/401': typeof R401Route
+  '/403': typeof R403Route
+  '/404': typeof R404Route
+  '/500': typeof R500Route
+  '/503': typeof R503Route
   '/web3-lab': typeof Web3LabRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/401': typeof R401Route
+  '/403': typeof R403Route
+  '/404': typeof R404Route
+  '/500': typeof R500Route
+  '/503': typeof R503Route
   '/web3-lab': typeof Web3LabRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/401': typeof R401Route
+  '/403': typeof R403Route
+  '/404': typeof R404Route
+  '/500': typeof R500Route
+  '/503': typeof R503Route
   '/web3-lab': typeof Web3LabRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/web3-lab'
+  fullPaths: '/' | '/401' | '/403' | '/404' | '/500' | '/503' | '/web3-lab'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/web3-lab'
-  id: '__root__' | '/' | '/web3-lab'
+  to: '/' | '/401' | '/403' | '/404' | '/500' | '/503' | '/web3-lab'
+  id:
+    '__root__' | '/' | '/401' | '/403' | '/404' | '/500' | '/503' | '/web3-lab'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  R401Route: typeof R401Route
+  R403Route: typeof R403Route
+  R404Route: typeof R404Route
+  R500Route: typeof R500Route
+  R503Route: typeof R503Route
   Web3LabRoute: typeof Web3LabRoute
 }
 
@@ -56,6 +107,41 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/401': {
+      id: '/401'
+      path: '/401'
+      fullPath: '/401'
+      preLoaderRoute: typeof R401RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/403': {
+      id: '/403'
+      path: '/403'
+      fullPath: '/403'
+      preLoaderRoute: typeof R403RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/404': {
+      id: '/404'
+      path: '/404'
+      fullPath: '/404'
+      preLoaderRoute: typeof R404RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/500': {
+      id: '/500'
+      path: '/500'
+      fullPath: '/500'
+      preLoaderRoute: typeof R500RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/503': {
+      id: '/503'
+      path: '/503'
+      fullPath: '/503'
+      preLoaderRoute: typeof R503RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/web3-lab': {
@@ -70,6 +156,11 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  R401Route: R401Route,
+  R403Route: R403Route,
+  R404Route: R404Route,
+  R500Route: R500Route,
+  R503Route: R503Route,
   Web3LabRoute: Web3LabRoute,
 }
 export const routeTree = rootRouteImport

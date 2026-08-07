@@ -148,5 +148,30 @@
     "genericSubmissionFailed": "取引の送信に失敗しました。",
     "genericRpcFailed": "RPCリクエストに失敗しました。",
     "unknown": "不明なエラーにより取引が失敗しました。"
+  },
+  "errorPages": {
+    "goBack": "戻る",
+    "backToHome": "ホームへ戻る",
+    "retry": "再試行",
+    "notFound": {
+      "title": "ページが見つかりません。",
+      "description": "お探しのページは存在しないか、削除された可能性があります。"
+    },
+    "unauthorised": {
+      "title": "認証が必要です",
+      "description": "このリソースにアクセスするには、適切な認証情報でサインインしてください。"
+    },
+    "forbidden": {
+      "title": "アクセスが禁止されています",
+      "description": "このリソースを表示する権限がありません。"
+    },
+    "general": {
+      "title": "問題が発生しました。",
+      "description": "ご不便をおかけして申し訳ありません。しばらくしてからもう一度お試しください。"
+    },
+    "maintenance": {
+      "title": "サイトはメンテナンス中です。",
+      "description": "現在サイトをご利用いただけません。まもなく復旧します。"
+    }
   }
 }

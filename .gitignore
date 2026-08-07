@@ -76,3 +76,6 @@ scripts/bin/harness.exe
 .harness-core/
 
 /docs/local-docs/
+
+# Playwright MCP snapshot/console dumps from interactive debugging.
+.playwright-mcp/

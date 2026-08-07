@@ -1,18 +1,11 @@
-import "server-only"
+import type enDictionary from "@/i18n/dictionaries/en.json"
 
-import type { Locale } from "@/i18n/config"
-import enDictionary from "@/i18n/dictionaries/en.json"
-
+/**
+ * Shape of a locale dictionary, derived from the English one so a missing key in
+ * another locale is a type error.
+ *
+ * This module used to also export an async `getDictionary` loader marked
+ * `server-only`, for App Router server components. There is no server and no
+ * caller; `I18nProvider` imports both dictionaries directly.
+ */
 export type Dictionary = typeof enDictionary
-
-const dictionaries: Record<Locale, () => Promise<Dictionary>> = {
-  en: () =>
-    import("@/i18n/dictionaries/en.json").then((module) => module.default),
-  ja: () =>
-    import("@/i18n/dictionaries/ja.json").then((module) => module.default),
-}
-
-export const getDictionary = async (locale: Locale): Promise<Dictionary> => {
-  const loader = dictionaries[locale] ?? dictionaries.en
-  return loader()
-}

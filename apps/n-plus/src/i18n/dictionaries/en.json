@@ -148,5 +148,30 @@
     "genericSubmissionFailed": "Transaction failed.",
     "genericRpcFailed": "RPC request failed.",
     "unknown": "Transaction failed due to an unknown error."
+  },
+  "errorPages": {
+    "goBack": "Go Back",
+    "backToHome": "Back to Home",
+    "retry": "Try again",
+    "notFound": {
+      "title": "Oops! Page not found.",
+      "description": "The page you are looking for does not exist or may have been removed."
+    },
+    "unauthorised": {
+      "title": "Unauthorized access",
+      "description": "Please sign in with the appropriate credentials to access this resource."
+    },
+    "forbidden": {
+      "title": "Access forbidden",
+      "description": "You do not have the permission needed to view this resource."
+    },
+    "general": {
+      "title": "Something went wrong.",
+      "description": "We apologize for the inconvenience. Please try again later."
+    },
+    "maintenance": {
+      "title": "The site is under maintenance.",
+      "description": "The site is unavailable at the moment. We will be back online shortly."
+    }
   }
 }
