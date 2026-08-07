@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
+import { useEffect } from "react"
 
 import Web3LabPage from "@/pages/web3-lab"
 
@@ -16,5 +17,22 @@ export const Route = createFileRoute("/web3-lab")({
   beforeLoad: () => {
     if (import.meta.env.PROD) throw notFound()
   },
-  component: Web3LabPage,
+  component: Web3LabRoute,
 })
+
+/**
+ * The App Router set a per-page title through route metadata. A static bundle
+ * has one <title> in index.html, so the route sets and restores it itself.
+ */
+function Web3LabRoute() {
+  useEffect(() => {
+    const previous = document.title
+    document.title = "Web3 Lab"
+
+    return () => {
+      document.title = previous
+    }
+  }, [])
+
+  return <Web3LabPage />
+}

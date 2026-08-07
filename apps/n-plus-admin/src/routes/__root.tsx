@@ -4,6 +4,7 @@ import { AdminShell } from "@/components/layout/authenticated-layout"
 import { DirectionProvider } from "@/context/direction-provider"
 import { ThemeProvider } from "@/context/theme-provider"
 import { AdminAuthProvider } from "@/features/auth/runtime/admin-auth-provider"
+import { GeneralError } from "@/features/errors/general-error"
 import { NotFoundError } from "@/features/errors/not-found-error"
 import { ThemedToaster } from "@/providers/themed-toaster"
 
@@ -24,6 +25,9 @@ function readSidebarOpen(): boolean {
 export const Route = createRootRoute({
   component: RootLayout,
   notFoundComponent: NotFoundError,
+  // Replaces the App Router's app/error.tsx. Without it an uncaught render error
+  // unmounts the tree and leaves a blank page instead of the 500 surface.
+  errorComponent: GeneralError,
 })
 
 function RootLayout() {

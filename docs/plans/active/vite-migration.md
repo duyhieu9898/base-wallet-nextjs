@@ -204,8 +204,13 @@ Validation:
 
 Follow-up, not in this plan:
 
-- Deployment configuration still has to change from a Node server to static
-  hosting; the repository holds no deployment manifest, so there was nothing to
-  edit here.
+- **Deployment must rewrite unknown paths to `index.html`.** This is the one
+  change that breaks silently. Client-side routing means `/members` exists only
+  in the bundle; a static host without an SPA fallback returns 404 for every
+  deep link, bookmark and refresh, while the root URL keeps working — so the
+  failure looks intermittent. Vite's own dev and preview servers do the rewrite,
+  which is why nothing here catches it. The repository holds no deployment
+  manifest, so this could not be fixed in code; whoever configures nginx, S3,
+  CloudFront or GitLab Pages has to add it.
 - `pnpm web3:smoke` and `staking:deploy-sepolia` now load env through Vite's
   `loadEnv`. Neither was executed — both require live RPC and funded keys.
