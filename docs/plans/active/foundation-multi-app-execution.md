@@ -2,7 +2,7 @@
 
 Kế hoạch thi công cho monorepo `nln-platform`, target 6 application (3 product + 3 admin) trên các foundation package.
 
-> **Target 6 Application:** Monorepo bao gồm **N+ System** (`apps/n-plus` & `apps/n-plus-admin`), **Neura System** (`apps/neura` & `apps/neura-admin`), và **Neura Link System** (`apps/neura-link` & `apps/neura-link-admin`), mỗi product system có admin app riêng. `apps/n-plus` và `apps/n-plus-admin` là hai app đang tồn tại; nội dung của `apps/n-plus` (SIWE auth, staking demo, web3-lab) là reference application của foundation, và N+ có Flexible USDT Staking nên nó là điểm khởi đầu thật.
+> **Target 6 Application:** Monorepo bao gồm **N+ System** (`apps/n-plus` & `apps/n-plus-admin`), **Neura System** (`apps/neura` & `apps/neura-admin`), và **Neura Link System** (`apps/neura-link` & `apps/neura-link-admin`), mỗi product system có admin app riêng. `apps/n-plus`, `apps/n-plus-admin` và `apps/neura` là ba app đang tồn tại; nội dung của `apps/n-plus` (SIWE auth, staking demo, web3-lab) là reference application của foundation, và N+ có Flexible USDT Staking nên nó là điểm khởi đầu thật.
 
 **Capacity:** 3 người. 4 workstream có thể overlap, nhưng **tối đa 3 workstream chạy thật cùng lúc** (§9).
 
@@ -49,7 +49,7 @@ React host khác, sau khi application config, SSR behavior và presentation
 coupling được tách ra.
 ```
 
-Điều đúng và đo được là: foundation có **zero import từ `next`**. Giữ được tính chất này là có giá trị — nó là thứ cho phép đổi host về sau — nhưng §2.2 đã chốt cả 6 app dùng Next, nên hiện **không có consumer non-Next nào**. Không thiết kế thêm gì cho host giả định.
+Điều đúng và đo được là: foundation có **zero import từ `next`**. Chính tính chất đó đã trả công: §2.2 sau này chuyển cả 6 app sang Vite, và foundation không phải sửa gì. Không thiết kế thêm gì cho host giả định.
 
 ---
 
@@ -67,22 +67,23 @@ nln-platform/
 │   ├── neura-link/            ← Neura Link Product App
 │   └── neura-link-admin/      ← Neura Link Admin App
 ├── packages/
-│   └── web3-evm/              ← dùng chung cho các EVM app
+│   ├── web3-evm/              ← dùng chung cho các EVM app
+│   └── web3-solana/           ← Neura System (hiện mới có read path)
 ├── docs/foundation/           ← authority dùng chung
 ├── pnpm-workspace.yaml
 └── package.json               ← CHỈ tooling, không chứa dependency của app
 ```
 
-Các EVM app dùng chung `@nln/web3-evm` (Neura System sẽ tạo `@nln/web3-solana` khi khởi chạy, xem [`CAPABILITIES.md`](../../foundation/CAPABILITIES.md)). Mỗi app **sở hữu độc lập**: runtime config · supported networks/tokens · RPC environment · contract deployment data · authentication policy · authorization/RBAC · feature module · product UI · business history · deployment pipeline.
+Các EVM app dùng chung `@nln/web3-evm`; Neura System dùng `@nln/web3-solana`, đã tồn tại với read path (xem [`CAPABILITIES.md`](../../foundation/CAPABILITIES.md)). Mỗi app **sở hữu độc lập**: runtime config · supported networks/tokens · RPC environment · contract deployment data · authentication policy · authorization/RBAC · feature module · product UI · business history · deployment pipeline.
 
 ### 2.1. Target architecture ≠ execution timing
 
 Chỉ scaffold cặp đang bắt đầu thật. Skeleton trống là thứ phải bảo trì trước khi ai viết dòng feature nào trong đó, và workspace làm việc thêm app sau này rẻ.
 
 ```text
-Bây giờ              apps/n-plus  ·  apps/n-plus-admin
-Neura bắt đầu        → thêm apps/neura  ·  apps/neura-admin (kèm @nln/web3-solana)
-Neura Link bắt đầu   → thêm apps/neura-link  ·  apps/neura-link-admin
+Đang có             apps/n-plus  ·  apps/n-plus-admin  ·  apps/neura (kèm @nln/web3-solana)
+Neura admin bắt đầu → thêm apps/neura-admin
+Neura Link bắt đầu  → thêm apps/neura-link  ·  apps/neura-link-admin
 ```
 
 Con số 6 nằm trong kiến trúc để naming, ESLint boundary, validation filter và deploy isolation thiết kế đúng ngay từ đầu — không phải để tạo trước.
@@ -247,7 +248,7 @@ Chỗ duy nhất của `0001` phải sửa: dòng quy định token cấu hình 
 
 `ssr` phải ra khỏi package vì `wagmi-config.adapter.ts:47` hardcode `ssr: true` — quyết định của application nằm bên trong package, đúng thứ tiêu chí nghiệm thu ở trên cấm. Nhưng nó **không thuộc `EvmRuntimeConfig`**: registry là metadata về chain, còn `ssr` là hosting concern của React/Wagmi. Trộn hai thứ làm chain config mang theo identity của framework.
 
-**Ghi nhận trung thực:** §2.2 chốt cả 6 app dùng Next nên `ssr: true` đúng cho mọi consumer hiện tại — lý do "Vite SPA cần `false`" không còn hiệu lực. App template đặt `ssr: true` làm default; đây là dọn coupling, không phải phục vụ consumer giả định.
+**Ghi nhận trung thực (cập nhật 2026-08-07):** đoạn này từng viết "§2.2 chốt cả 6 app dùng Next nên `ssr: true` đúng cho mọi consumer" — không còn đúng sau khi §2.2 chuyển sang Vite. `ssr: true` bị bỏ quên trong `apps/n-plus` suốt quá trình migration và đã sửa về `false`; giá trị đúng cho SPA tĩnh. Việc tách `ssr` ra khỏi `EvmRuntimeConfig` vẫn đúng — và chính nó làm chỗ sửa gọn trong một dòng thay vì lan vào chain config.
 
 #### `web3:smoke` là consumer đầu tiên — sửa trong cùng commit (R1)
 
@@ -795,12 +796,15 @@ Chưa làm: RPC fallback · observability package · UI/staking/MLM package · t
 Neura System (`apps/neura` & `apps/neura-admin`) sử dụng Solana runtime. Tuân thủ ranh giới độc lập theo `CHAIN_FAMILY_TEMPLATE.md`:
 
 ```text
-· Tạo packages/web3-solana dưới dạng sibling package song song với packages/web3-evm
-· KHÔNG gộp Solana code vào packages/web3-evm
-· KHÔNG ép Solana vào EVM Address/Wagmi abstractions; sở hữu riêng account, program ABI, wallet-adapter, connection client và error taxonomy
+· ĐÃ LÀM  packages/web3-solana tồn tại như sibling package của packages/web3-evm
+· ĐÃ LÀM  không gộp Solana code vào packages/web3-evm — ESLint chặn cả hai chiều
+· ĐÃ LÀM  Solana sở hữu riêng account, wallet-adapter, connection client, error taxonomy
+· CÒN LẠI write path (IDL/program ID chưa có — mục 6 của requirement record)
 ```
 
 `CAPABILITIES.md` đã liệt non-goal: "tự failover giữa các chain family", "ép các chain family vào một transaction model giả". `docs/foundation/CHAIN_FAMILY_TEMPLATE.md` là tài liệu, không phải implementation đang dở.
+
+Kế hoạch thi công chi tiết — bao gồm ranh giới hai pha (read không phụ thuộc item 3, write bị chặn bởi item 3): [`solana-runtime.md`](solana-runtime.md).
 
 ---
 

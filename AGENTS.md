@@ -1,7 +1,7 @@
 # Build model
 
-Both applications are **Vite + React SPAs** with **TanStack Router** (file-based
-routes under `src/routes/`, generated `routeTree.gen.ts`). There is no Next.js,
+All three applications are **Vite + React SPAs** with **TanStack Router**
+(file-based routes under `src/routes/`, generated `routeTree.gen.ts`). There is no Next.js,
 no server rendering, no prerendering, and no API routes anywhere in this
 repository — do not reintroduce a framework convention that assumes one.
 
@@ -13,7 +13,10 @@ Rationale and the decisions behind it: [vite-migration.md](docs/plans/completed/
 
 ## Current State & Ecosystem Vision
 
-- **Present Stage**: Hardening the single EVM runtime, `@nln/web3-evm` (network/token registry, Wagmi/Viem provider, read/write hooks, transaction lifecycle, error taxonomy). It is a workspace package at `packages/web3-evm/`. SIWE auth is application-owned (`apps/n-plus/src/features/auth/`), not part of the package.
+- **Present Stage**: Two runtimes exist, at different depths.
+  - `@nln/web3-evm` (`packages/web3-evm/`) — complete: network/token registry, Wagmi/Viem provider, read/write hooks, transaction lifecycle, error taxonomy. SIWE auth is application-owned (`apps/n-plus/src/features/auth/`), not part of the package.
+  - `@nln/web3-solana` (`packages/web3-solana/`) — **reads only**. Cluster/SPL registry, `Connection` factory, wallet-adapter provider, selection, native and SPL balances, error taxonomy. It exports **no write surface**, and that is deliberate, not unfinished work in the ordinary sense: writes were gated on a confirmation-evidence decision, now accepted as `confirmed` for user-facing flows. Before adding anything that concludes a write succeeded, read [solana-runtime-requirement.md](docs/foundation/solana-runtime-requirement.md) "Item 3 acceptance" and [solana-runtime.md](docs/plans/active/solana-runtime.md).
+  - The two are **siblings**. Neither imports the other; ESLint enforces it in both directions.
 - **Target**: One pnpm workspace monorepo, shared packages (`@nln/web3-evm`, `@nln/web3-solana`) serving **6 applications** (3 product + 3 admin). Not separate repositories — see the execution plan §1.
   1. **N+ System** — in progress, `apps/n-plus` & `apps/n-plus-admin`: Flexible USDT Staking, Unilevel MLM (Personal & Team Ranks). No Lending, no NFT membership.
   2. **Neura System** — in progress in parallel, `apps/neura` & `apps/neura-admin`: Solana NRA ⇄ NRA Staking Platform (Multi-Pools, Fixed/Flexible Terms, Claim/Compound, Reservation).
@@ -37,8 +40,10 @@ across.
   `packages/uniswap/src/data/solanaConnection/`,
   `packages/uniswap/src/features/providers/getSolanaConnection.ts`,
   `apps/web/src/connection/signSolanaTransaction.tsx`, and an EVM/SVM platform
-  split in `buildAccountAddressesByPlatform.ts`. Read it before designing
-  `@nln/web3-solana`.
+  split in `buildAccountAddressesByPlatform.ts`. It informed phase 1 of
+  `@nln/web3-solana`, with two limits found in practice: it is a connection
+  client rather than a runtime package, and it enumerates wallet holdings where
+  this repository is registry-driven.
   **Caveat that matters:** its swap path delegates confirmation to the Jupiter
   execute API and marks success from Jupiter's response, so it does **not**
   answer what terminal on-chain evidence should be. See

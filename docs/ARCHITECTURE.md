@@ -26,19 +26,20 @@ One pnpm workspace, `nln-platform`. Not one repository per product.
 
 ```text
 packages/
-└── web3-evm/            @nln/web3-evm — the only executable runtime today
+├── web3-evm/            @nln/web3-evm — reads and writes
+└── web3-solana/         @nln/web3-solana — reads only so far
 
 apps/
 ├── n-plus/              product
-└── n-plus-admin/        admin
+├── n-plus-admin/        admin
+└── neura/               product
 ```
 
 Planned, not yet scaffolded — listed so the dependency rules below are read as
 the target, not as a description of today:
 
 ```text
-packages/web3-solana/    @nln/web3-solana
-apps/neura/              apps/neura-admin/
+apps/neura-admin/
 apps/neura-link/         apps/neura-link-admin/
 ```
 
@@ -57,10 +58,15 @@ recorded for this repository.
 | ------------------ | ------- | ------------------ | ----------- |
 | `n-plus`           | product | `@nln/web3-evm`    | Implemented |
 | `n-plus-admin`     | admin   | `@nln/web3-evm`    | Implemented |
-| `neura`            | product | `@nln/web3-solana` | Planned     |
+| `neura`            | product | `@nln/web3-solana` | In Progress |
 | `neura-admin`      | admin   | `@nln/web3-solana` | Planned     |
 | `neura-link`       | product | `@nln/web3-evm`    | Planned     |
 | `neura-link-admin` | admin   | `@nln/web3-evm`    | Planned     |
+
+`Status` describes **runtime adoption**. `apps/neura` reads `In Progress`: it
+mounts `@nln/web3-solana` and displays live devnet balances, but the runtime has
+no write surface yet. `neura-admin` stays `Planned` — the application does not
+exist. Build sequence: [solana-runtime.md](plans/active/solana-runtime.md).
 
 Per-application adoption detail — networks, default network, adopted
 capabilities, restrictions, deviations — lives in each application's own record:

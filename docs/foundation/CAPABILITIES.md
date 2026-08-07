@@ -15,7 +15,7 @@ Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó ch
 | `Product-dependent` | Thuộc application hoặc feature cụ thể                                                            |
 | `Non-goal`          | Không trở thành trách nhiệm mặc định của foundation                                              |
 
-Lifecycle một chiều:
+Lifecycle thông thường:
 
 ```text
 Deferred → Planned → In Progress → Ready
@@ -24,6 +24,12 @@ Deferred → Planned → In Progress → Ready
 Không bao giờ ghi một ô ở dạng `In Progress / Ready`. Một capability ở đúng một
 trạng thái tại một thời điểm; nếu không xác định được thì trạng thái là cái thấp
 hơn.
+
+**Lùi trạng thái được phép, kèm lý do ghi lại.** Bản trước ghi lifecycle là "một
+chiều". Quy tắc đó chặt hơn mức cần: nếu điều kiện của một trạng thái không còn
+đúng — decision bị đảo, dependency vỡ, definition of done hoá ra chưa đạt — thì
+cấm lùi chỉ khiến bảng này nói sai. Bảng phải mô tả **thực tế**, không phải mô tả
+tiến độ mong muốn. Lùi thì ghi ngày và lý do ngay dưới bảng.
 
 Điều kiện chuyển trạng thái của một chain-family runtime:
 
@@ -43,17 +49,19 @@ hơn.
 | Foundation/application separation    | Ready             |
 | Chain-family module boundary         | Ready             |
 | EVM module (`@nln/web3-evm`)         | Ready             |
-| Solana module (`@nln/web3-solana`)   | Planned           |
+| Solana module (`@nln/web3-solana`)   | In Progress       |
 | EVM multi-network registry           | Ready             |
 | EVM read/write lifecycle             | Ready             |
 | Chain-family implementation template | Ready             |
 | Multi-family provider composition    | Deferred          |
 | Cross-family application UX          | Product-dependent |
 
-`@nln/web3-solana` là `Planned`: requirement của Neura System đã được chấp nhận
-và ghi tại [`solana-runtime-requirement.md`](solana-runtime-requirement.md).
-Chưa có package, chưa có code. Nó chuyển sang `In Progress` khi
-`packages/web3-solana/` tồn tại.
+`@nln/web3-solana` là `In Progress`: `packages/web3-solana/` đã tồn tại và đọc
+được số dư devnet thật (registry, address, connection, provider, selection,
+balances, errors). Phần write chưa có — xem
+[`solana-runtime.md`](../plans/active/solana-runtime.md) về ranh giới hai pha.
+Nó chuyển sang `Ready` khi definition of done trong `CHAIN_FAMILY_TEMPLATE.md`
+được đáp ứng.
 
 ```text
 EVM runtime tồn tại
@@ -274,7 +282,7 @@ Hook/domain invariants hiện được ưu tiên. Application cụ thể bổ su
 
 ### Additional chain-family runtime beyond Solana
 
-Solana không còn nằm ở mục này — nó đã là `Planned`, xem bảng
+Solana không còn nằm ở mục này — nó đã là `In Progress`, xem bảng
 "Implementation status".
 
 Một family thứ ba chỉ triển khai khi có application requirement được chấp nhận và

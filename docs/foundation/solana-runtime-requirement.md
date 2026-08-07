@@ -5,8 +5,11 @@ down **before** any code is written for a new chain family. Without it,
 `@nln/web3-solana` is not authorised to start and `CAPABILITIES.md` cannot list
 Solana above `Deferred`.
 
-Status: **approved requirement, implementation not started.** Solana is `Planned`
-in [`CAPABILITIES.md`](CAPABILITIES.md).
+Status: **phase 1 implemented, phase 2 unblocked.** `packages/web3-solana/`
+exists and reads live devnet balances, so Solana is `In Progress` in
+[`CAPABILITIES.md`](CAPABILITIES.md). Item 3 was accepted on 2026-08-07 — see
+"Item 3 acceptance" at the end of this record. Build state:
+[`solana-runtime.md`](../plans/active/solana-runtime.md).
 
 Source specification:
 `docs/local-docs/NLN-181_project1-neura/02_docs/01_requirement/`
@@ -153,10 +156,17 @@ What has to be decided, and the recommendation for each:
 | Preflight                                    | `simulateTransaction` against the connected account, mapping Anchor error codes to typed errors |
 | Dropped transaction                          | Needs an explicit timeout policy and a user-visible "not landed" state                          |
 
-The recommendation is `finalized` because the alternative fails in exactly the
+> **Superseded.** The recommendations in the table above were not adopted. See
+> "Item 3 acceptance" at the end of this record for the decision that governs:
+> `confirmed` is terminal evidence for user-facing flows. The table is kept
+> because the reasoning against it is what the accepted decision had to answer.
+
+The recommendation was `finalized` because the alternative fails in exactly the
 way this product cannot tolerate: a `confirmed` claim that later reorgs would
 have shown the user a reward they did not receive, and would have run
-once-per-signature side effects for a transaction that never happened.
+once-per-signature side effects for a transaction that never happened. The
+accepted decision answers this with indexer reconciliation rather than with a
+slower commitment.
 
 #### Evidence from a production Solana frontend, including what weakens the above
 
@@ -196,8 +206,16 @@ to, so this decision has to be made here and cannot be copied.
 
 **This is a recommendation, not a decision.** Someone with authority over the
 product has to accept it — or accept `confirmed`, with the reasoning recorded —
-and this record has to be updated with that acceptance, before
-`packages/web3-solana/` is created.
+and this record has to be updated with that acceptance under
+"Item 3 acceptance" below.
+
+The gate is **any write path**, not the package. An earlier version of this
+sentence blocked creating `packages/web3-solana/` at all; the phase split lifted
+that, because the read half encodes no commitment policy. The package now exists
+and reads live devnet balances.
+
+**This item has since been accepted** — see "Item 3 acceptance" at the end of the
+record. The gate is closed and phase 2 may proceed.
 
 ### 4. RPC provider, rate limit and failure policy
 
@@ -220,10 +238,21 @@ Decided by the spec:
 The decimals mismatch is a correctness requirement, not a display concern: the
 spec records that skipping the decimal conversion underpays rewards by a factor
 of 1,000 **with no error raised** (§Edge Case 5). Registry validation must check
-declared decimals against on-chain mint metadata, as the EVM registry does for
-ERC-20.
+declared decimals against on-chain mint metadata.
 
-- **OPEN** — the metadata source of record and where the token registry lives.
+**Correction.** An earlier version of this paragraph said "as the EVM registry
+does for ERC-20". That is not accurate: `hydrateTokens` in `@nln/web3-evm`
+validates the _shape_ of `expectedDecimals` at boot — integer, non-negative — and
+never compares it against the contract. Solana implements the on-chain
+comparison first, in `fetchTokenBalances`, because this spec calls the
+consequence out explicitly. Whether the EVM runtime should gain the same check is
+a separate question and not addressed here.
+
+- **DECIDED** — the token registry is application-owned and injected, identical
+  to the EVM runtime: `apps/neura/src/config/solana.config.ts` holds the mints
+  and the package holds only the schema and its validation.
+- **OPEN** — the metadata source of record for populating that registry
+  (on-chain metadata program, a curated list, or the backend).
 
 ### 6. Program ownership and deployment verification
 
@@ -273,12 +302,37 @@ above.
   semantics is the only trigger, and there is currently one.
 - Existing EVM decisions are not rewritten to cover Solana. Solana writes its own
   decisions under `docs/foundation/solana/decisions/`, and only when the
-  corresponding semantics are actually implemented. That directory does not exist
-  yet, and creating it empty would be documentation ahead of evidence.
+  corresponding semantics are actually implemented — creating the directory empty
+  would be documentation ahead of evidence.
+
+  **Done 2026-08-07.** Phase 1 implemented real semantics, so the read-path
+  decisions were promoted out of the execution plan into
+  [`solana/decisions/`](solana/decisions/README.md). This mattered because of the
+  authority order in `AGENTS.md` — `docs/foundation/` → code → `docs/plans/` — so
+  a decision living only in a plan sat at the **lowest** authority and a later
+  session would have been entitled to overrule it.
+
+  | Semantics                                                   | Now recorded in |
+  | ----------------------------------------------------------- | --------------- |
+  | `confirmed` as terminal evidence, indexer reconciles        | this record     |
+  | Selection has no `unsupported` state; cluster is app-chosen | `0018`          |
+  | Balance reads are registry-driven, SPL only, zero-filled    | `0019`          |
+  | Declared decimals verified against the on-chain mint        | `0020`          |
+  | `isValidAddress` accepts PDAs; signing needs on-curve       | `0021`          |
+
+  The confirmation-evidence decision stays here rather than becoming a decision
+  record, because no write path exists yet to describe. It moves when phase 2
+  implements one.
+
 - Solana does not need i18n, toast, reusable components or a dev harness to count
   as a runtime. Definition of done is in `CHAIN_FAMILY_TEMPLATE.md` and lists none
   of those.
 - The package is not an indexer. See constraint 1.
+- **No allowance or approval surface.** Solana has no ERC-20 spender model; an
+  Anchor program signs with PDA authority. `@nln/web3-evm`'s `reads/allowances`
+  and `transactions/erc20-approval` subtrees have no Solana counterpart and are
+  not to be translated into one. `@nln/web3-solana` is therefore materially
+  smaller than the EVM runtime — that is the correct shape, not missing work.
 
 ## Out of scope for v0.1
 
@@ -291,12 +345,75 @@ large architecture change. Do not build toward it speculatively.
 
 ## Status transitions
 
-| From          | To            | Trigger                                                |
-| ------------- | ------------- | ------------------------------------------------------ |
-| `Deferred`    | `Planned`     | This record — done                                     |
-| `Planned`     | `In Progress` | Item 3 accepted **and** `packages/web3-solana/` exists |
-| `In Progress` | `Ready`       | `CHAIN_FAMILY_TEMPLATE.md` definition of done is met   |
+| From          | To            | Trigger                                              |
+| ------------- | ------------- | ---------------------------------------------------- |
+| `Deferred`    | `Planned`     | This record — done                                   |
+| `Planned`     | `In Progress` | `packages/web3-solana/` exists                       |
+| `In Progress` | `Ready`       | `CHAIN_FAMILY_TEMPLATE.md` definition of done is met |
 
-Item 3 must be closed before the transition to `In Progress`. The other OPEN
-items must be closed before the code each one governs is written, not necessarily
-before the package is created.
+An earlier version of this table required item 3 before the package could exist.
+That was stricter than the risk warrants: the read half of the runtime — registry,
+address, connection, provider, wallet selection, balances, errors — does not
+encode a commitment policy and cannot be made wrong by item 3 landing either way.
+Blocking it stalled ready work for a decision it does not depend on.
+
+**Item 3 still gates every write.** No simulation gate, write lifecycle, terminal
+status derivation, transaction history, or post-write invalidation may be written
+until item 3 is recorded as accepted below, because each of those encodes the
+chosen commitment level. The phase boundary is in
+[solana-runtime.md](../plans/active/solana-runtime.md).
+
+The other OPEN items must be closed before the code each one governs is written,
+not necessarily before the package is created.
+
+### Item 3 acceptance
+
+**Accepted 2026-08-07 by hieund: `confirmed` is terminal evidence for
+user-facing flows.**
+
+Reasoning given: follow the approach of a production application with many users
+and a track record, rather than a stricter policy chosen in the abstract. The
+`finalized` recommendation earlier in this section is therefore **not** adopted
+as a blanket rule.
+
+#### What this does and does not inherit from the reference
+
+Stating this precisely matters, because the reference is weaker evidence than it
+first appears and a later reader should not over-trust it.
+
+What Uniswap actually demonstrates is that **`confirmed` is safe enough to drive
+balance reads** in a high-volume production application. That is a real, tested
+signal and it is what this decision rests on.
+
+What it does not demonstrate is a write-confirmation policy, because it has none:
+its swap path delegates to the Jupiter execute API and marks success from
+Jupiter's response (see the section above). Extending `confirmed` from reads to
+terminal write evidence is **our** decision, not an inherited one.
+
+One difference in consequence profile is worth recording, since it is the reason
+the earlier recommendation existed. A reorged swap means the swap did not happen
+and the next balance refetch corrects the display. A reorged claim in Neura would
+also have run once-per-signature side effects — reward marked claimed, history
+row written — and those do not self-correct. The mitigation is below, not a
+reopening of the decision.
+
+#### Consequences to implement in phase 2
+
+| Question                      | Accepted answer                                                                                |
+| ----------------------------- | ---------------------------------------------------------------------------------------------- |
+| Terminal evidence             | `confirmed`                                                                                    |
+| What a signature alone proves | Submission only. It is the EVM hash and must never conclude success                            |
+| Expired blockhash             | Distinct terminal state — not success, not error. The transaction can never land               |
+| Dropped transaction           | Explicit timeout with a user-visible "not landed" state                                        |
+| Preflight                     | `simulateTransaction` against the connected account, Anchor error codes mapped to typed errors |
+| Once-per-signature effects    | Keyed on signature, run at `confirmed`                                                         |
+
+**Reconciliation, not a second commitment level.** Constraint 1 of this record
+already establishes that Solana keeps no on-chain history, so an indexer is
+required regardless. That indexer is the system of record for balances and
+history, and it reads at `finalized` by construction. The frontend showing
+`confirmed` is therefore an optimistic view that a `finalized` source corrects,
+which covers the reorg case without charging every user 12-13 seconds.
+
+This means phase 2 must not treat the frontend's `confirmed` conclusion as the
+durable record of a claim. Where the two disagree, the indexer wins.

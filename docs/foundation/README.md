@@ -120,10 +120,13 @@ thuộc lớp runtime, không phải lớp foundation.
 | `evm/FEATURE_MODULE_CONTRACT.md` | Cơ chế EVM cho 8 safety obligation                                 |
 | `evm/ADOPTION_GUIDE.md`          | Cách adopt runtime EVM cho một dApp mới                            |
 | `evm/decisions/`                 | Rule riêng của EVM (`0001`–`0009`, `0011`, `0012`, `0015`, `0016`) |
+| `solana/decisions/`              | Rule riêng của Solana (`0018`–`0021`) — hiện chỉ phủ read path     |
 
-Solana chưa có thư mục runtime. Requirement đã được ghi tại
-[`solana-runtime-requirement.md`](solana-runtime-requirement.md); `solana/` được
-tạo khi implementation bắt đầu.
+Thư mục `solana/` mới chỉ có `decisions/`. Nó chưa có `ARCHITECTURE.md`,
+`EXTENSION_CONTRACT.md` hay `FEATURE_MODULE_CONTRACT.md` như `evm/`, vì runtime
+chưa có write path — chưa đủ semantics để mô tả. Requirement và quyết định về
+confirmation evidence nằm tại
+[`solana-runtime-requirement.md`](solana-runtime-requirement.md).
 
 ### Lớp application
 

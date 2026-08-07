@@ -4,11 +4,12 @@ Thư mục này chỉ chứa decisions đúng với **mọi** chain family.
 
 Decision của một runtime cụ thể nằm dưới thư mục của runtime đó:
 
-| Scope       | Location                                          |
-| ----------- | ------------------------------------------------- |
-| Foundation  | `docs/foundation/decisions/` — thư mục này        |
-| EVM         | [`../evm/decisions/`](../evm/decisions/README.md) |
-| Application | [`../../decisions/`](../../decisions/README.md)   |
+| Scope       | Location                                                |
+| ----------- | ------------------------------------------------------- |
+| Foundation  | `docs/foundation/decisions/` — thư mục này              |
+| EVM         | [`../evm/decisions/`](../evm/decisions/README.md)       |
+| Solana      | [`../solana/decisions/`](../solana/decisions/README.md) |
+| Application | [`../../decisions/`](../../decisions/README.md)         |
 
 Mỗi file mô tả một responsibility ổn định:
 
