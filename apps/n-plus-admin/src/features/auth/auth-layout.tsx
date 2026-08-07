@@ -1,5 +1,3 @@
-"use client"
-
 import type { ReactNode } from "react"
 import { Logo } from "@/assets/logo"
 import { ThemeSwitch } from "@/components/theme-switch"

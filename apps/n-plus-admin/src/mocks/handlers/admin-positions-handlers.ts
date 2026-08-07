@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw"
 import { getAddress } from "viem"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 const ROOT_POSITION_ID = "pos-root-000"
 

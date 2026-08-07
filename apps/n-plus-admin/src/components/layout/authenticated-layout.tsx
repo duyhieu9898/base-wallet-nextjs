@@ -1,7 +1,5 @@
-"use client"
-
 import { useEffect, type ReactNode } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import { useLocation, useNavigate } from "@tanstack/react-router"
 
 import { AppSidebar } from "@/components/layout/app-sidebar"
 import { Header } from "@/components/layout/header"
@@ -18,8 +16,9 @@ import { cn } from "@/lib/utils"
 type AdminShellProps = {
   children: ReactNode
   /**
-   * Sidebar open state read from the cookie on the server, so the first paint
-   * matches what the user left open instead of flashing the default.
+   * Sidebar open state read from the cookie by the root route before first
+   * paint, so the rail matches what the operator left open instead of flashing
+   * the default.
    */
   defaultSidebarOpen?: boolean
 }
@@ -32,8 +31,8 @@ export function AdminShell({
   children,
   defaultSidebarOpen = true,
 }: AdminShellProps) {
-  const router = useRouter()
-  const pathname = usePathname()
+  const navigate = useNavigate()
+  const pathname = useLocation({ select: (s) => s.pathname })
   const { theme, setTheme } = useTheme()
 
   let authState = { status: "authenticated" }
@@ -49,17 +48,17 @@ export function AdminShell({
   useEffect(() => {
     if (isLoginPage) {
       if (authState.status === "authenticated") {
-        router.push("/")
+        void navigate({ to: "/" })
       }
     } else {
       if (
         authState.status === "unauthenticated" ||
         authState.status === "2fa_required"
       ) {
-        router.push("/login")
+        void navigate({ to: "/login" })
       }
     }
-  }, [authState.status, isLoginPage, router])
+  }, [authState.status, isLoginPage, navigate])
 
   // Login page layout: render standalone without sidebar frame
   if (isLoginPage) {

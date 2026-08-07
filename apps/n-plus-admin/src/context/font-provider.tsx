@@ -1,5 +1,3 @@
-"use client"
-
 import { createContext, useContext, useEffect, useState } from "react"
 import { fonts } from "@/config/fonts"
 import { getCookie, setCookie, removeCookie } from "@/lib/cookies"

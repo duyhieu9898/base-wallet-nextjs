@@ -1,8 +1,5 @@
-"use client"
-
 import { type ReactNode } from "react"
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { Link, useLocation } from "@tanstack/react-router"
 import { ChevronRight } from "lucide-react"
 import {
   Collapsible,
@@ -38,7 +35,7 @@ import {
 
 export function NavGroup({ title, items }: NavGroupProps) {
   const { state, isMobile } = useSidebar()
-  const href = usePathname()
+  const href = useLocation({ select: (s) => s.pathname })
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -74,7 +71,7 @@ function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
         isActive={checkIsActive(href, item)}
         tooltip={item.title}
       >
-        <Link href={item.url} onClick={() => setOpenMobile(false)}>
+        <Link to={item.url} onClick={() => setOpenMobile(false)}>
           {item.icon && <item.icon />}
           <span>{item.title}</span>
           {item.badge && <NavBadge>{item.badge}</NavBadge>}
@@ -115,7 +112,7 @@ function SidebarMenuCollapsible({
                   asChild
                   isActive={checkIsActive(href, subItem)}
                 >
-                  <Link href={subItem.url} onClick={() => setOpenMobile(false)}>
+                  <Link to={subItem.url} onClick={() => setOpenMobile(false)}>
                     {subItem.icon && <subItem.icon />}
                     <span>{subItem.title}</span>
                     {subItem.badge && <NavBadge>{subItem.badge}</NavBadge>}
@@ -159,7 +156,7 @@ function SidebarMenuCollapsedDropdown({
           {item.items.map((sub) => (
             <DropdownMenuItem key={`${sub.title}-${sub.url}`} asChild>
               <Link
-                href={sub.url}
+                to={sub.url}
                 className={`${checkIsActive(href, sub) ? "bg-secondary" : ""}`}
               >
                 {sub.icon && <sub.icon />}

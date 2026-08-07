@@ -9,7 +9,7 @@ import type {
   TwoFactorVerifyInput,
 } from "../domain/admin-auth.schemas"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 export const adminAuthEndpoints = {
   login: "/api/admin/auth/login",

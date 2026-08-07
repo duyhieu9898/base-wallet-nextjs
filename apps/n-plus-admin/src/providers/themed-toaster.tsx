@@ -1,5 +1,3 @@
-"use client"
-
 import { Toaster } from "@/components/ui/sonner"
 import { useTheme } from "@/context/theme-provider"
 

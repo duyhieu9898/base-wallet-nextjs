@@ -1,6 +1,4 @@
-"use client"
-
-import Link from "next/link"
+import { Link } from "@tanstack/react-router"
 import { Menu, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -25,7 +23,7 @@ export function AppTitle() {
         >
           <div>
             <Link
-              href="/"
+              to="/"
               onClick={() => setOpenMobile(false)}
               className="grid flex-1 text-start text-sm leading-tight"
             >

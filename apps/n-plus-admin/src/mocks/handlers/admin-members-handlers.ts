@@ -1,7 +1,7 @@
 import { http, HttpResponse } from "msw"
 import { getAddress } from "viem"
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 const RANKS = {
   personal: ["Bronze", "Silver", "Gold", "Platinum", "Diamond"] as const,

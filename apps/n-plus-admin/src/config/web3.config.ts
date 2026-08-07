@@ -55,9 +55,7 @@ export function resolveAdminChain(appEnv: string | undefined): Chain {
   }
 }
 
-export const adminChain: Chain = resolveAdminChain(
-  process.env.NEXT_PUBLIC_APP_ENV,
-)
+export const adminChain: Chain = resolveAdminChain(import.meta.env.VITE_APP_ENV)
 
 /**
  * `tokens` is empty on purpose: explorer URLs come from `chain.blockExplorers`,
