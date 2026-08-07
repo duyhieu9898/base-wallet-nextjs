@@ -208,7 +208,9 @@ export function AuthRuntimeProvider({
       dispatch({
         type: "session-established",
         user: payload.user,
-        position: payload.position,
+        // The verify schema lets `position` be absent as well as null; the auth
+        // state models "no position" as null only.
+        position: payload.position ?? null,
         expiresIn: payload.expiresIn,
       })
     },

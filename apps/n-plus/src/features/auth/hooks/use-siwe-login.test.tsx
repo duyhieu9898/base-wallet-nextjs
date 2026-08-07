@@ -16,7 +16,7 @@ import {
   setMockAuthDelay,
   setMockAuthFailureMode,
 } from "@/mocks/data/auth-session"
-import { useSiweLogin } from "./use-siwe-login"
+import { useSiweLogin, type SiweLoginResult } from "./use-siwe-login"
 
 const ADDRESS = MOCK_ADDRESS
 const OTHER_ADDRESS = MOCK_OTHER_ADDRESS
@@ -116,7 +116,7 @@ beforeEach(() => {
 })
 
 type HarnessHandle = {
-  signIn: () => Promise<void>
+  signIn: () => Promise<SiweLoginResult>
   logout: () => Promise<void>
 }
 
