@@ -6,12 +6,15 @@
   "scripts": {
     "dev": "pnpm --filter n-plus dev",
     "dev:admin": "pnpm --filter n-plus-admin dev",
+    "dev:neura": "pnpm --filter neura dev",
     "dev:all": "pnpm --parallel --filter \"./apps/*\" dev",
     "build": "pnpm -r --if-present build",
     "build:user": "pnpm --filter n-plus build",
     "build:admin": "pnpm --filter n-plus-admin build",
+    "build:neura": "pnpm --filter neura build",
     "start": "pnpm --filter n-plus preview",
     "start:admin": "pnpm --filter n-plus-admin preview",
+    "start:neura": "pnpm --filter neura preview",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "pnpm -r typecheck && pnpm typecheck:tooling",
@@ -26,6 +29,7 @@
     "staking:compile": "pnpm --filter n-plus staking:compile",
     "staking:deploy-sepolia": "pnpm --filter n-plus staking:deploy-sepolia",
     "web3:smoke": "pnpm --filter n-plus web3:smoke",
+    "solana:smoke": "pnpm --filter neura solana:smoke",
     "prepare": "husky"
   },
   "devDependencies": {

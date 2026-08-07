@@ -37,6 +37,24 @@ const WEB3_PUBLIC_PATHS = [
   "@nln/web3-evm/testing",
 ]
 
+/**
+ * Public boundary of the Solana runtime.
+ *
+ * Same rule, separate list — the two runtimes are siblings, and a shared list
+ * would imply a shared surface they do not have. The Solana package exposes no
+ * `provider`, `testing` or `contracts` leaf yet because none exists; add the
+ * path here when the module lands, not before.
+ */
+const WEB3_SOLANA_PUBLIC_PATHS = [
+  "@nln/web3-solana",
+  "@nln/web3-solana/address",
+  "@nln/web3-solana/errors",
+  "@nln/web3-solana/registry",
+  "@nln/web3-solana/config",
+  "@nln/web3-solana/provider",
+  "@nln/web3-solana/testing",
+]
+
 const web3DeepImportPatterns = [
   {
     group: [
@@ -51,6 +69,15 @@ const web3DeepImportPatterns = [
     ],
     message:
       "EVM internals are private. Import from @nln/web3-evm (runtime API), or one of the public subpaths: @nln/web3-evm/address, @nln/web3-evm/errors, @nln/web3-evm/errors/adapter, @nln/web3-evm/contracts, @nln/web3-evm/registry, @nln/web3-evm/config, @nln/web3-evm/provider.",
+  },
+  {
+    group: [
+      "@nln/web3-solana/*",
+      "@nln/web3-solana/**",
+      ...WEB3_SOLANA_PUBLIC_PATHS.map((path) => `!${path}`),
+    ],
+    message:
+      "Solana internals are private. Import from @nln/web3-solana (runtime API), or one of the public subpaths: @nln/web3-solana/address, @nln/web3-solana/errors, @nln/web3-solana/registry, @nln/web3-solana/config, @nln/web3-solana/provider, @nln/web3-solana/testing.",
   },
 ]
 
@@ -116,6 +143,25 @@ const crossAppPattern = {
     "Applications must not import each other, and a product app must not import its admin (§2.3). They have different deployments and permission models. Share through @nln/web3-evm, or duplicate deliberately.",
 }
 
+/**
+ * Application surfaces no foundation package may reach into, in either family.
+ */
+const foundationApplicationPattern = {
+  group: [
+    "@/features",
+    "@/features/*",
+    "@/features/**",
+    "@/app",
+    "@/app/*",
+    "@/app/**",
+    "@/contracts",
+    "@/contracts/*",
+    "@/contracts/**",
+  ],
+  message:
+    "Web3 foundation must not import application features, routes, or contract registries. Foundation must be reusable in other dApps.",
+}
+
 const eslintConfig = defineConfig([
   js.configs.recommended,
   ...tseslint.configs.recommended,
@@ -150,7 +196,20 @@ const eslintConfig = defineConfig([
     },
   },
 
-  // Dependency direction: foundation must not know about application.
+  // Dependency direction and sibling isolation, one block per foundation
+  // package.
+  //
+  // Both concerns share a block on purpose. Flat config resolves a rule by its
+  // key, so a later block naming `no-restricted-imports` for overlapping files
+  // *replaces* an earlier one instead of adding to it. Expressing these as a
+  // generic `packages/*/**` block plus per-package blocks reads fine and
+  // silently disables the generic half for every package that has its own.
+  //
+  // Sibling isolation is the load-bearing half. `@nln/web3-evm` and
+  // `@nln/web3-solana` are siblings, not layers, and neither imports the other
+  // in either direction. Without the rule the first "just reuse the EVM address
+  // helper" import creates exactly the coupling `web3-core` was rejected to
+  // avoid, and it passes review because the import looks ordinary.
   {
     files: ["packages/web3-evm/**/*.{ts,tsx}"],
     rules: {
@@ -158,20 +217,29 @@ const eslintConfig = defineConfig([
         "error",
         {
           patterns: [
+            foundationApplicationPattern,
             {
-              group: [
-                "@/features",
-                "@/features/*",
-                "@/features/**",
-                "@/app",
-                "@/app/*",
-                "@/app/**",
-                "@/contracts",
-                "@/contracts/*",
-                "@/contracts/**",
-              ],
+              group: ["@nln/web3-solana", "@nln/web3-solana/**"],
               message:
-                "Web3 foundation must not import application features, routes, or contract registries. Foundation must be reusable in other dApps.",
+                "Chain-family runtimes are siblings and must not import each other. No shared/core package is approved — see docs/foundation/package-scope-evidence.md.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["packages/web3-solana/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            foundationApplicationPattern,
+            {
+              group: ["@nln/web3-evm", "@nln/web3-evm/**"],
+              message:
+                "Chain-family runtimes are siblings and must not import each other. No EVM type crosses into the Solana runtime — see docs/foundation/solana-runtime-requirement.md.",
             },
           ],
         },
@@ -286,6 +354,12 @@ const eslintConfig = defineConfig([
       "apps/*/src/features/**/*.{ts,tsx}",
       "apps/*/src/components/**/*.{ts,tsx}",
       "apps/*/src/app/**/*.{ts,tsx}",
+      // `routes` and `pages` are the TanStack equivalents of the old `app`
+      // directory and were missed when the App Router glob was carried over.
+      // They are where a Vite application's screens actually live, so the rule
+      // was blind to its largest surface.
+      "apps/*/src/routes/**/*.{ts,tsx}",
+      "apps/*/src/pages/**/*.{ts,tsx}",
       "apps/*/src/providers/**/*.{ts,tsx}",
       "apps/*/src/contracts/**/*.{ts,tsx}",
       "apps/*/src/lib/**/*.{ts,tsx}",
@@ -307,6 +381,8 @@ const eslintConfig = defineConfig([
       "apps/*/src/features/**/components/**/*.{ts,tsx}",
       "apps/*/src/components/**/*.{ts,tsx}",
       "apps/*/src/app/**/*.{ts,tsx}",
+      "apps/*/src/routes/**/*.{ts,tsx}",
+      "apps/*/src/pages/**/*.{ts,tsx}",
     ],
     rules: {
       "no-restricted-imports": [
