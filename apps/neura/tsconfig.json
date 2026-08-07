@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@nln/web3-solana": ["../../packages/web3-solana/src/index.ts"],
+      "@nln/web3-solana/address": [
+        "../../packages/web3-solana/src/address/index.ts"
+      ],
+      "@nln/web3-solana/errors": [
+        "../../packages/web3-solana/src/errors/index.ts"
+      ],
+      "@nln/web3-solana/registry": [
+        "../../packages/web3-solana/src/chain/registry/index.ts"
+      ],
+      "@nln/web3-solana/config": [
+        "../../packages/web3-solana/src/config/index.ts"
+      ],
+      "@nln/web3-solana/provider": [
+        "../../packages/web3-solana/src/provider/index.ts"
+      ],
+      "@nln/web3-solana/testing": [
+        "../../packages/web3-solana/src/testing/index.ts"
+      ]
+    },
+    "types": ["vite/client"]
+  },
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mts"],
+  "exclude": ["node_modules", "dist"]
+}
