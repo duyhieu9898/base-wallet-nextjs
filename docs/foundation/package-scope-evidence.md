@@ -30,15 +30,13 @@ Theo `EXTENSION_CONTRACT.md` §10 và `README.md` "Change policy", một applica
 
 ### 2.1. Repository và package structure
 
-| Sự kiện              | Giá trị đo được                                                                                            |
-| -------------------- | ---------------------------------------------------------------------------------------------------------- |
-| Số application       | **1** (`package.json` name `next-blank`, private, Next 16.2.12 + React 19.2.4)                             |
-| Số workspace package | **0** (`pnpm-workspace.yaml` không khai báo `packages:`)                                                   |
-| App routes           | `/`, `/web3-lab`, `/api/health`, `/_not-found`                                                             |
-| Features implemented | `src/features/auth/` (SIWE), `src/features/staking/`                                                       |
-| Foundation           | `src/web3/evm/**` + `src/web3/chain-family-template/` (documentation only) + `src/web3/web3-providers.tsx` |
-| Path alias           | `@/*` → `./src/*`, một alias duy nhất                                                                      |
-| Test files           | 55 file, 527 test, trong đó 25 test file thuộc `src/web3/`                                                 |
+| Thành phần            | Trạng thái monorepo hiện hành                                                                                                |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Cấu trúc Monorepo     | Workspace monorepo (`nln-platform`, `pnpm-workspace.yaml` khai báo `packages/*`, `apps/*`)                                   |
+| Số application target | **6 applications** (3 product: `n-plus`, `neura`, `neura-link` + 3 admin: `n-plus-admin`, `neura-admin`, `neura-link-admin`) |
+| Workspace packages    | **2 packages** (`packages/web3-evm` cho EVM apps, `packages/web3-solana` cho Solana apps)                                    |
+| Framework chuẩn       | Next.js App Router cho cả 6 applications                                                                                     |
+| Root repository       | Chỉ chứa tooling chung (`prettier`, `eslint`, `husky`, `lint-staged`, `typescript`, `tsx`)                                   |
 
 ### 2.2. Public API
 
@@ -176,14 +174,16 @@ Không được làm tạm: fallback im lặng che read failure — vi phạm "N
 
 Đây là phần được hỏi lại nhiều nhất. Mỗi dòng có evidence ở §3.
 
-| Package đề xuất            | Verdict    | Evidence                                                                                                                                                                          |
-| -------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@nln/staking-sdk`         | **REJECT** | Cả N+ và Neura Link đều chưa có ABI, chưa có địa chỉ. Deployment duy nhất là `TestStakingVault test-v1`. Chia sẻ theo tên "staking" là điều `EXTENSION_CONTRACT.md` §5 cấm thẳng. |
-| `@nln/mlm-sdk`             | **REJECT** | 0 dòng code MLM trong `src/`. Tree traversal + rank calculation là indexer/backend domain. Chưa có contract, chưa có API contract, chưa có consumer.                              |
-| `@nln/rpc-observability`   | **REJECT** | `grep -rln "reportError\|observability" src/` → 0 hit. `0017`: reporter chỉ thêm khi có production observability requirement.                                                     |
-| `@nln/ui-components`       | **DEFER**  | `src/components/ui/` có 4 primitive shadcn-generated. Không duplication thật, không consumer thứ hai.                                                                             |
-| `@nln/transaction-planner` | **DEFER**  | Xem §4. Một consumer.                                                                                                                                                             |
-| Shared config packages     | **DEFER**  | `tsconfig.json`, `eslint.config.mjs` phục vụ đúng một app. Extract trước khi có app thứ hai là tooling cost không đổi lấy gì.                                                     |
+| Proposed package           | Verdict      | Evidence / Role                                                                                                                                                                   |
+| -------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nln/web3-evm`            | **Accepted** | Foundation package cho EVM apps (`n-plus`, `neura-link`).                                                                                                                         |
+| `@nln/web3-solana`         | **Accepted** | Sibling foundation package cho Solana apps (`neura`, `neura-admin`).                                                                                                              |
+| `@nln/staking-sdk`         | **REJECT**   | Cả N+ và Neura Link đều chưa có ABI, chưa có địa chỉ. Deployment duy nhất là `TestStakingVault test-v1`. Chia sẻ theo tên "staking" là điều `EXTENSION_CONTRACT.md` §5 cấm thẳng. |
+| `@nln/mlm-sdk`             | **REJECT**   | 0 dòng code MLM trong `src/`. Tree traversal + rank calculation là indexer/backend domain. Chưa có contract, chưa có API contract, chưa có consumer.                              |
+| `@nln/rpc-observability`   | **REJECT**   | `grep -rln "reportError\|observability" src/` → 0 hit. `0017`: reporter chỉ thêm khi có production observability requirement.                                                     |
+| `@nln/ui-components`       | **DEFER**    | `src/components/ui/` có 4 primitive shadcn-generated. Không duplication thật, không consumer thứ hai.                                                                             |
+| `@nln/transaction-planner` | **DEFER**    | Xem §4. Một consumer.                                                                                                                                                             |
+| Shared config packages     | **DEFER**    | `tsconfig.json`, `eslint.config.mjs` phục vụ đúng một app. Extract trước khi có app thứ hai là tooling cost không đổi lấy gì.                                                     |
 
 Khi ai đó đề xuất một trong số này, câu hỏi đầu tiên là: **consumer thứ hai đã implement chưa?** — không phải "có hợp lý không".
 

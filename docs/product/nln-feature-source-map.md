@@ -69,30 +69,28 @@ It also records **product-side candidates** for a shared Base Foundation Package
     4. _Staking Referral Reward_ (Direct Referral Bonus).
     5. _Team Reward_ (Unilevel Team Bonus across Levels 1–3).
 
-### 1.3 Neura System (Project 1 — `docs/local-docs/NLN-181_project1-neura`) — OUT OF SCOPE
+### 1.3 Neura System (Project 1 — `docs/local-docs/NLN-181_project1-neura`) — IN SCOPE (song song với N+)
 
-- **Scope Status**: Out of Scope / Independent External Team.
-- **Description**: Solana-based NRA ⇄ NRA Staking Platform.
-- **Repository Impact**: Zero. No code, shared components, or web3 EVM providers in this workspace serve Neura System.
+- **Scope Status**: In Scope / Solana-based Platform (`apps/neura` & `apps/neura-admin`).
+- **Description**: Solana-based NRA ⇄ NRA Staking Platform (Multi-Pools, Fixed/Flexible Terms, Claim/Compound, Reservation).
+- **Repository Impact**: Triển khai dưới dạng sibling package song song `@nln/web3-solana` (`packages/web3-solana`), không gộp vào `@nln/web3-evm`.
 
 ---
 
 ## 2. Cross-Project Module Comparison Matrix
 
-| Domain Module  | Feature Capability               | N+ (NLN-1 — đang làm) | Neura Link (NLN-180 — sau) |    Base Foundation Candidate?     |
-| :------------- | :------------------------------- | :-------------------: | :------------------------: | :-------------------------------: |
-| **Foundation** | Wallet Connect & SIWE Auth       |          ✅           |             ✅             |     **Core `@nln/web3-evm`**      |
-| **Foundation** | Transaction Lifecycle & Tracking |          ✅           |             ✅             |  `@nln/web3-evm` (`0008`/`0015`)  |
-| **Foundation** | RPC Health & Telemetry           |          ✅           |             ✅             | App `reportError` (`0017`) — §4.2 |
-| **Membership** | 5 NFT Tiers Purchase & Upgrade   |          ❌           |         ✅ (USDT)          |        Application Package        |
-| **Staking**    | NRA ⇄ USDT Pool                  |          ✅           |             ✅             | Feature-local — REJECT (§6 evid.) |
-| **Lending**    | USDT ⇄ USDT Lending Pool         |          ✅           |             ❌             |        Application Package        |
-| **MLM Tree**   | Unilevel Tree Structure          |          ✅           |             ✅             |  Backend/indexer — REJECT (§4.3)  |
-| **MLM Rank**   | 5-Tier Multi-Rank System         |          ❌           |             ✅             |        Application Package        |
-| **MLM Rank**   | Personal & Team Rank System      |          ✅           |             ❌             |        Application Package        |
-| **MLM Reward** | Stairstep Breakaway & Same-rank  |          ❌           |             ✅             |        Application Package        |
-| **MLM Reward** | Direct & Unilevel Team Bonus     |          ✅           |             ✅             |  Backend/indexer — REJECT (§4.3)  |
-| **Admin**      | Member, Position & Node Tree     |          ✅           |             ✅             |        Shared UI Component        |
+| Domain Module  | Feature Capability               | N+ (NLN-1 — đang làm) | Neura (NLN-181 — Solana) | Neura Link (NLN-180 — sau) |             Base Foundation Candidate?              |
+| :------------- | :------------------------------- | :-------------------: | :----------------------: | :------------------------: | :-------------------------------------------------: |
+| **Foundation** | Wallet Connect & Auth            |       ✅ (EVM)        |       ✅ (Solana)        |          ✅ (EVM)          | `@nln/web3-evm` (EVM) & `@nln/web3-solana` (Solana) |
+| **Foundation** | Transaction Lifecycle & Tracking |       ✅ (EVM)        |       ✅ (Solana)        |          ✅ (EVM)          | `@nln/web3-evm` (EVM) & `@nln/web3-solana` (Solana) |
+| **Foundation** | RPC Health & Telemetry           |          ✅           |            ✅            |             ✅             |          App `reportError` (`0017`) — §4.2          |
+| **Membership** | 5 NFT Tiers Purchase & Upgrade   |          ❌           |            ❌            |         ✅ (USDT)          |                 Application Package                 |
+| **Staking**    | Staking Platform                 |    ✅ (NRA ⇄ USDT)    |  ✅ (Solana NRA ⇄ NRA)   |      ✅ (NRA ⇄ USDT)       |          Feature-local — REJECT (§6 evid.)          |
+| **Lending**    | USDT ⇄ USDT Lending Pool         |          ✅           |            ❌            |             ❌             |                 Application Package                 |
+| **MLM Tree**   | Unilevel Tree Structure          |          ✅           |            ❌            |             ✅             |           Backend/indexer — REJECT (§4.3)           |
+| **MLM Rank**   | Rank System                      |     ✅ (P/T Rank)     |            ❌            |        ✅ (5 Ranks)        |                 Application Package                 |
+| **MLM Reward** | Referral & Unilevel Team Bonus   |          ✅           |            ❌            |             ✅             |           Backend/indexer — REJECT (§4.3)           |
+| **Admin**      | Admin Portal & Management        |          ✅           |            ✅            |             ✅             |      `apps/*-admin` (Next.js / `shadcn-admin`)      |
 
 ---
 

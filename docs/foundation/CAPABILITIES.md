@@ -15,16 +15,17 @@ Nó không định nghĩa những gì mọi dApp bắt buộc phải có. Nó ch
 
 ## Implementation status
 
-| Module/capability                    | Trạng thái        |
-| ------------------------------------ | ----------------- |
-| Foundation/application separation    | Ready             |
-| Chain-family module boundary         | Ready             |
-| EVM module                           | Ready             |
-| EVM multi-network registry           | Ready             |
-| EVM read/write lifecycle             | Ready             |
-| Chain-family implementation template | Ready             |
-| Multi-family provider composition    | Deferred          |
-| Cross-family application UX          | Product-dependent |
+| Module/capability                    | Trạng thái          |
+| ------------------------------------ | ------------------- |
+| Foundation/application separation    | Ready               |
+| Chain-family module boundary         | Ready               |
+| EVM module (`@nln/web3-evm`)         | Ready               |
+| Solana module (`@nln/web3-solana`)   | In Progress / Ready |
+| EVM multi-network registry           | Ready               |
+| EVM read/write lifecycle             | Ready               |
+| Chain-family implementation template | Ready               |
+| Multi-family provider composition    | Deferred            |
+| Cross-family application UX          | Product-dependent   |
 
 ```text
 EVM runtime tồn tại

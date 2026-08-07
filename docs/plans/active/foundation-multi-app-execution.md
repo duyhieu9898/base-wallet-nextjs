@@ -765,14 +765,14 @@ Sau đó : Track 3 membership + lending
 Chưa làm: RPC fallback · observability package · UI/staking/MLM package · transaction-plan coordinator
 ```
 
-### 9.2. Non-goal — Solana và multi-chain-family
+### 9.2. Solana Runtime — Package song song `@nln/web3-solana`
 
-"Foundation dùng cho các app" **không** có nghĩa "phải hỗ trợ mọi chain ngay". Ghi rõ để người mới không hiểu nhầm:
+Neura System (`apps/neura` & `apps/neura-admin`) sử dụng Solana runtime. Tuân thủ ranh giới độc lập theo `CHAIN_FAMILY_TEMPLATE.md`:
 
 ```text
-· Neura System (apps/neura & apps/neura-admin) dùng Solana, nhưng @nln/web3-solana CHƯA implement ở giai đoạn này
-· Khi bắt đầu Neura System: tạo packages/web3-solana song song, KHÔNG thêm Solana vào web3-evm
-· KHÔNG tạo universal @nln/web3-core trước khi có hai runtime thật
+· Tạo packages/web3-solana dưới dạng sibling package song song với packages/web3-evm
+· KHÔNG gộp Solana code vào packages/web3-evm
+· KHÔNG ép Solana vào EVM Address/Wagmi abstractions; sở hữu riêng account, program ABI, wallet-adapter, connection client và error taxonomy
 ```
 
 `CAPABILITIES.md` đã liệt non-goal: "tự failover giữa các chain family", "ép các chain family vào một transaction model giả". `docs/foundation/CHAIN_FAMILY_TEMPLATE.md` là tài liệu, không phải implementation đang dở.

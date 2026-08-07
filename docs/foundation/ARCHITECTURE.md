@@ -23,7 +23,7 @@ Foundation không quyết định thay application:
 - backend, indexer hoặc analytics;
 - product-specific UI và business rules.
 
-EVM là runtime implementation duy nhất hiện tại.
+Foundation hiện hỗ trợ hai chain family runtime độc lập: EVM (`@nln/web3-evm`) và Solana (`@nln/web3-solana`).
 
 ## 2. Design principles
 
@@ -90,8 +90,9 @@ Foundation không import application feature.
 ## 4. Module ownership
 
 ```text
-packages/web3-evm/
-├── package.json          shared workspace package descriptor (@nln/web3-evm)
+packages/
+├── web3-evm/             shared workspace package descriptor (@nln/web3-evm)
+└── web3-solana/          sibling workspace package descriptor (@nln/web3-solana)
 ├── tsconfig.json
 ├── vitest.config.mts     independent package test configuration
 ├── test/
@@ -142,20 +143,19 @@ mục 10 (`không đưa shared abstraction vào core/ trước khi có ít nhấ
 consumers thật`) chúng thuộc về EVM. `core/` chỉ được lập lại khi hai family
 thật chứng minh một khái niệm chung.
 
-| Layer                      | Responsibility                                       |
-| -------------------------- | ---------------------------------------------------- |
-| `evm/index.ts`             | Public boundary; mọi path khác là internal           |
-| `evm/address/`             | EVM address validation và presentation               |
-| `evm/errors/`              | Typed error taxonomy và phase-aware normalization    |
-| `evm/chain/registry/`      | EVM network, token và native asset configuration     |
-| `evm/chain/selection/`     | EVM wallet/network readiness                         |
-| `evm/reads/`               | Balance và allowance: hook, builder, mapper, service |
-| `evm/transactions/`        | Shared write mechanics + vertical slice mỗi loại tx  |
-| `evm/components/`          | Reusable component hiểu EVM semantics                |
-| `evm/provider/`            | EvmProvider và wagmi configuration                   |
-| `components/web3/`         | Application-owned web3 presentation                  |
-| `features/`                | Application business behavior                        |
-| `CHAIN_FAMILY_TEMPLATE.md` | Checklist documentation cho family runtime tương lai |
+| Layer                             | Responsibility                                       |
+| --------------------------------- | ---------------------------------------------------- |
+| `evm/index.ts`                    | Public boundary; mọi path khác là internal           |
+| `evm/address/`                    | EVM address validation và presentation               |
+| `evm/errors/`                     | Typed error taxonomy và phase-aware normalization    |
+| `evm/chain/registry/`             | EVM network, token và native asset configuration     |
+| `evm/chain/selection/`            | EVM wallet/network readiness                         |
+| `evm/reads/`                      | Balance và allowance: hook, builder, mapper, service |
+| `evm/transactions/`               | Shared write mechanics + vertical slice mỗi loại tx  |
+| `evm/provider/`                   | EvmProvider và wagmi configuration                   |
+| `apps/<app>/src/components/web3/` | Application-owned web3 presentation (0014)           |
+| `features/`                       | Application business behavior                        |
+| `CHAIN_FAMILY_TEMPLATE.md`        | Checklist documentation cho family runtime tương lai |
 
 ## 5. Foundation module classification
 
@@ -226,6 +226,7 @@ Public entrypoints được khai báo tường minh, không suy ra từ việc a
 @nln/web3-evm/errors         pure error taxonomy, React-free và wagmi-free
 @nln/web3-evm/errors/adapter Viem/Wagmi RPC error normalization adapter
 @nln/web3-evm/contracts      generic contract deployment types và hydration helpers (0016)
+@nln/web3-evm/registry       pure registry read selectors (explorer URL, network lookup), React-free và wagmi-free
 @nln/web3-evm/config         runtime configuration injection leaf
 @nln/web3-evm/provider       EvmProvider và wagmi config adapter
 @nln/web3-evm/testing        live RPC smoke verification của chính package
